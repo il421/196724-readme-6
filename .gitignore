@@ -1,4 +1,4 @@
-.vscode/
+cd.vscode/
 /node_modules/
 /build/
 /lib/
@@ -9,3 +9,6 @@
 .DS_Store
 coverage
 *.log
+
+.nx/installation
+.nx/cache
