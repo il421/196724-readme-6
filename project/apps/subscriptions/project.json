@@ -1,0 +1,24 @@
+{
+  "name": "subscriptions",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/subscriptions/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "subscriptions:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "subscriptions:build:development"
+        },
+        "production": {
+          "buildTarget": "subscriptions:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}
