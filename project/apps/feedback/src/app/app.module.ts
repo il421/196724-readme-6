@@ -3,7 +3,5 @@ import { FeedbackModule } from '@project/feedback-lib';
 
 @Module({
   imports: [FeedbackModule],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
