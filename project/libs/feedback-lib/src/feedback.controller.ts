@@ -1,8 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  HttpStatus,
+} from '@nestjs/common';
 import { OpenApiTags, RoutePaths } from '@project/core';
 import { CreateCommentDto } from './dtos';
 import { fillDto } from '@project/helpers';
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiResponse,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
 
@@ -13,6 +26,13 @@ export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
   @Get('/')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    schema: {
+      $ref: getSchemaPath(CommentRdo),
+    },
+  })
   public async getPostComments(@Param('postId') postId: string) {
     const comments = await this.feedbackService.getCommentsByPostId(postId);
     return comments.map((comment) =>
@@ -20,6 +40,12 @@ export class FeedbackController {
     );
   }
   @Post('create')
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    schema: {
+      $ref: getSchemaPath(CommentRdo),
+    },
+  })
   public async create(@Body() dto: CreateCommentDto) {
     const newComment = await this.feedbackService.create(dto);
     return fillDto(CommentRdo, newComment.toPlainData());
