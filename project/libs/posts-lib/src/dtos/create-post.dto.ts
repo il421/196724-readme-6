@@ -20,10 +20,10 @@ export class CreatePostDto {
   @ApiProperty()
   public quoteAuthor!: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: PostTypes })
   public type!: PostTypes;
 
-  @ApiProperty()
+  @ApiProperty({ enum: PostState })
   public state!: PostState;
 
   @ApiProperty()

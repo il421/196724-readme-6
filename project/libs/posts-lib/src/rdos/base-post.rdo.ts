@@ -5,13 +5,17 @@ import { PostState, PostTypes, Tag } from '@project/core';
 export class BasePostRdo {
   @ApiProperty()
   @Expose()
-  readonly name!: string;
+  readonly id!: string;
 
   @ApiProperty()
   @Expose()
+  readonly name!: string;
+
+  @ApiProperty({ enum: PostTypes })
+  @Expose()
   readonly type!: PostTypes;
 
-  @ApiProperty()
+  @ApiProperty({ enum: PostState })
   @Expose()
   readonly state!: PostState;
 
