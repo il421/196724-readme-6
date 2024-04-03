@@ -6,7 +6,8 @@
     "start-users-app": "npx nx run users:serve",
     "start-auth-app": "npx nx run auth:serve",
     "start-posts-app": "npx nx run posts:serve",
-    "start-feedback-app": "npx nx run feedback:serve"
+    "start-feedback-app": "npx nx run feedback:serve",
+    "start-subscriptions-app": "npx nx run subscriptions:serve"
   },
   "private": true,
   "dependencies": {

@@ -20,6 +20,11 @@ export class PostService {
     return postEntity;
   }
 
+  public async getPosts(usersIds: string[]) {
+    // @TODO need to merge with current userId may be
+    return this.postRepository.findPosts(usersIds);
+  }
+
   public async getPost(id: string) {
     const post = this.postRepository.findById(id);
 

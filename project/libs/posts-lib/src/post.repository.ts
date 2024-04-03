@@ -8,4 +8,11 @@ export class PostRepository extends MemoryRepository<PostEntity> {
   constructor(entityFactory: PostFactory) {
     super(entityFactory);
   }
+
+  public findPosts(usersIds: string[]) {
+    const entities = Array.from(this.entities.values());
+    return entities
+      .filter((entry) => entry.createdBy && usersIds.includes(entry.createdBy))
+      .map((post) => this.entityFactory.create(post));
+  }
 }
