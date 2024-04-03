@@ -18,6 +18,8 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
   public publishedBy?: string;
   public publishedAt?: string;
   public data: object;
+
+  private currentDateIso = new Date().toISOString();
   constructor(post: Post) {
     const {
       id,
@@ -40,8 +42,8 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
     this.tags = tags ?? [];
     this.isRepost = !!isRepost;
     this.createdBy = createdBy;
-    this.createdAt = createdAt;
-    this.publishedBy = publishedBy;
+    this.createdAt = createdAt ?? this.currentDateIso;
+    this.publishedBy = publishedBy ?? this.currentDateIso;
     this.publishedAt = publishedAt;
     this.data = data;
   }

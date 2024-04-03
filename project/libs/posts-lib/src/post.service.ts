@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreatePostDto } from './dtos';
-import { ErrorMessages } from '@project/core';
+import { CreatePostDto, UpdatePostDto } from './dtos';
+import { ErrorMessages, PostState } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 
@@ -9,20 +9,51 @@ export class PostService {
   constructor(private postRepository: PostRepository) {}
 
   public async create(dto: CreatePostDto): Promise<PostEntity> {
-    const postEntity = new PostEntity(dto);
+    const postEntity = new PostEntity({ ...dto, state: PostState.Draft });
     await this.postRepository.save(postEntity);
     return postEntity;
   }
 
-  public async update(dto: CreatePostDto): Promise<PostEntity> {
-    const postEntity = new PostEntity(dto);
-    await this.postRepository.update(postEntity);
-    return postEntity;
+  public async update(id: string, dto: UpdatePostDto): Promise<PostEntity> {
+    const post = await this.postRepository.findById(id);
+    if (post) {
+      const postEntity = new PostEntity({ ...post.toPlainData(), ...dto });
+      await this.postRepository.update(postEntity);
+      return postEntity;
+    }
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
-  public async getPosts(usersIds: string[]) {
-    // @TODO need to merge with current userId may be
-    return this.postRepository.findPosts(usersIds);
+  public async publish(id: string): Promise<PostEntity> {
+    const post = await this.postRepository.findById(id);
+    if (post) {
+      const postEntity = new PostEntity({
+        ...post.toPlainData(),
+        state: PostState.Published,
+      });
+      await this.postRepository.update(postEntity);
+      return postEntity;
+    }
+    throw new NotFoundException(ErrorMessages.PostNotFound);
+  }
+
+  public async repost(id: string, repostBy: string): Promise<PostEntity> {
+    const post = await this.postRepository.findById(id);
+    if (post) {
+      const postEntity = new PostEntity({
+        ...post.toPlainData(),
+        isRepost: true,
+        publishedAt: new Date().toISOString(),
+        publishedBy: repostBy,
+      });
+      await this.postRepository.update(postEntity);
+      return postEntity;
+    }
+    throw new NotFoundException(ErrorMessages.PostNotFound);
+  }
+
+  public async getPosts(usersIds: string[], tags?: string[]) {
+    return this.postRepository.findPosts(usersIds, tags);
   }
 
   public async searchByTitle(title: string) {
