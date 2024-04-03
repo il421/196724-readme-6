@@ -28,7 +28,6 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { PostService } from './post.service';
-import { SubscriptionRdo } from '@project/subscriptions-lib';
 
 @ApiTags(OpenApiTags.Posts)
 @ApiExtraModels(
