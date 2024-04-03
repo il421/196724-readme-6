@@ -21,7 +21,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
   constructor(post: Post) {
     const {
       id,
-      name,
+      title,
       type,
       state,
       tags,
@@ -34,7 +34,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
     } = post;
     super();
     this.id = id;
-    this.name = name;
+    this.name = title;
     this.type = type;
     this.state = state;
     this.tags = tags ?? [];
@@ -49,7 +49,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
   toPlainData(): Post {
     return {
       id: this.id,
-      name: this.name,
+      title: this.name,
       type: this.type,
       state: this.state,
       tags: this.tags,

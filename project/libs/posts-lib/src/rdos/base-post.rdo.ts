@@ -9,7 +9,7 @@ export class BasePostRdo {
 
   @ApiProperty()
   @Expose()
-  readonly name!: string;
+  readonly title!: string;
 
   @ApiProperty({ enum: PostTypes })
   @Expose()

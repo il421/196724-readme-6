@@ -15,4 +15,11 @@ export class PostRepository extends MemoryRepository<PostEntity> {
       .filter((entry) => entry.createdBy && usersIds.includes(entry.createdBy))
       .map((post) => this.entityFactory.create(post));
   }
+
+  public search(name: string) {
+    const entities = Array.from(this.entities.values());
+    return entities
+      .filter((entry) => entry.title.includes(name))
+      .map((post) => this.entityFactory.create(post));
+  }
 }

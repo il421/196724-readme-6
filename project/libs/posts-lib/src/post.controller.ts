@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { OpenApiTags, RoutePaths } from '@project/core';
 import { CreatePostDto } from './dtos';
@@ -81,5 +82,35 @@ export class PostController {
   public async getPostById(@Param('id') id: string) {
     const post = await this.postService.getPost(id);
     return fillDto(withPostRdo(post?.type), post?.toPlainData());
+  }
+
+  @Get('/')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    schema: {
+      $ref: getSchemaPath(BasePostRdo),
+    },
+  })
+  public async getUsersPosts(@Query('usersIds') usersIds: string[]) {
+    const posts = await this.postService.getPosts(usersIds);
+    return posts.map((post) =>
+      fillDto(withPostRdo(post?.type), post?.toPlainData())
+    );
+  }
+
+  @Get('/search')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    schema: {
+      $ref: getSchemaPath(BasePostRdo),
+    },
+  })
+  public async search(@Query('title') title: string) {
+    const posts = await this.postService.searchByTitle(title);
+    return posts.map((post) =>
+      fillDto(withPostRdo(post?.type), post?.toPlainData())
+    );
   }
 }
