@@ -1,11 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostState, PostTypes, Tag } from '@project/core';
 
-export class CreatePostDto {
+export class UpdatePostDto {
   @ApiProperty()
   public title!: string;
 
-  @ApiProperty({ enum: PostTypes })
+  @ApiProperty()
+  public state!: PostState;
+
+  @ApiProperty()
   public type!: PostTypes;
 
   @ApiProperty()

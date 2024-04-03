@@ -10,7 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { OpenApiTags, RoutePaths } from '@project/core';
-import { CreatePostDto } from './dtos';
+import { CreatePostDto, UpdatePostDto } from './dtos';
 import { fillDto } from '@project/helpers';
 import {
   BasePostRdo,
@@ -50,8 +50,12 @@ export class PostController {
       $ref: getSchemaPath(BasePostRdo),
     },
   })
-  public async getUsersPosts(@Query('usersIds') usersIds: string[]) {
-    const posts = await this.postService.getPosts(usersIds);
+  public async getUsersPosts(
+    @Query('usersIds') usersIds: string[],
+    @Query('tags') tags?: string[]
+  ) {
+    // @TODO need to grab user id from token ??
+    const posts = await this.postService.getPosts(usersIds, tags);
     return posts.map((post) =>
       fillDto(withPostRdo(post?.type), post?.toPlainData())
     );
@@ -92,20 +96,48 @@ export class PostController {
     },
   })
   public async create(@Body() dto: CreatePostDto) {
+    // @TODO need to grab user id from token
     const newPost = await this.postService.create(dto);
     return fillDto(withPostRdo(dto.type), newPost.toPlainData());
   }
 
-  @Put('update')
+  @Put('update/:id')
   @ApiResponse({
     status: HttpStatus.OK,
     schema: {
       $ref: getSchemaPath(BasePostRdo),
     },
   })
-  public async update(@Body() dto: CreatePostDto) {
-    const newPost = await this.postService.update(dto);
+  public async update(@Param('id') id: string, @Body() dto: UpdatePostDto) {
+    // @TODO need to grab user id from token
+    const newPost = await this.postService.update(id, dto);
     return fillDto(withPostRdo(dto.type), newPost.toPlainData());
+  }
+
+  @Put('publish/:id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      $ref: getSchemaPath(BasePostRdo),
+    },
+  })
+  public async publish(@Param('id') id: string) {
+    // @TODO need to grab user id from token
+    const newPost = await this.postService.publish(id);
+    return fillDto(withPostRdo(newPost.type), newPost.toPlainData());
+  }
+
+  @Put('repost/:id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      $ref: getSchemaPath(BasePostRdo),
+    },
+  })
+  public async repost(@Param('id') id: string) {
+    // @TODO need to grab user id from token
+    const newPost = await this.postService.repost(id, '1');
+    return fillDto(withPostRdo(newPost.type), newPost.toPlainData());
   }
 
   @Delete('delete')
