@@ -1,6 +1,6 @@
 import { ChangeLog } from '../base';
 
-export interface User extends Pick<ChangeLog, 'createdAt'> {
+export type User = Pick<ChangeLog, 'createdAt'> & {
   id?: string;
   email: string;
   firstName: string;
@@ -11,4 +11,4 @@ export interface User extends Pick<ChangeLog, 'createdAt'> {
   likedPosts?: string[];
   subscribedBlogs?: string[];
   receiveNotifications?: boolean;
-}
+};
