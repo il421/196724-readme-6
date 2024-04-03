@@ -14,10 +14,10 @@ export class MemoryRepository<
   protected entities: Map<T['id'], ReturnType<T['toPlainData']>> = new Map();
   constructor(protected entityFactory: IEntityFactory<T>) {}
 
-  public async findById(id: T['id']): Promise<T> {
+  public async findById(id: T['id']): Promise<T | null> {
     const entity = this.entities.get(id);
     if (!entity) {
-      throw new Error(ErrorMessages.EntityNotFound);
+      return null;
     }
     return this.entityFactory.create(entity);
   }

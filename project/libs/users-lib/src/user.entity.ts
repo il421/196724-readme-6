@@ -8,7 +8,7 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
   public lastName?: string;
   public password?: string;
   public avatarUrl?: string;
-  public createdAt?: Date;
+  public createdAt?: string;
   constructor(user: User) {
     super();
     this.id = user.id;
@@ -16,7 +16,7 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
     this.firstName = user.firstName;
     this.lastName = user.lastName;
     this.avatarUrl = user.avatarUrl;
-    this.createdAt = user.createdAt;
+    this.createdAt = user.createdAt ?? new Date().toISOString();
   }
 
   toPlainData(): User {

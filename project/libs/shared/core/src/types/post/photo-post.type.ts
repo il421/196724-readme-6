@@ -1,5 +1,5 @@
-import { BasePost } from './base-post';
+import { BasePost } from './base-post.type.';
 
-export type PhotoPost = BasePost & {
-  url: string;
-};
+export type PhotoPost = BasePost<{
+  url?: string;
+}>;

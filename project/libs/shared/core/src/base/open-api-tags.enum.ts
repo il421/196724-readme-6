@@ -1,3 +1,5 @@
 export enum OpenApiTags {
-  Auth = 'auth',
+  Auth = 'Auth',
+  Posts = 'Posts',
+  Comments = 'Comments',
 }
