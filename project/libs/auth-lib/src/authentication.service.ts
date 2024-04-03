@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
   NotFoundException,
 } from '@nestjs/common';
-import { UserEntity, UserRepository } from '@project/user';
+import { UserEntity, UserRepository } from '@project/users-lib';
 import { CreateUserDto, LoginUserDto } from './dtos';
 import { ErrorMessages } from '@project/core';
 
@@ -54,6 +54,10 @@ export class AuthenticationService {
   }
 
   public async getUser(id: string) {
-    return this.userRepository.findById(id);
+    const user = this.userRepository.findById(id);
+    if (user) {
+      return user;
+    }
+    throw new NotFoundException(ErrorMessages.UserNotFound);
   }
 }

@@ -2,7 +2,12 @@
   "name": "@project/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start-users-app": "npx nx run users:serve",
+    "start-auth-app": "npx nx run auth:serve",
+    "start-posts-app": "npx nx run posts:serve",
+    "start-feedback-app": "npx nx run feedback:serve"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^10.0.2",

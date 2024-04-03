@@ -1,6 +1,6 @@
-import { BasePost } from './base-post';
+import { BasePost } from './base-post.type.';
 
-export type TextPost = BasePost & {
-  announcement: string;
-  text: string;
-};
+export type TextPost = BasePost<{
+  announcement?: string;
+  text?: string;
+}>;

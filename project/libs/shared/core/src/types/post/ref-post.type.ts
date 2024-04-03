@@ -1,6 +1,6 @@
-import { BasePost } from './base-post';
+import { BasePost } from './base-post.type.';
 
-export type RefPost = BasePost & {
-  url: string;
+export type RefPost = BasePost<{
+  url?: string;
   description?: string;
-};
+}>;
