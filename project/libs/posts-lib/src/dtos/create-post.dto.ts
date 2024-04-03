@@ -3,7 +3,19 @@ import { PostState, PostTypes, Tag } from '@project/core';
 
 export class CreatePostDto {
   @ApiProperty()
-  public name!: string;
+  public title!: string;
+
+  @ApiProperty({ enum: PostTypes })
+  public type!: PostTypes;
+
+  @ApiProperty({ enum: PostState })
+  public state!: PostState;
+
+  @ApiProperty()
+  isRepost?: boolean;
+
+  @ApiProperty()
+  tags?: Tag[];
 
   @ApiProperty()
   public text!: string;
@@ -19,16 +31,4 @@ export class CreatePostDto {
 
   @ApiProperty()
   public quoteAuthor!: string;
-
-  @ApiProperty({ enum: PostTypes })
-  public type!: PostTypes;
-
-  @ApiProperty({ enum: PostState })
-  public state!: PostState;
-
-  @ApiProperty()
-  isRepost?: boolean;
-
-  @ApiProperty()
-  tags?: Tag[];
 }

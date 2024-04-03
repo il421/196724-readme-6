@@ -25,6 +25,10 @@ export class PostService {
     return this.postRepository.findPosts(usersIds);
   }
 
+  public async searchByTitle(title: string) {
+    return this.postRepository.search(title);
+  }
+
   public async getPost(id: string) {
     const post = this.postRepository.findById(id);
 

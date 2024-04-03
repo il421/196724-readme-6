@@ -6,7 +6,7 @@ import { ChangeLog } from '../base';
 export type BasePost<T> = T &
   ChangeLog & {
     id?: string;
-    name: string;
+    title: string;
     type: PostTypes;
     state: PostState;
     isRepost?: boolean;
