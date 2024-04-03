@@ -43,47 +43,6 @@ import { SubscriptionRdo } from '@project/subscriptions-lib';
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @Post('create')
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    schema: {
-      $ref: getSchemaPath(BasePostRdo),
-    },
-  })
-  public async create(@Body() dto: CreatePostDto) {
-    const newPost = await this.postService.create(dto);
-    return fillDto(withPostRdo(dto.type), newPost.toPlainData());
-  }
-
-  @Put('update')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    schema: {
-      $ref: getSchemaPath(BasePostRdo),
-    },
-  })
-  public async update(@Body() dto: CreatePostDto) {
-    const newPost = await this.postService.update(dto);
-    return fillDto(withPostRdo(dto.type), newPost.toPlainData());
-  }
-
-  @Delete('delete')
-  public async delete(@Param('id') id: string) {
-    return await this.postService.delete(id);
-  }
-
-  @Get(':id')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    schema: {
-      $ref: getSchemaPath(BasePostRdo),
-    },
-  })
-  public async getPostById(@Param('id') id: string) {
-    const post = await this.postService.getPost(id);
-    return fillDto(withPostRdo(post?.type), post?.toPlainData());
-  }
-
   @Get('/')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -112,5 +71,46 @@ export class PostController {
     return posts.map((post) =>
       fillDto(withPostRdo(post?.type), post?.toPlainData())
     );
+  }
+
+  @Get(':id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      $ref: getSchemaPath(BasePostRdo),
+    },
+  })
+  public async getPostById(@Param('id') id: string) {
+    const post = await this.postService.getPost(id);
+    return fillDto(withPostRdo(post?.type), post?.toPlainData());
+  }
+
+  @Post('create')
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    schema: {
+      $ref: getSchemaPath(BasePostRdo),
+    },
+  })
+  public async create(@Body() dto: CreatePostDto) {
+    const newPost = await this.postService.create(dto);
+    return fillDto(withPostRdo(dto.type), newPost.toPlainData());
+  }
+
+  @Put('update')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      $ref: getSchemaPath(BasePostRdo),
+    },
+  })
+  public async update(@Body() dto: CreatePostDto) {
+    const newPost = await this.postService.update(dto);
+    return fillDto(withPostRdo(dto.type), newPost.toPlainData());
+  }
+
+  @Delete('delete')
+  public async delete(@Param('id') id: string) {
+    return await this.postService.delete(id);
   }
 }
