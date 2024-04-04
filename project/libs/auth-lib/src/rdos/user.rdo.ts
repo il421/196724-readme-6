@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UserRdo {
   @ApiProperty({
-    description: 'Unique identification',
+    description: 'Unique identifier',
     example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
   })
   @Expose()

@@ -1,6 +1,7 @@
 export enum ErrorMessages {
   UserNotFound = 'User not found',
   PostNotFound = 'Post not found',
+  SubscriptionNotFound = 'Subscription not found',
   CommentNotFound = 'Comment not found',
   CommentUserError = 'Not able to delete other users comments',
   UserBadPassword = 'User password is invalid',

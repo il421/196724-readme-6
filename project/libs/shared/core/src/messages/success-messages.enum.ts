@@ -12,4 +12,7 @@ export enum SuccessMessages {
   PostDeleted = 'Post successfully deleted',
   CommentCreated = 'A new post comment is created',
   CommentDeleted = 'Comment is deleted',
+  Subscriptions = 'User subscriptions',
+  Subscribed = 'Blog successfully subscribed',
+  Unsubscribed = 'Blog unsuccessfully subscribed',
 }

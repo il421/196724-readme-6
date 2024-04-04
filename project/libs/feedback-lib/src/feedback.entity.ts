@@ -12,7 +12,7 @@ export class FeedbackEntity extends Entity implements IStorableEntity<Comment> {
     this.text = text;
     this.postId = postId;
     this.createdBy = createdBy;
-    this.createdAt = createdAt;
+    this.createdAt = createdAt ?? new Date().toISOString();
   }
 
   toPlainData(): Comment {
