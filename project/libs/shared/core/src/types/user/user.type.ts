@@ -8,7 +8,6 @@ export type User = Pick<ChangeLog, 'createdAt'> & {
   password: string;
   avatarUrl?: string;
   posts?: number;
+  followers?: number;
   likedPosts?: string[];
-  subscribedBlogs?: string[];
-  receiveNotifications?: boolean;
 };
