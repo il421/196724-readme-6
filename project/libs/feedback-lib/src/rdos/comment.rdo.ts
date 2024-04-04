@@ -2,23 +2,38 @@ import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CommentRdo {
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Unique identification',
+    example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
+  })
   @Expose()
   readonly id!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Unique post identification',
+    example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
+  })
   @Expose()
   readonly postId!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Comment text',
+    example: 'My perfect comment',
+  })
   @Expose()
   readonly text!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Comment author identification',
+    example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
+  })
   @Expose()
   readonly createdBy!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Comment publishing date',
+    example: '2012-12-02',
+  })
   @Expose()
   readonly createdAt!: string;
 }
