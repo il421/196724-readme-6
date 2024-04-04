@@ -44,11 +44,28 @@ export class PostService {
   public async repost(id: string, repostBy: string): Promise<PostEntity> {
     const post = await this.postRepository.findById(id);
     if (post) {
+      const { id, ...rest } = post.toPlainData();
       const postEntity = new PostEntity({
-        ...post.toPlainData(),
+        ...rest,
         isRepost: true,
         publishedAt: new Date().toISOString(),
         publishedBy: repostBy,
+      });
+      await this.postRepository.save(postEntity);
+      return postEntity;
+    }
+    throw new NotFoundException(ErrorMessages.PostNotFound);
+  }
+
+  public async like(id: string, userId: string): Promise<PostEntity> {
+    const post = await this.postRepository.findById(id);
+    if (post) {
+      const { likes = [], ...rest } = post.toPlainData();
+      const postEntity = new PostEntity({
+        ...rest,
+        likes: likes.includes(userId)
+          ? likes.filter((like) => like !== userId)
+          : [...likes, userId],
       });
       await this.postRepository.update(postEntity);
       return postEntity;

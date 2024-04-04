@@ -8,6 +8,7 @@ export enum SuccessMessages {
   PostUpdated = 'Post successfully updated',
   PostPublished = 'Post successfully published',
   PostReposted = 'Post successfully re-posted',
+  PostLiked = 'Post liked/un-liked',
   PostDeleted = 'Post successfully deleted',
   CommentCreated = 'A new post comment is created',
   CommentDeleted = 'Comment is deleted',

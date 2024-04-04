@@ -132,7 +132,7 @@ export class PostController {
     return fillDto(withPostRdo(newPost.type), newPost.toPlainData());
   }
 
-  @Put(':userId/repost/:id')
+  @Post(':userId/repost/:id')
   @ApiResponse({
     status: HttpStatus.OK,
     type: BasePostRdo,
@@ -148,6 +148,22 @@ export class PostController {
   ) {
     // @TODO need to grab user id from token
     const newPost = await this.postService.repost(id, userId);
+    return fillDto(withPostRdo(newPost.type), newPost.toPlainData());
+  }
+
+  @Post(':userId/like/:id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: BasePostRdo,
+    description: SuccessMessages.PostLiked,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ErrorMessages.PostNotFound,
+  })
+  public async like(@Param('userId') userId: string, @Param('id') id: string) {
+    // @TODO need to grab user id from token
+    const newPost = await this.postService.like(id, userId);
     return fillDto(withPostRdo(newPost.type), newPost.toPlainData());
   }
 
