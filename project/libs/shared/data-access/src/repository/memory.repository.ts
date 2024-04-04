@@ -1,10 +1,5 @@
 import { IRepository } from './repository.interface';
-import {
-  Entity,
-  ErrorMessages,
-  IEntityFactory,
-  IStorableEntity,
-} from '@project/core';
+import { Entity, IEntityFactory, IStorableEntity } from '@project/core';
 import { randomUUID } from 'node:crypto';
 
 export class MemoryRepository<
@@ -31,18 +26,10 @@ export class MemoryRepository<
   }
 
   public async update(entity: T): Promise<void> {
-    if (!this.entities.has(entity.id)) {
-      throw new Error(ErrorMessages.EntityNotFound);
-    }
-
     this.entities.set(entity.id, entity.toPlainData());
   }
 
   public async deleteById(id: T['id']): Promise<void> {
-    if (!this.entities.has(id)) {
-      throw new Error(ErrorMessages.EntityNotFound);
-    }
-
     this.entities.delete(id);
   }
 }
