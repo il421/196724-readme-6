@@ -4,22 +4,22 @@ export class SubscriptionsEntity
   extends Entity
   implements IStorableEntity<Subscription>
 {
-  public publisherId: string;
+  public authorId: string;
   public createdBy?: string;
   public createdAt?: string;
   constructor(subscription: Subscription) {
-    const { id, publisherId, createdBy, createdAt } = subscription;
+    const { id, authorId, createdBy, createdAt } = subscription;
     super();
     this.id = id;
-    this.publisherId = publisherId;
+    this.authorId = authorId;
     this.createdBy = createdBy;
-    this.createdAt = createdAt;
+    this.createdAt = createdAt ?? new Date().toISOString();
   }
 
   toPlainData(): Subscription {
     return {
       id: this.id,
-      publisherId: this.publisherId,
+      authorId: this.authorId,
       createdBy: this.createdBy,
       createdAt: this.createdAt,
     };

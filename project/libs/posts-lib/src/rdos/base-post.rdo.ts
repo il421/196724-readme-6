@@ -4,7 +4,7 @@ import { PostState, PostTypes } from '@project/core';
 
 export class BasePostRdo {
   @ApiProperty({
-    description: 'Unique identification',
+    description: 'Unique identifier',
     example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
   })
   @Expose()
@@ -52,7 +52,7 @@ export class BasePostRdo {
 
   @ApiProperty({
     example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
-    description: 'Post author identification',
+    description: 'Post author identifier',
   })
   @Expose()
   createdBy!: string;
@@ -66,7 +66,7 @@ export class BasePostRdo {
 
   @ApiProperty({
     example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
-    description: 'Post publisher identification',
+    description: 'Post publisher identifier',
   })
   @Expose()
   publishedBy!: string;

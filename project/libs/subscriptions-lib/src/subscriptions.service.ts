@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dtos';
 import { SubscriptionsRepository } from './subscriptions.repository';
 import { SubscriptionsEntity } from './subscriptions.entity';
+import { ErrorMessages } from '@project/core';
 
 @Injectable()
 export class SubscriptionsService {
@@ -12,14 +13,22 @@ export class SubscriptionsService {
   }
 
   public async create(
+    userId: string,
     dto: CreateSubscriptionDto
   ): Promise<SubscriptionsEntity> {
-    const postEntity = new SubscriptionsEntity(dto);
+    const postEntity = new SubscriptionsEntity({ ...dto, createdBy: userId });
     await this.subscriptionsRepository.save(postEntity);
     return postEntity;
   }
 
-  public async delete(publisherId: string) {
-    return this.subscriptionsRepository.deleteByPublisherId(publisherId);
+  public async delete(userId: string, authorId: string) {
+    const subscription = this.subscriptionsRepository.findByAuthorId(
+      userId,
+      authorId
+    );
+    if (subscription) {
+      return this.subscriptionsRepository.deleteById(subscription.id);
+    }
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 }
