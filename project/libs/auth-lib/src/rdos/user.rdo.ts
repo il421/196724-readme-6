@@ -52,13 +52,6 @@ export class UserRdo {
   followers!: number;
 
   @ApiProperty({
-    description: 'User liked posts ids',
-    example: '[1, 2, 4]',
-  })
-  @Expose()
-  likedPosts!: string[];
-
-  @ApiProperty({
     description: 'Data of user registration',
     example: '2012-12-12',
   })
