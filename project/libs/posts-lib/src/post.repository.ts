@@ -17,7 +17,7 @@ export class PostRepository extends MemoryRepository<PostEntity> {
         (entry) =>
           entry.createdBy &&
           usersIds.includes(entry.createdBy) &&
-          entry.tags?.some((tag) => tags?.includes(tag.id)) &&
+          entry.tags?.some((tag) => tags?.includes(tag)) &&
           entry.state === PostState.Published
       )
       .map((post) => this.entityFactory.create(post));

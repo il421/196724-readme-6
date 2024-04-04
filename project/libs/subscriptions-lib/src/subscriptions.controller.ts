@@ -10,12 +10,7 @@ import {
 import { OpenApiTags, RoutePaths } from '@project/core';
 import { CreateSubscriptionDto } from './dtos';
 import { fillDto } from '@project/helpers';
-import {
-  ApiExtraModels,
-  ApiResponse,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
+import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionRdo } from './rdos';
 
@@ -29,9 +24,7 @@ export class SubscriptionsController {
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
-    schema: {
-      $ref: getSchemaPath(SubscriptionRdo),
-    },
+    type: SubscriptionRdo,
   })
   public async getSubscriptions() {
     const subscription = await this.subscriptionService.find('id'); // @TODO need to get it from token
@@ -43,9 +36,7 @@ export class SubscriptionsController {
 
   @ApiResponse({
     status: HttpStatus.CREATED,
-    schema: {
-      $ref: getSchemaPath(SubscriptionRdo),
-    },
+    type: SubscriptionRdo,
   })
   @Post('create')
   public async subscribe(@Body() dto: CreateSubscriptionDto) {
@@ -53,6 +44,9 @@ export class SubscriptionsController {
     return fillDto(SubscriptionRdo, newSubscription.toPlainData());
   }
 
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
   @Delete('delete')
   public async unsubscribe(@Param('publisherId') publisherId: string) {
     return await this.subscriptionService.delete(publisherId);
