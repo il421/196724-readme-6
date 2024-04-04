@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  HttpStatus,
+  Patch,
+} from '@nestjs/common';
 import {
   ErrorMessages,
   OpenApiTags,
@@ -66,7 +74,7 @@ export class AuthenticationController {
     return fillDto(LoggedUserRdo, { accessToken: '123' }); // @TODO not completed
   }
 
-  @Post(':id/password/update')
+  @Patch(':id/password/update')
   @ApiResponse({
     type: LoggedUserRdo,
     status: HttpStatus.OK,
