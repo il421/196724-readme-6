@@ -12,6 +12,8 @@ import {
 import {
   ErrorMessages,
   OpenApiTags,
+  PostState,
+  PostTypes,
   RoutePaths,
   SuccessMessages,
 } from '@project/core';
@@ -48,11 +50,13 @@ export class PostController {
     type: BasePostRdo,
     description: SuccessMessages.Posts,
   })
-  public async getUsersPosts(
-    @Query('usersIds') usersIds: string[],
-    @Query('tags') tags?: string[]
+  public async getPosts(
+    @Query('usersIds') usersIds?: string[],
+    @Query('tags') tags?: string[],
+    @Query('type') type?: PostTypes,
+    @Query('state') state?: PostState
   ) {
-    const posts = await this.postService.getPosts(usersIds, tags);
+    const posts = await this.postService.getPosts(usersIds, tags, type, state);
     return posts.map((post) =>
       fillDto(withPostRdo(post?.type), post?.toPlainData())
     );

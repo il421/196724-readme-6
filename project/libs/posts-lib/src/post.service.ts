@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto, UpdatePostDto } from './dtos';
-import { ErrorMessages, PostState } from '@project/core';
+import { ErrorMessages, PostState, PostTypes } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 
@@ -73,8 +73,13 @@ export class PostService {
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
-  public async getPosts(usersIds: string[], tags?: string[]) {
-    return this.postRepository.findPosts(usersIds, tags);
+  public async getPosts(
+    usersIds?: string[],
+    tags?: string[],
+    types?: PostTypes[],
+    state?: PostState
+  ) {
+    return this.postRepository.findPosts(usersIds, tags, types, state);
   }
 
   public async searchByTitle(title: string) {
