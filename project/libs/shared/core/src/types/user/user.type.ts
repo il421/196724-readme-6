@@ -9,5 +9,4 @@ export type User = Pick<ChangeLog, 'createdAt'> & {
   avatarUrl?: string;
   posts?: number;
   followers?: number;
-  likedPosts?: string[];
 };
