@@ -17,13 +17,7 @@ import { AuthenticationService } from './authentication.service';
 import { CreateUserDto, LoginUserDto } from './dtos';
 import { fillDto } from '@project/helpers';
 import { LoggedUserRdo, UserRdo } from './rdos';
-import {
-  ApiExtraModels,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateUserPasswordDto } from './dtos/update-user-password.dto';
 
 @ApiTags(OpenApiTags.Auth)

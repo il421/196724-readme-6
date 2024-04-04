@@ -5,6 +5,5 @@ export * from './quote-post.type';
 export * from './photo-post.type';
 export * from './ref-post.type';
 export * from './post.type';
-export * from './tag.type';
 export * from './post-types.enum';
 export * from './post-state.enum';

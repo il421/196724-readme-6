@@ -8,8 +8,12 @@ import { PostEntity } from './post.entity';
 export class PostService {
   constructor(private postRepository: PostRepository) {}
 
-  public async create(dto: CreatePostDto): Promise<PostEntity> {
-    const postEntity = new PostEntity({ ...dto, state: PostState.Draft });
+  public async create(userId: string, dto: CreatePostDto): Promise<PostEntity> {
+    const postEntity = new PostEntity({
+      ...dto,
+      createdBy: userId,
+      state: PostState.Draft,
+    });
     await this.postRepository.save(postEntity);
     return postEntity;
   }

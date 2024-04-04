@@ -3,7 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { BasePostRdo } from './base-post.rdo';
 
 export class VideoPostRdo extends BasePostRdo {
-  @ApiProperty()
+  @ApiProperty({
+    example: 'https://docs.nestjs.com/openapi/introduction',
+    description: 'Post link url',
+  })
   @Expose()
   readonly url!: string;
 }

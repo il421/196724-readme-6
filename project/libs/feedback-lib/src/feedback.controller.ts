@@ -15,12 +15,7 @@ import {
 } from '@project/core';
 import { CreateCommentDto } from './dtos';
 import { fillDto } from '@project/helpers';
-import {
-  ApiExtraModels,
-  ApiResponse,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
 

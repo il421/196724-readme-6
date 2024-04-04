@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { PostState, PostTypes, Tag } from '@project/core';
+import { PostState, PostTypes } from '@project/core';
 
 export class BasePostRdo {
   @ApiProperty({
@@ -8,57 +8,66 @@ export class BasePostRdo {
     example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
   })
   @Expose()
-  readonly id!: string;
+  id!: string;
 
-  @ApiProperty({
-    description: 'Post title',
-    example: 'My first post',
-  })
+  @ApiProperty({ example: 'My new post', description: 'Post title' })
   @Expose()
-  readonly title!: string;
+  title!: string;
 
   @ApiProperty({
     enum: PostTypes,
     enumName: 'PostTypes',
-    description: 'Post type',
     example: 'video',
+    description: 'Post type',
   })
   @Expose()
-  readonly type!: PostTypes;
+  type!: PostTypes;
 
   @ApiProperty({
     enum: PostState,
     enumName: 'PostState',
-    description: 'Post state',
     example: 'published',
+    description: 'Post state',
   })
   @Expose()
-  readonly state!: PostState;
+  state!: PostState;
 
   @ApiProperty({
-    description: 'Flag to show if the post has been reposted',
-    example: 'true',
+    description: 'Flag to show if a post is reposted',
+    example: true,
   })
   @Expose()
-  readonly isRepost!: boolean;
+  isRepost!: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ example: '[personal, business]', description: 'Post tags' })
   @Expose()
-  readonly tags!: Tag[];
+  tags!: string[];
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
+    description: 'Post author identification',
+  })
   @Expose()
-  readonly createdBy!: string;
+  createdBy!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '2012-12-22',
+    description: 'Post create data',
+  })
   @Expose()
-  readonly createdAt!: string;
+  createdAt!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
+    description: 'Post publisher identification',
+  })
   @Expose()
-  readonly publishedBy!: string;
+  publishedBy!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '2012-12-22',
+    description: 'Post publish data',
+  })
   @Expose()
-  readonly publishedAt!: string;
+  publishedAt!: string;
 }

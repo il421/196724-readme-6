@@ -1,31 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PostState, PostTypes, Tag } from '@project/core';
+import { PostState } from '@project/core';
+import { CreatePostDto } from './create-post.dto';
 
-export class UpdatePostDto {
-  @ApiProperty()
-  public title!: string;
-
-  @ApiProperty()
+export class UpdatePostDto extends CreatePostDto {
+  @ApiProperty({
+    enum: PostState,
+    enumName: 'PostState',
+    example: 'published',
+    description: 'Post state',
+  })
   public state!: PostState;
-
-  @ApiProperty()
-  public type!: PostTypes;
-
-  @ApiProperty()
-  tags?: Tag[];
-
-  @ApiProperty()
-  public text!: string;
-
-  @ApiProperty()
-  public url!: string;
-
-  @ApiProperty()
-  public description!: string;
-
-  @ApiProperty()
-  public announcement!: string;
-
-  @ApiProperty()
-  public quoteAuthor!: string;
 }
