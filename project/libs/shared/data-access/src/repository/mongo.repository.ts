@@ -21,7 +21,10 @@ export abstract class MongoRepository<
     const plainObject = document.toObject({ versionKey: false }) as ReturnType<
       T['toPlainData']
     >;
-    return this.entityFactory.create(plainObject);
+
+    const entity = this.entityFactory.create(plainObject);
+    entity.id = document._id;
+    return entity;
   }
 
   public async findById(id: T['id']): Promise<T | null> {
@@ -38,14 +41,12 @@ export abstract class MongoRepository<
 
   public async update(entity: T): Promise<void> {
     const updatedDocument = await this.model
-      // @ts-ignore
-      .findByIdAndUpdate(entity.id, entity.toPlainData(), {
+      .findByIdAndUpdate(entity.id, entity, {
         new: true,
-        runValidators: true,
       })
       .exec();
 
-    if (updatedDocument) {
+    if (!updatedDocument) {
       throw new NotFoundException(`Entity with id ${entity.id} not found`);
     }
   }
