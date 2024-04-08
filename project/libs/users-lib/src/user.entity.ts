@@ -15,12 +15,14 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
     super();
     this.id = user.id;
     this.email = user.email;
+    this.password = user.password;
     this.firstName = user.firstName;
     this.lastName = user.lastName;
     this.avatarUrl = user.avatarUrl;
     this.posts = user.posts;
     this.followers = user.followers;
     this.createdAt = user.createdAt;
+    this.createdAt = user.avatarUrl;
   }
 
   toPlainData(): User {
@@ -33,7 +35,6 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
       avatarUrl: this.avatarUrl ?? '',
       posts: this.posts ?? 0,
       followers: this.followers ?? 0,
-      createdAt: this.createdAt,
     };
   }
 
