@@ -43,6 +43,7 @@ export class AuthenticationController {
     @Body()
     dto: CreateUserDto
   ) {
+    console.log(dto);
     const newUser = await this.authService.register(dto);
     return fillDto(UserRdo, newUser.toPlainData());
   }

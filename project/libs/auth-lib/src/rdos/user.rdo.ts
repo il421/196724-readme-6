@@ -52,9 +52,16 @@ export class UserRdo {
   followers!: number;
 
   @ApiProperty({
-    description: 'Data of user registration',
+    description: 'Date of user registration',
     example: '2012-12-12',
   })
   @Expose()
   createdAt!: string;
+
+  @ApiProperty({
+    description: 'Date of user date update',
+    example: '2012-12-12',
+  })
+  @Expose()
+  updatedAt!: string;
 }

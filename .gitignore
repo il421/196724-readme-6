@@ -12,3 +12,5 @@ coverage
 
 .nx/installation
 .nx/cache
+
+*.env
