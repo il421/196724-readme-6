@@ -1,0 +1,24 @@
+{
+  "name": "files-storage",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/files-storage/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "files-storage:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "files-storage:build:development"
+        },
+        "production": {
+          "buildTarget": "files-storage:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}
