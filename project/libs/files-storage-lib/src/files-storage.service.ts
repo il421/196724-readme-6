@@ -4,7 +4,7 @@ import { FileEntity } from './file.entity';
 import { File, SwaggerErrorMessages } from '@project/core';
 import * as fs from 'fs';
 import { path } from './utils';
-
+import 'multer';
 @Injectable()
 export class FilesStorageService {
   constructor(private filesStorageRepository: FilesStorageRepository) {}

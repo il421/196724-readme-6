@@ -50,6 +50,7 @@ export class FilesStorageController {
     schema: FileSwaggerSchema,
   })
   public async upload(
+    // @TODO files format and size validator
     @UploadedFile() file: Express.Multer.File,
     @Param('userId') userId: string
   ) {
