@@ -2,13 +2,15 @@ import { Request } from 'express';
 import { extension } from 'mime-types';
 import { randomUUID } from 'node:crypto';
 
+const getFileName = (file: Express.Multer.File) =>
+  `${randomUUID()}.${extension(file.mimetype)}`;
 export const filename = (
-  req: Request,
+  _req: Request,
   file: Express.Multer.File,
   callback: (error: Error | null, filename: string) => void
 ) => {
-  callback(null, path(file));
+  callback(null, getFileName(file));
 };
 
-export const path = (file: Express.Multer.File): string =>
-  `${randomUUID()}.${extension(file.mimetype)}`;
+export const path = (fileName: string, host?: string, port?: number): string =>
+  `http://${host}:${port}/${fileName}`;

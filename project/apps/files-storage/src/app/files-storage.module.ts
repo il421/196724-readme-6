@@ -9,13 +9,15 @@ import {
   FileSchema,
 } from '@project/files-storage-lib';
 import { MongooseModule } from '@nestjs/mongoose';
-import { getMongooseOptions } from '@project/core';
+import { getMongooseOptions, getStaticStorageOptions } from '@project/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
     FilesStorageConfigModule,
     MongooseModule.forRootAsync(getMongooseOptions()),
     MongooseModule.forFeature([{ name: FileModel.name, schema: FileSchema }]),
+    ServeStaticModule.forRootAsync(getStaticStorageOptions()),
   ],
   controllers: [FilesStorageController],
   providers: [FilesStorageService, FilesStorageRepository, FilesStorageFactory],

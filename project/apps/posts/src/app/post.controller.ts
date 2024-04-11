@@ -10,12 +10,12 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  SwaggerErrorMessages,
+  ErrorMessages,
   SwaggerTags,
   PostState,
   PostTypes,
   RoutePaths,
-  SwaggerSuccessMessages,
+  SuccessMessages,
 } from '@project/core';
 import { CreatePostDto, UpdatePostDto } from './dtos';
 import { fillDto } from '@project/helpers';
@@ -48,7 +48,7 @@ export class PostController {
     status: HttpStatus.OK,
     isArray: true,
     type: BasePostRdo,
-    description: SwaggerSuccessMessages.Posts,
+    description: SuccessMessages.Posts,
   })
   public async getPosts(
     @Query('usersIds') usersIds?: string[],
@@ -67,7 +67,7 @@ export class PostController {
     status: HttpStatus.OK,
     isArray: true,
     type: BasePostRdo,
-    description: SwaggerSuccessMessages.Posts,
+    description: SuccessMessages.Posts,
   })
   public async search(@Query('title') title: string) {
     const posts = await this.postService.searchByTitle(title);
@@ -80,11 +80,11 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: BasePostRdo,
-    description: SwaggerSuccessMessages.Posts,
+    description: SuccessMessages.Posts,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.PostNotFound,
+    description: ErrorMessages.PostNotFound,
   })
   public async getPostById(@Param('id') id: string) {
     const post = await this.postService.getPost(id);
@@ -95,7 +95,7 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: BasePostRdo,
-    description: SwaggerSuccessMessages.PostCreated,
+    description: SuccessMessages.PostCreated,
   })
   public async create(
     @Param('userId') userId: string,
@@ -110,11 +110,11 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: BasePostRdo,
-    description: SwaggerSuccessMessages.PostUpdated,
+    description: SuccessMessages.PostUpdated,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.PostNotFound,
+    description: ErrorMessages.PostNotFound,
   })
   public async update(@Param('id') id: string, @Body() dto: UpdatePostDto) {
     const newPost = await this.postService.update(id, dto);
@@ -125,11 +125,11 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: BasePostRdo,
-    description: SwaggerSuccessMessages.PostPublished,
+    description: SuccessMessages.PostPublished,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.PostNotFound,
+    description: ErrorMessages.PostNotFound,
   })
   public async publish(@Param('id') id: string) {
     const newPost = await this.postService.publish(id);
@@ -140,11 +140,11 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: BasePostRdo,
-    description: SwaggerSuccessMessages.PostReposted,
+    description: SuccessMessages.PostReposted,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.PostNotFound,
+    description: ErrorMessages.PostNotFound,
   })
   public async repost(
     @Param('userId') userId: string,
@@ -159,11 +159,11 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: BasePostRdo,
-    description: SwaggerSuccessMessages.PostLiked,
+    description: SuccessMessages.PostLiked,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.PostNotFound,
+    description: ErrorMessages.PostNotFound,
   })
   public async like(@Param('userId') userId: string, @Param('id') id: string) {
     // @TODO need to grab user id from token
@@ -174,11 +174,11 @@ export class PostController {
   @Delete('delete/:id')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.PostDeleted,
+    description: SuccessMessages.PostDeleted,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.PostNotFound,
+    description: ErrorMessages.PostNotFound,
   })
   public async delete(@Param('id') id: string) {
     return await this.postService.delete(id);

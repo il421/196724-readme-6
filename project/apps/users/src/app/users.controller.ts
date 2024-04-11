@@ -1,8 +1,8 @@
 import { Controller, Get, Param, HttpStatus } from '@nestjs/common';
 import {
-  SwaggerErrorMessages,
+  ErrorMessages,
   RoutePaths,
-  SwaggerSuccessMessages,
+  SuccessMessages,
   SwaggerTags,
 } from '@project/core';
 import { fillDto } from '@project/helpers';
@@ -19,11 +19,11 @@ export class UsersController {
   @ApiResponse({
     type: UserRdo,
     status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.UserFound,
+    description: SuccessMessages.UserFound,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.UserNotFound,
+    description: ErrorMessages.UserNotFound,
   })
   public async getUser(
     @Param('id')

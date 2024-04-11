@@ -8,9 +8,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
-  SwaggerErrorMessages,
+  ErrorMessages,
   RoutePaths,
-  SwaggerSuccessMessages,
+  SuccessMessages,
   SwaggerTags,
 } from '@project/core';
 import { CreateCommentDto } from './dtos';
@@ -29,7 +29,7 @@ export class FeedbackController {
     status: HttpStatus.OK,
     isArray: true,
     type: CommentRdo,
-    description: SwaggerSuccessMessages.Comments,
+    description: SuccessMessages.Comments,
   })
   public async getPostComments(@Param('postId') postId: string) {
     const comments = await this.feedbackService.getCommentsByPostId(postId);
@@ -41,7 +41,7 @@ export class FeedbackController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: CommentRdo,
-    description: SwaggerSuccessMessages.CommentCreated,
+    description: SuccessMessages.CommentCreated,
   })
   public async create(@Body() dto: CreateCommentDto) {
     const newComment = await this.feedbackService.create(dto);
@@ -51,15 +51,15 @@ export class FeedbackController {
   @Delete('user/:userId/delete/:id')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.CommentDeleted,
+    description: SuccessMessages.CommentDeleted,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.CommentNotFound,
+    description: ErrorMessages.CommentNotFound,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: SwaggerErrorMessages.CommentUserError,
+    description: ErrorMessages.CommentUserError,
   })
   public async delete(
     @Param('userId') userId: string,

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserEntity, UserRepository } from '@project/users-lib';
-import { SwaggerErrorMessages } from '@project/core';
+import { ErrorMessages } from '@project/core';
 import { FilesStorageService } from '@project/files-storage-lib';
 
 @Injectable()
@@ -26,6 +26,6 @@ export class UsersService {
       return userEntity;
     }
 
-    throw new NotFoundException(SwaggerErrorMessages.UserNotFound);
+    throw new NotFoundException(ErrorMessages.UserNotFound);
   }
 }

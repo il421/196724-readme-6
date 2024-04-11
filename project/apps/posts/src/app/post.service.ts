@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto, UpdatePostDto } from './dtos';
-import { SwaggerErrorMessages, PostState, PostTypes } from '@project/core';
+import { ErrorMessages, PostState, PostTypes } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 
@@ -25,7 +25,7 @@ export class PostService {
       await this.postRepository.update(postEntity);
       return postEntity;
     }
-    throw new NotFoundException(SwaggerErrorMessages.PostNotFound);
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
   public async publish(id: string): Promise<PostEntity> {
@@ -38,7 +38,7 @@ export class PostService {
       await this.postRepository.update(postEntity);
       return postEntity;
     }
-    throw new NotFoundException(SwaggerErrorMessages.PostNotFound);
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
   public async repost(id: string, repostBy: string): Promise<PostEntity> {
@@ -54,7 +54,7 @@ export class PostService {
       await this.postRepository.save(postEntity);
       return postEntity;
     }
-    throw new NotFoundException(SwaggerErrorMessages.PostNotFound);
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
   public async like(id: string, userId: string): Promise<PostEntity> {
@@ -70,7 +70,7 @@ export class PostService {
       await this.postRepository.update(postEntity);
       return postEntity;
     }
-    throw new NotFoundException(SwaggerErrorMessages.PostNotFound);
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
   public async getPosts(
@@ -90,7 +90,7 @@ export class PostService {
     const post = this.postRepository.findById(id);
 
     if (post) return post;
-    throw new NotFoundException(SwaggerErrorMessages.PostNotFound);
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
   public async delete(id: string) {

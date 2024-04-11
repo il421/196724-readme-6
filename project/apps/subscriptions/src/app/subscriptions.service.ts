@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSubscriptionDto } from './dtos';
 import { SubscriptionsRepository } from './subscriptions.repository';
 import { SubscriptionsEntity } from './subscriptions.entity';
-import { SwaggerErrorMessages } from '@project/core';
+import { ErrorMessages } from '@project/core';
 
 @Injectable()
 export class SubscriptionsService {
@@ -29,6 +29,6 @@ export class SubscriptionsService {
     if (subscription) {
       return this.subscriptionsRepository.deleteById(subscription.id);
     }
-    throw new NotFoundException(SwaggerErrorMessages.PostNotFound);
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 }
