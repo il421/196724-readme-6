@@ -28,4 +28,21 @@ export class UsersService {
 
     throw new NotFoundException(ErrorMessages.UserNotFound);
   }
+
+  public async updateUserAvatar(id: string, fileId: string) {
+    const userEntity = await this.userRepository.findById(id);
+
+    if (userEntity) {
+      const filedEntity = await this.filesStorageService.findById(fileId);
+      if (filedEntity) {
+        const newUserEntity = new UserEntity({
+          ...userEntity.toPlainData(),
+          avatarId: filedEntity.id,
+        });
+        return await this.userRepository.update(newUserEntity);
+      }
+      throw new NotFoundException(ErrorMessages.FileNotFound);
+    }
+    throw new NotFoundException(ErrorMessages.UserNotFound);
+  }
 }
