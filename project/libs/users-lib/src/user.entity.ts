@@ -7,17 +7,19 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
   public firstName?: string;
   public lastName?: string;
   public password?: string;
-  public avatarUrl?: string;
+  public avatarId?: string;
   public posts?: number;
   public followers?: number;
   public createdAt?: string;
+  public avatarUrl?: string;
   constructor(user: User) {
     super();
     this.id = user.id;
     this.email = user.email;
+    this.password = user.password;
     this.firstName = user.firstName;
     this.lastName = user.lastName;
-    this.avatarUrl = user.avatarUrl;
+    this.avatarId = user.avatarId;
     this.posts = user.posts;
     this.followers = user.followers;
     this.createdAt = user.createdAt;
@@ -30,10 +32,9 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
       firstName: this.firstName ?? '',
       lastName: this.lastName ?? '',
       password: this.password ?? '',
-      avatarUrl: this.avatarUrl ?? '',
+      avatarId: this.avatarId,
       posts: this.posts ?? 0,
       followers: this.followers ?? 0,
-      createdAt: this.createdAt,
     };
   }
 
