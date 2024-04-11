@@ -13,10 +13,11 @@ async function bootstrap() {
   const app = await NestFactory.create(FilesStorageModule);
   const configService = app.get(ConfigService);
   const port = configService.get('application.port');
+  const host = configService.get('application.host');
   buildSwagger(app, SwaggerTags.Files);
   await app.listen(port);
   Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${GLOBAL_PREFIX}`
+    `🚀 Application is running on: http://${host}:${port}/${GLOBAL_PREFIX}`
   );
 }
 

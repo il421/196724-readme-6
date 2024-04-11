@@ -13,11 +13,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AuthenticationModule);
   const configService = app.get(ConfigService);
   const port = configService.get('application.port');
+  const host = configService.get('application.host');
   app.setGlobalPrefix(GLOBAL_PREFIX);
   buildSwagger(app, SwaggerTags.Auth);
   await app.listen(port);
   Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${GLOBAL_PREFIX}`
+    `🚀 Application is running on: http://${host}:${port}/${GLOBAL_PREFIX}`
   );
 }
 

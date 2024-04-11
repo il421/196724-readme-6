@@ -5,19 +5,28 @@ import { File, SwaggerErrorMessages } from '@project/core';
 import * as fs from 'fs';
 import { path } from './utils';
 import 'multer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class FilesStorageService {
-  constructor(private filesStorageRepository: FilesStorageRepository) {}
+  constructor(
+    private filesStorageRepository: FilesStorageRepository,
+    private config: ConfigService
+  ) {}
 
   public async upload(
     file: Express.Multer.File,
     userId: string
   ): Promise<FileEntity> {
+    console.log(file);
     const dto: File = {
       createdBy: userId,
       format: file.mimetype,
-      path: path(file),
+      path: path(
+        file.filename,
+        this.config.get('application.host'),
+        this.config.get('application.port')
+      ),
     };
     const postEntity = new FileEntity(dto);
     await this.filesStorageRepository.save(postEntity);
