@@ -1,18 +1,18 @@
 import {
   Controller,
+  Delete,
+  Get,
+  HttpStatus,
   Param,
   Post,
-  HttpStatus,
-  UseInterceptors,
   UploadedFile,
-  Get,
-  Delete,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
-  SwaggerTags,
   RoutePaths,
-  SwaggerSuccessMessages,
   SwaggerErrorMessages,
+  SwaggerSuccessMessages,
+  SwaggerTags,
 } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -20,13 +20,13 @@ import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import {
-  FilesStorageService,
   FIELD_NAME,
-  FILES_DESTINATION,
-  FileRdo,
-  MIME_TYPE,
-  FileSwaggerSchema,
   filename,
+  FileRdo,
+  FILES_DESTINATION,
+  FilesStorageService,
+  FileSwaggerSchema,
+  MIME_TYPE,
 } from '@project/files-storage-lib';
 
 @ApiTags(SwaggerTags.Files)
@@ -34,7 +34,7 @@ import {
 export class FilesStorageController {
   constructor(private readonly filesStorageService: FilesStorageService) {}
 
-  @Post('upload/:userId')
+  @Post(':userId')
   @UseInterceptors(
     FileInterceptor(FIELD_NAME, {
       storage: diskStorage({ destination: FILES_DESTINATION, filename }),
@@ -54,7 +54,7 @@ export class FilesStorageController {
     @UploadedFile() file: Express.Multer.File,
     @Param('userId') userId: string
   ) {
-    const newFile = await this.filesStorageService.create(userId, file);
+    const newFile = await this.filesStorageService.upload(file, userId);
     return fillDto(FileRdo, newFile.toPlainData());
   }
 

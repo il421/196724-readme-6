@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, HttpStatus } from '@nestjs/common';
 import {
   SwaggerErrorMessages,
   RoutePaths,
@@ -32,19 +32,4 @@ export class UsersController {
     const user = await this.usersService.getUser(id);
     return fillDto(UserRdo, user?.toPlainData());
   }
-
-  @Patch('uploadAvatar/:id')
-  @ApiResponse({
-    type: UserRdo,
-    status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.UserAvatar,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.UserNotFound,
-  })
-  public async uploadAvatar(
-    @Param('id')
-    id: string
-  ) {}
 }

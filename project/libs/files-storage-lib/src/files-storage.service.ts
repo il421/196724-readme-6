@@ -5,13 +5,14 @@ import { File, SwaggerErrorMessages } from '@project/core';
 import * as fs from 'fs';
 import { path } from './utils';
 import 'multer';
+
 @Injectable()
 export class FilesStorageService {
   constructor(private filesStorageRepository: FilesStorageRepository) {}
 
-  public async create(
-    userId: string,
-    file: Express.Multer.File
+  public async upload(
+    file: Express.Multer.File,
+    userId: string
   ): Promise<FileEntity> {
     const dto: File = {
       createdBy: userId,
