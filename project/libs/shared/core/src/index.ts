@@ -8,3 +8,4 @@ export * from './interfaces';
 export * from './base';
 export * from './swagger';
 export * from './config';
+export * from './messages';

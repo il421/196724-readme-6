@@ -6,7 +6,7 @@ import {
 import { CreateCommentDto } from './dtos';
 import { FeedbackRepository } from './feedback.repository';
 import { FeedbackEntity } from './feedback.entity';
-import { SwaggerErrorMessages } from '@project/core';
+import { ErrorMessages } from '@project/core';
 
 @Injectable()
 export class FeedbackService {
@@ -27,8 +27,8 @@ export class FeedbackService {
     if (comment) {
       if (comment.createdBy === userId)
         return this.feedbackRepository.deleteById(id);
-      throw new BadRequestException(SwaggerErrorMessages.CommentUserError);
+      throw new BadRequestException(ErrorMessages.CommentUserError);
     }
-    throw new NotFoundException(SwaggerErrorMessages.CommentNotFound);
+    throw new NotFoundException(ErrorMessages.CommentNotFound);
   }
 }

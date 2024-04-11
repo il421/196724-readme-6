@@ -8,9 +8,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
-  SwaggerErrorMessages,
+  ErrorMessages,
   RoutePaths,
-  SwaggerSuccessMessages,
+  SuccessMessages,
   SwaggerTags,
 } from '@project/core';
 import { CreateSubscriptionDto } from './dtos';
@@ -29,7 +29,7 @@ export class SubscriptionsController {
     status: HttpStatus.OK,
     isArray: true,
     type: SubscriptionRdo,
-    description: SwaggerSuccessMessages.Subscriptions,
+    description: SuccessMessages.Subscriptions,
   })
   public async getSubscriptions(@Param('userId') userId: string) {
     // @TODO need to get userId from token
@@ -42,7 +42,7 @@ export class SubscriptionsController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: SubscriptionRdo,
-    description: SwaggerSuccessMessages.Subscribed,
+    description: SuccessMessages.Subscribed,
   })
   @Post(':userId/create')
   public async subscribe(
@@ -56,11 +56,11 @@ export class SubscriptionsController {
 
   @ApiResponse({
     status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.Unsubscribed,
+    description: SuccessMessages.Unsubscribed,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.SubscriptionNotFound,
+    description: ErrorMessages.SubscriptionNotFound,
   })
   @Delete(':userId/delete/:authorId')
   public async unsubscribe(

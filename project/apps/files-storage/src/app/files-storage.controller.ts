@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import {
   RoutePaths,
-  SwaggerErrorMessages,
-  SwaggerSuccessMessages,
+  ErrorMessages,
+  SuccessMessages,
   SwaggerTags,
 } from '@project/core';
 import { fillDto } from '@project/helpers';
@@ -43,7 +43,7 @@ export class FilesStorageController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: FileRdo,
-    description: SwaggerSuccessMessages.FileUploaded,
+    description: SuccessMessages.FileUploaded,
   })
   @ApiConsumes(MIME_TYPE)
   @ApiBody({
@@ -62,11 +62,11 @@ export class FilesStorageController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: FileRdo,
-    description: SwaggerSuccessMessages.File,
+    description: SuccessMessages.File,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.FileNotFound,
+    description: ErrorMessages.FileNotFound,
   })
   public async getById(@Param('id') id: string) {
     const newFile = await this.filesStorageService.findById(id);
@@ -76,11 +76,11 @@ export class FilesStorageController {
   @Delete(':id')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.FileDeleted,
+    description: SuccessMessages.FileDeleted,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.FileNotFound,
+    description: ErrorMessages.FileNotFound,
   })
   public async delete(@Param('id') id: string) {
     return await this.filesStorageService.delete(id);

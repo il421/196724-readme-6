@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserEntity, UserRepository } from '@project/users-lib';
-import { SwaggerErrorMessages } from '@project/core';
+import { ErrorMessages } from '@project/core';
 import {
   CreateUserDto,
   LoginUserDto,
@@ -21,12 +21,12 @@ export class AuthenticationService {
     const { email, firstName, lastName, password } = dto;
 
     if (!email || !password || !firstName || !lastName) {
-      throw new BadRequestException(SwaggerErrorMessages.NoEmailOrPassword);
+      throw new BadRequestException(ErrorMessages.NoEmailOrPassword);
     }
 
     const user = await this.userRepository.findByEmail(email);
     if (user) {
-      throw new ConflictException(SwaggerErrorMessages.DuplicatedUser);
+      throw new ConflictException(ErrorMessages.DuplicatedUser);
     }
 
     const userEntity = await new UserEntity(dto).setPassword(password);
@@ -39,11 +39,11 @@ export class AuthenticationService {
     const existUser = await this.userRepository.findByEmail(email);
 
     if (!existUser) {
-      throw new NotFoundException(SwaggerErrorMessages.UserNotFound);
+      throw new NotFoundException(ErrorMessages.UserNotFound);
     }
 
     if (!password || !(await existUser.comparePassword(password))) {
-      throw new UnauthorizedException(SwaggerErrorMessages.UserBadPassword);
+      throw new UnauthorizedException(ErrorMessages.UserBadPassword);
     }
 
     return existUser;
@@ -56,13 +56,13 @@ export class AuthenticationService {
         !payload.password ||
         !(await user.comparePassword(payload.password))
       ) {
-        throw new UnauthorizedException(SwaggerErrorMessages.UserBadPassword);
+        throw new UnauthorizedException(ErrorMessages.UserBadPassword);
       }
       const userEntity = await new UserEntity(user.toPlainData()).setPassword(
         payload.newPassword
       );
       return await this.userRepository.update(userEntity);
     }
-    throw new NotFoundException(SwaggerErrorMessages.UserNotFound);
+    throw new NotFoundException(ErrorMessages.UserNotFound);
   }
 }

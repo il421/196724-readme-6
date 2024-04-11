@@ -1,17 +1,16 @@
 import {
   Body,
   Controller,
-  Get,
   Param,
   Post,
   HttpStatus,
   Patch,
 } from '@nestjs/common';
 import {
-  SwaggerErrorMessages,
+  ErrorMessages,
   SwaggerTags,
   RoutePaths,
-  SwaggerSuccessMessages,
+  SuccessMessages,
 } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -31,16 +30,16 @@ export class AuthenticationController {
   @Post('create')
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: SwaggerSuccessMessages.UserCreate,
+    description: SuccessMessages.UserCreate,
     type: UserRdo,
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: SwaggerErrorMessages.DuplicatedUser,
+    description: ErrorMessages.DuplicatedUser,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: SwaggerErrorMessages.UserBadPassword,
+    description: ErrorMessages.UserBadPassword,
   })
   public async create(
     @Body()
@@ -57,11 +56,11 @@ export class AuthenticationController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: SwaggerErrorMessages.UserBadPassword,
+    description: ErrorMessages.UserBadPassword,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.UserNotFound,
+    description: ErrorMessages.UserNotFound,
   })
   public async login(
     @Body()
@@ -75,11 +74,11 @@ export class AuthenticationController {
   @ApiResponse({
     type: LoggedUserRdo,
     status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.UserPasswordUpdated,
+    description: SuccessMessages.UserPasswordUpdated,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: SwaggerErrorMessages.UserBadPassword,
+    description: ErrorMessages.UserBadPassword,
   })
   public async updatePassword(
     @Param('id') id: string,
