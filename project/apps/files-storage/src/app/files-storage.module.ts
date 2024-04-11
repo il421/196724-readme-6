@@ -10,6 +10,7 @@ import {
 } from '@project/files-storage-lib';
 import { MongooseModule } from '@nestjs/mongoose';
 import { getMongooseOptions } from '@project/core';
+
 @Module({
   imports: [
     FilesStorageConfigModule,
