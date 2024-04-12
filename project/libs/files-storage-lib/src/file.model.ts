@@ -19,7 +19,7 @@ export class FileModel extends Document implements File {
   public createdAt!: string;
 
   @Prop({ required: true })
-  public createdBy?: string;
+  public createdBy!: string;
 }
 
 export const FileSchema = SchemaFactory.createForClass(FileModel);

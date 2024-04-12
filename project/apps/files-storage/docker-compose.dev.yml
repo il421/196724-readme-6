@@ -1,10 +1,10 @@
 version: '3.9'
 services:
-  readme-users-mongo:
+  readme-files-mongo:
     image: mongo:4.4
     command: --port ${MONGO_PORT}
     restart: always
-    container_name: readme-users-mongo
+    container_name: readme-files-mongo
 
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
@@ -15,12 +15,12 @@ services:
       - ${MONGO_PORT}:${MONGO_PORT}
 
     volumes:
-      - readme-mongo-users:/data/db
+      - readme-mongo-files:/data/db
 
   users.mongo.ui:
     image: mongo-express:1.0.2-20
     restart: always
-    container_name: readme-users-mongo-ui
+    container_name: readme-files-mongo-ui
     ports:
       - ${MONGO_UI_PORT}:${MONGO_UI_PORT}
     environment:
@@ -29,7 +29,7 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_PASSWORD}
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@readme-users-mongo:${MONGO_PORT}/
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@readme-files-mongo:${MONGO_PORT}/
 
 volumes:
-  readme-mongo-users:
+  readme-mongo-files:
