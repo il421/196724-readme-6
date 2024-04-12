@@ -18,7 +18,6 @@ export class FilesStorageService {
     file: Express.Multer.File,
     userId: string
   ): Promise<FileEntity> {
-    console.log(file);
     const dto: File = {
       createdBy: userId,
       format: file.mimetype,
