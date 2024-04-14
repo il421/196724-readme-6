@@ -31,6 +31,10 @@ export class SubscriptionsController {
     type: SubscriptionRdo,
     description: SuccessMessages.Subscriptions,
   })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ErrorMessages.UserNotFound,
+  })
   public async getSubscriptions(@Param('userId') userId: string) {
     // @TODO need to get userId from token
     const subscription = await this.subscriptionService.find(userId);
@@ -44,6 +48,14 @@ export class SubscriptionsController {
     type: SubscriptionRdo,
     description: SuccessMessages.Subscribed,
   })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ErrorMessages.UserNotFound,
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: ErrorMessages.SubscriptionExists,
+  })
   @Post(':userId/create')
   public async subscribe(
     @Param('userId') userId: string,
@@ -55,12 +67,16 @@ export class SubscriptionsController {
   }
 
   @ApiResponse({
-    status: HttpStatus.OK,
+    status: HttpStatus.NO_CONTENT,
     description: SuccessMessages.Unsubscribed,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: ErrorMessages.SubscriptionNotFound,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ErrorMessages.UserNotFound,
   })
   @Delete(':userId/delete/:authorId')
   public async unsubscribe(

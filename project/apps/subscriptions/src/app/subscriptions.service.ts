@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateSubscriptionDto } from './dtos';
 import { SubscriptionsRepository } from './subscriptions.repository';
 import { SubscriptionsEntity } from './subscriptions.entity';
@@ -16,13 +20,18 @@ export class SubscriptionsService {
     userId: string,
     dto: CreateSubscriptionDto
   ): Promise<SubscriptionsEntity> {
-    const subEntity = new SubscriptionsEntity({ ...dto, createdBy: userId });
-    await this.subscriptionsRepository.save(subEntity);
-    return subEntity;
+    const existingSubscription =
+      await this.subscriptionsRepository.findByAuthorId(userId, dto.authorId);
+    if (!existingSubscription) {
+      const subEntity = new SubscriptionsEntity({ ...dto, createdBy: userId });
+      await this.subscriptionsRepository.save(subEntity);
+      return subEntity;
+    }
+    throw new ConflictException(ErrorMessages.SubscriptionExists);
   }
 
   public async delete(userId: string, authorId: string) {
-    const subscription = this.subscriptionsRepository.findByAuthorId(
+    const subscription = await this.subscriptionsRepository.findByAuthorId(
       userId,
       authorId
     );
