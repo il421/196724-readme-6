@@ -3,6 +3,7 @@ export const ErrorMessages = {
   PostNotFound: 'Post not found',
   FileNotFound: 'File not found',
   SubscriptionNotFound: 'Subscription not found',
+  SubscriptionExists: 'Subscription exists already',
   CommentNotFound: 'Comment not found',
   CommentUserError: 'Not able to delete other users comments',
   UserBadPassword: 'User password is invalid',

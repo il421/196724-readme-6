@@ -4,6 +4,14 @@ services:
     image: mongo:4.4
     command: --port ${MONGO_PORT}
     restart: always
+
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:${MONGO_PORT}/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
     container_name: readme-users-mongo
 
     environment:

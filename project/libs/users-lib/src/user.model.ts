@@ -1,9 +1,9 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from '@project/core';
+import { MongoCollections, User } from '@project/core';
 
 @Schema({
-  collection: 'users',
+  collection: MongoCollections.Users,
   timestamps: true,
 })
 export class UserModel extends Document implements User {

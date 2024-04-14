@@ -50,15 +50,11 @@ export class UsersController {
     status: HttpStatus.NOT_FOUND,
     description: ErrorMessages.UserNotFound,
   })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.FileNotFound,
-  })
   public async updateAvatar(
     @Param('id')
     id: string,
     @Body() dto: UpdateUserAvatarDto
   ) {
-    return await this.usersService.updateUserAvatar(id, dto.fileId);
+    return await this.usersService.updateUserAvatar(id, dto.avatarId);
   }
 }

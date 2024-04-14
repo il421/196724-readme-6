@@ -1,9 +1,9 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { File } from '@project/core';
+import { File, MongoCollections } from '@project/core';
 
 @Schema({
-  collection: 'files',
+  collection: MongoCollections.Files,
   timestamps: true,
 })
 export class FileModel extends Document implements File {
