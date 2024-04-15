@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PostFactory } from './post.factory';
 import { Post, PostState, PostType } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
+import { DEFAULT_NUMBER_OF_POSTS } from './post.restrictions';
 
 @Injectable()
 export class PostRepository extends PostgresRepository<PostEntity, Post> {
@@ -14,7 +15,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     super(entityFactory, client);
   }
 
-  public async saveComment(entity: PostEntity): Promise<void> {
+  public async save(entity: PostEntity): Promise<void> {
     const record = await this.client.post.create({
       data: { ...entity.toPlainData() },
     });
@@ -30,6 +31,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
   ) {
     const documents = await this.client.post.findMany({
       // where: { title, state: PostState.Published },
+      take: DEFAULT_NUMBER_OF_POSTS,
     });
     return documents.map((document) => this.createEntityFromDocument(document));
   }
@@ -37,13 +39,14 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
   public async searchByTitle(title: string) {
     const documents = await this.client.post.findMany({
       where: { title, state: PostState.Published },
+      take: DEFAULT_NUMBER_OF_POSTS,
     });
     return documents.map((document) => this.createEntityFromDocument(document));
   }
 
-  public async findCommentById(id: string) {
+  public async findById(id: string) {
     const document = await this.client.post.findFirst({
-      where: { id },
+      where: { id: id },
     });
     return this.createEntityFromDocument(document);
   }
