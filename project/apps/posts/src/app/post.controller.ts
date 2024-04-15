@@ -116,6 +116,10 @@ export class PostController {
     status: HttpStatus.NOT_FOUND,
     description: ErrorMessages.PostNotFound,
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ErrorMessages.PostPublish,
+  })
   public async publish(
     @Param('userId') userId: string,
     @Param('id') id: string
@@ -143,9 +147,9 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Delete('delete/:id')
+  @Delete(':id/delete')
   @ApiResponse({
-    status: HttpStatus.OK,
+    status: HttpStatus.NO_CONTENT,
     description: SuccessMessages.PostDeleted,
   })
   @ApiResponse({

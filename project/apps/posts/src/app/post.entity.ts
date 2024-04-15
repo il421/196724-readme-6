@@ -1,6 +1,7 @@
 import {
   Entity,
   IStorableEntity,
+  Like,
   Post,
   PostState,
   PostType,
@@ -12,7 +13,6 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
   public state: PostState;
   public tags: string[];
   public isRepost?: boolean;
-  public likes?: number;
   public createdAt?: Date;
   public publishedAt?: Date;
   public createdBy: string;
@@ -40,7 +40,6 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       description,
       quoteAuthor,
       announcement,
-      likes,
     } = post;
     super();
     this.id = id;
@@ -49,7 +48,6 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
     this.state = state;
     this.tags = tags;
     this.isRepost = isRepost;
-    this.likes = likes;
     this.createdBy = createdBy;
     this.createdAt = createdAt;
     this.publishedBy = publishedBy;
@@ -69,7 +67,6 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       state: this.state as PostState,
       tags: this.tags,
       isRepost: this.isRepost,
-      likes: this.likes,
       createdBy: this.createdBy,
       publishedBy: this.publishedBy,
       createdAt: this.createdAt,

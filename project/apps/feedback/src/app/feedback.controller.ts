@@ -21,11 +21,11 @@ import { CommentRdo } from './rdos';
 import { PostRdo } from '../../../posts/src/app/rdos';
 
 @ApiTags(SwaggerTags.Feedback)
-@Controller(RoutePaths.Comments)
+@Controller(RoutePaths.Feedback)
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
-  @Get('/')
+  @Get('/comments')
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
@@ -38,7 +38,7 @@ export class FeedbackController {
       fillDto(CommentRdo, comment.toPlainData())
     );
   }
-  @Post(':userId/comment/create')
+  @Post(':userId/comments/create')
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: CommentRdo,
@@ -52,7 +52,7 @@ export class FeedbackController {
     return fillDto(CommentRdo, newComment.toPlainData());
   }
 
-  @Delete(':userId/comment/:id/delete')
+  @Delete(':userId/comments/:id/delete')
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SuccessMessages.CommentDeleted,
@@ -72,12 +72,10 @@ export class FeedbackController {
     return await this.feedbackService.deleteComment(userId, id);
   }
 
-  @Post(':userId/like/:postId')
+  @Post(':userId/likes/:postId/create')
   @ApiResponse({
-    status: HttpStatus.OK,
-  })
-  @ApiResponse({
-    status: HttpStatus.NO_CONTENT,
+    status: HttpStatus.CREATED,
+    description: SuccessMessages.CommentCreated,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -93,5 +91,26 @@ export class FeedbackController {
   ) {
     // @TODO need to grab user id from token
     await this.feedbackService.like(userId, postId);
+  }
+
+  @Delete(':userId/likes/:postId/delete')
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: SuccessMessages.CommentDeleted,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ErrorMessages.PostNotFound,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ErrorMessages.PostNotPublish,
+  })
+  public async unlike(
+    @Param('userId') userId: string,
+    @Param('postId') postId: string
+  ) {
+    // @TODO need to grab user id from token
+    await this.feedbackService.unlike(userId, postId);
   }
 }
