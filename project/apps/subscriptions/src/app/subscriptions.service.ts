@@ -24,7 +24,7 @@ export class SubscriptionsService {
       await this.subscriptionsRepository.findByAuthorId(userId, dto.authorId);
     if (!existingSubscription) {
       const subEntity = new SubscriptionsEntity({ ...dto, createdBy: userId });
-      await this.subscriptionsRepository.saveComment(subEntity);
+      await this.subscriptionsRepository.save(subEntity);
       return subEntity;
     }
     throw new ConflictException(ErrorMessages.SubscriptionExists);
@@ -36,7 +36,7 @@ export class SubscriptionsService {
       authorId
     );
     if (subscription) {
-      return this.subscriptionsRepository.deleteCommentById(subscription.id);
+      return this.subscriptionsRepository.deleteById(subscription.id);
     }
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
