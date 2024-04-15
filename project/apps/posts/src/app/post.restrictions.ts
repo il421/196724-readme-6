@@ -1,1 +1,2 @@
 export const DEFAULT_NUMBER_OF_POSTS = 25;
+export const DEFAULT_NUMBER_OF_POSTS_BY_TITLE = 20;
