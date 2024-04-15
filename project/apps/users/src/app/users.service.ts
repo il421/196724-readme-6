@@ -7,7 +7,7 @@ export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
   public async getUser(id: string) {
-    const userEntity = await this.userRepository.findById(id);
+    const userEntity = await this.userRepository.findCommentById(id);
     if (userEntity) {
       return userEntity;
     }
@@ -16,7 +16,7 @@ export class UsersService {
   }
 
   public async updateUserAvatar(id: string, avatarId: string) {
-    const userEntity = await this.userRepository.findById(id);
+    const userEntity = await this.userRepository.findCommentById(id);
 
     if (userEntity) {
       const newUserEntity = new UserEntity({

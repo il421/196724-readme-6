@@ -13,32 +13,17 @@ import {
   ErrorMessages,
   SwaggerTags,
   PostState,
-  PostTypes,
+  PostType,
   RoutePaths,
   SuccessMessages,
 } from '@project/core';
 import { CreatePostDto, UpdatePostDto } from './dtos';
 import { fillDto } from '@project/helpers';
-import {
-  BasePostRdo,
-  PhotoPostRdo,
-  QuotePostRdo,
-  RefPostRdo,
-  TextPostRdo,
-  VideoPostRdo,
-  withPostRdo,
-} from './rdos';
-import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PostRdo } from './rdos';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
 
 @ApiTags(SwaggerTags.Posts)
-@ApiExtraModels(
-  TextPostRdo,
-  PhotoPostRdo,
-  VideoPostRdo,
-  RefPostRdo,
-  QuotePostRdo
-)
 @Controller(RoutePaths.Posts)
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -47,39 +32,35 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
-    type: BasePostRdo,
+    type: PostRdo,
     description: SuccessMessages.Posts,
   })
   public async getPosts(
     @Query('usersIds') usersIds?: string[],
     @Query('tags') tags?: string[],
-    @Query('type') type?: PostTypes[],
+    @Query('type') type?: PostType[],
     @Query('state') state?: PostState
   ) {
-    const posts = await this.postService.getPosts(usersIds, tags, type, state);
-    return posts.map((post) =>
-      fillDto(withPostRdo(post?.type), post?.toPlainData())
-    );
+    // const posts = await this.postService.getPosts(usersIds, tags, type, state);
+    // return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
   }
 
   @Get('/search')
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
-    type: BasePostRdo,
+    type: PostRdo,
     description: SuccessMessages.Posts,
   })
   public async search(@Query('title') title: string) {
     const posts = await this.postService.searchByTitle(title);
-    return posts.map((post) =>
-      fillDto(withPostRdo(post?.type), post?.toPlainData())
-    );
+    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
   }
 
   @Get(':id')
   @ApiResponse({
     status: HttpStatus.OK,
-    type: BasePostRdo,
+    type: PostRdo,
     description: SuccessMessages.Posts,
   })
   @ApiResponse({
@@ -88,13 +69,13 @@ export class PostController {
   })
   public async getPostById(@Param('id') id: string) {
     const post = await this.postService.getPost(id);
-    return fillDto(withPostRdo(post?.type), post?.toPlainData());
+    return fillDto(PostRdo, post?.toPlainData());
   }
 
   @Post(':userId/create')
   @ApiResponse({
     status: HttpStatus.CREATED,
-    type: BasePostRdo,
+    type: PostRdo,
     description: SuccessMessages.PostCreated,
   })
   public async create(
@@ -103,13 +84,13 @@ export class PostController {
   ) {
     // @TODO need to grab user id from token later
     const newPost = await this.postService.create(userId, dto);
-    return fillDto(withPostRdo(dto.type), newPost.toPlainData());
+    return fillDto(PostRdo, newPost.toPlainData());
   }
 
   @Put('update/:id')
   @ApiResponse({
     status: HttpStatus.OK,
-    type: BasePostRdo,
+    type: PostRdo,
     description: SuccessMessages.PostUpdated,
   })
   @ApiResponse({
@@ -118,28 +99,35 @@ export class PostController {
   })
   public async update(@Param('id') id: string, @Body() dto: UpdatePostDto) {
     const newPost = await this.postService.update(id, dto);
-    return fillDto(withPostRdo(dto.type), newPost.toPlainData());
+    return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Put('publish/:id')
+  @Put(':userId/publish/:id')
   @ApiResponse({
     status: HttpStatus.OK,
-    type: BasePostRdo,
+    type: PostRdo,
     description: SuccessMessages.PostPublished,
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: ErrorMessages.PostPublishConflict,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: ErrorMessages.PostNotFound,
   })
-  public async publish(@Param('id') id: string) {
-    const newPost = await this.postService.publish(id);
-    return fillDto(withPostRdo(newPost.type), newPost.toPlainData());
+  public async publish(
+    @Param('userId') userId: string,
+    @Param('id') id: string
+  ) {
+    const newPost = await this.postService.publish(id, userId);
+    return fillDto(PostRdo, newPost.toPlainData());
   }
 
   @Post(':userId/repost/:id')
   @ApiResponse({
     status: HttpStatus.OK,
-    type: BasePostRdo,
+    type: PostRdo,
     description: SuccessMessages.PostReposted,
   })
   @ApiResponse({
@@ -152,23 +140,7 @@ export class PostController {
   ) {
     // @TODO need to grab user id from token
     const newPost = await this.postService.repost(id, userId);
-    return fillDto(withPostRdo(newPost.type), newPost.toPlainData());
-  }
-
-  @Post(':userId/like/:id')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: BasePostRdo,
-    description: SuccessMessages.PostLiked,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.PostNotFound,
-  })
-  public async like(@Param('userId') userId: string, @Param('id') id: string) {
-    // @TODO need to grab user id from token
-    const newPost = await this.postService.like(id, userId);
-    return fillDto(withPostRdo(newPost.type), newPost.toPlainData());
+    return fillDto(PostRdo, newPost.toPlainData());
   }
 
   @Delete('delete/:id')

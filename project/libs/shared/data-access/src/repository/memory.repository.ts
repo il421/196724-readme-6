@@ -9,7 +9,7 @@ export class MemoryRepository<
   protected entities: Map<T['id'], ReturnType<T['toPlainData']>> = new Map();
   constructor(protected entityFactory: IEntityFactory<T>) {}
 
-  public async findById(id: T['id']): Promise<T | null> {
+  public async findCommentById(id: T['id']): Promise<T | null> {
     const entity = this.entities.get(id);
     if (!entity) {
       return null;
@@ -17,7 +17,7 @@ export class MemoryRepository<
     return this.entityFactory.create(entity);
   }
 
-  public async save(entity: T): Promise<void> {
+  public async saveComment(entity: T): Promise<void> {
     if (!entity.id) {
       entity.id = randomUUID();
     }
@@ -29,7 +29,7 @@ export class MemoryRepository<
     this.entities.set(entity.id, entity.toPlainData());
   }
 
-  public async deleteById(id: T['id']): Promise<void> {
+  public async deleteCommentById(id: T['id']): Promise<void> {
     this.entities.delete(id);
   }
 }

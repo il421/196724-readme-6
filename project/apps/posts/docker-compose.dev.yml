@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - readme-posts-postgres:/var/lib/postgresql/data
 
@@ -30,7 +30,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
-      - 8082:80
+      - ${PGADMIN_PORT}:${PGADMIN_PORT_REMOTE}
     depends_on:
       - readme-posts-postgres
     networks:

@@ -1,10 +1,10 @@
 import { Comment, Entity, IStorableEntity } from '@project/core';
 
-export class FeedbackEntity extends Entity implements IStorableEntity<Comment> {
+export class CommentEntity extends Entity implements IStorableEntity<Comment> {
   public text: string;
   public postId: string;
   public createdBy?: string;
-  public createdAt?: string;
+  public createdAt?: Date;
   constructor(comment: Comment) {
     const { id, text, postId, createdBy, createdAt } = comment;
     super();
@@ -12,7 +12,7 @@ export class FeedbackEntity extends Entity implements IStorableEntity<Comment> {
     this.text = text;
     this.postId = postId;
     this.createdBy = createdBy;
-    this.createdAt = createdAt ?? new Date().toISOString();
+    this.createdAt = createdAt;
   }
 
   toPlainData(): Comment {

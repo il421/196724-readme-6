@@ -11,6 +11,7 @@ export function fillDto<T, V>(
 ): T {
   return plainToInstance(someDto, plainObject, {
     excludeExtraneousValues: true,
+    exposeUnsetFields: false,
     ...options,
   });
 }

@@ -27,12 +27,12 @@ export abstract class MongoRepository<
     return entity;
   }
 
-  public async findById(id: T['id']): Promise<T | null> {
+  public async findCommentById(id: T['id']): Promise<T | null> {
     const document = await this.model.findById(id).exec();
     return this.createEntityFromDocument(document);
   }
 
-  public async save(entity: T): Promise<void> {
+  public async saveComment(entity: T): Promise<void> {
     const newEntity = new this.model(entity.toPlainData());
     await newEntity.save();
 
@@ -51,7 +51,7 @@ export abstract class MongoRepository<
     }
   }
 
-  public async deleteById(id: T['id']): Promise<void> {
+  public async deleteCommentById(id: T['id']): Promise<void> {
     const deletedDocument = await this.model.findByIdAndDelete(id).exec();
     if (!deletedDocument) {
       throw new NotFoundException(`Entity with id ${id} not found.`);

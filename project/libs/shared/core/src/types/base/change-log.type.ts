@@ -1,6 +1,6 @@
 export type ChangeLog = {
-  createdBy?: string;
-  createdAt?: string;
+  createdBy: string;
+  createdAt?: Date;
   publishedBy?: string;
-  publishedAt?: string;
+  publishedAt?: Date;
 };
