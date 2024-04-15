@@ -10,12 +10,19 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { getMongooseOptions } from '@project/core';
+import {
+  SubscriptionModel,
+  SubscriptionSchema,
+} from '../../../subscriptions/src/app/subscription.model';
 
 @Module({
   imports: [
     UsersConfigModule,
     MongooseModule.forRootAsync(getMongooseOptions()),
-    MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: UserModel.name, schema: UserSchema },
+      { name: SubscriptionModel.name, schema: SubscriptionSchema }, // move subs model to libs
+    ]),
   ],
   controllers: [UsersController],
   providers: [UsersService, UserRepository, UserFactory],
