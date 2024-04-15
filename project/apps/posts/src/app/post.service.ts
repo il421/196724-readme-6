@@ -18,7 +18,7 @@ export class PostService {
       createdBy: userId,
       state: PostState.Draft,
     });
-    await this.postRepository.saveComment(postEntity);
+    await this.postRepository.save(postEntity);
     return postEntity;
   }
 
@@ -34,7 +34,7 @@ export class PostService {
   }
 
   public async publish(id: string, userId: string): Promise<PostEntity> {
-    const postEntity = await this.postRepository.findCommentById(id);
+    const postEntity = await this.postRepository.findById(id);
     if (postEntity) {
       if (postEntity.createdBy === userId) {
         const updatedPost = await this.postRepository.client.post.update({
@@ -54,7 +54,7 @@ export class PostService {
   }
 
   public async repost(id: string, repostBy: string): Promise<PostEntity> {
-    const postEntity = await this.postRepository.findCommentById(id);
+    const postEntity = await this.postRepository.findById(id);
     if (postEntity) {
       const { id, tags, likes, ...rest } = postEntity;
       const payloadEntity = new PostEntity({
@@ -63,7 +63,7 @@ export class PostService {
         publishedAt: new Date(),
         publishedBy: repostBy,
       });
-      await this.postRepository.saveComment(payloadEntity);
+      await this.postRepository.save(payloadEntity);
       return payloadEntity;
     }
     throw new NotFoundException(ErrorMessages.PostNotFound);
@@ -83,7 +83,7 @@ export class PostService {
   }
 
   public async getPost(id: string) {
-    const post = this.postRepository.findCommentById(id);
+    const post = this.postRepository.findById(id);
 
     if (post) return post;
     throw new NotFoundException(ErrorMessages.PostNotFound);
