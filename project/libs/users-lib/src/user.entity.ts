@@ -35,8 +35,8 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
       password: this.password ?? '',
       avatarId: this.avatarId,
       avatarUrl: this.avatarUrl,
-      posts: this.posts ?? 0,
-      followers: this.followers ?? 0,
+      posts: this.posts,
+      followers: this.followers,
     };
   }
 

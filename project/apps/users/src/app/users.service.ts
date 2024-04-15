@@ -8,7 +8,7 @@ export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
   public async getUser(id: string) {
-    const userEntity = await this.userRepository.findById(id);
+    const userEntity = await this.userRepository.searchById(id);
     if (userEntity) {
       return userEntity;
     }
