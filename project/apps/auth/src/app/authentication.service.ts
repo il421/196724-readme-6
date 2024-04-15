@@ -30,7 +30,7 @@ export class AuthenticationService {
     }
 
     const userEntity = await new UserEntity(dto).setPassword(password);
-    await this.userRepository.saveComment(userEntity);
+    await this.userRepository.save(userEntity);
     return userEntity;
   }
 
@@ -50,7 +50,7 @@ export class AuthenticationService {
   }
 
   public async updatePassword(id: string, payload: UpdateUserPasswordDto) {
-    const user = await this.userRepository.findCommentById(id);
+    const user = await this.userRepository.findById(id);
     if (user) {
       if (
         !payload.password ||

@@ -23,6 +23,7 @@ export class SubscriptionsService {
     const existingSubscription =
       await this.subscriptionsRepository.findByAuthorId(userId, dto.authorId);
     if (!existingSubscription) {
+      // @TODO check for author
       const subEntity = new SubscriptionsEntity({ ...dto, createdBy: userId });
       await this.subscriptionsRepository.save(subEntity);
       return subEntity;
@@ -38,6 +39,6 @@ export class SubscriptionsService {
     if (subscription) {
       return this.subscriptionsRepository.deleteById(subscription.id);
     }
-    throw new NotFoundException(ErrorMessages.PostNotFound);
+    throw new NotFoundException(ErrorMessages.SubscriptionNotFound);
   }
 }
