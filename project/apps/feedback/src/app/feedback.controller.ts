@@ -38,7 +38,7 @@ export class FeedbackController {
       fillDto(CommentRdo, comment.toPlainData())
     );
   }
-  @Post(':userId/create')
+  @Post(':userId/comment/create')
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: CommentRdo,
@@ -48,13 +48,13 @@ export class FeedbackController {
     @Param('userId') userId: string,
     @Body() dto: CreateCommentDto
   ) {
-    const newComment = await this.feedbackService.create(userId, dto);
+    const newComment = await this.feedbackService.createComment(userId, dto);
     return fillDto(CommentRdo, newComment.toPlainData());
   }
 
-  @Delete('user/:userId/delete/:id')
+  @Delete(':userId/comment/:id/delete')
   @ApiResponse({
-    status: HttpStatus.OK,
+    status: HttpStatus.NO_CONTENT,
     description: SuccessMessages.CommentDeleted,
   })
   @ApiResponse({
@@ -69,17 +69,23 @@ export class FeedbackController {
     @Param('userId') userId: string,
     @Param('id') id: string
   ) {
-    return await this.feedbackService.delete(userId, id);
+    return await this.feedbackService.deleteComment(userId, id);
   }
 
   @Post(':userId/like/:postId')
   @ApiResponse({
     status: HttpStatus.OK,
-    type: PostRdo,
+  })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: ErrorMessages.PostNotFound,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ErrorMessages.PostNotPublish,
   })
   public async like(
     @Param('userId') userId: string,

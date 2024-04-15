@@ -10,7 +10,8 @@ import { Model } from 'mongoose';
 export class UserRepository extends MongoRepository<UserEntity, UserModel> {
   constructor(
     entityFactory: UserFactory,
-    @InjectModel(UserModel.name) userModel: Model<UserModel>
+    @InjectModel(UserModel.name)
+    userModel: Model<UserModel>
   ) {
     super(entityFactory, userModel);
   }

@@ -10,7 +10,7 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
   public avatarId?: string;
   public posts?: number;
   public followers?: number;
-  public createdAt?: string;
+  public createdAt?: Date;
   public avatarUrl?: string;
   constructor(user: User) {
     super();

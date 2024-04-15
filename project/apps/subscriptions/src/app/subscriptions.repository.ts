@@ -1,8 +1,7 @@
-import { MemoryRepository, MongoRepository } from '@project/data-access';
+import { MongoRepository } from '@project/data-access';
 import { SubscriptionsEntity } from './subscriptions.entity';
 import { Injectable } from '@nestjs/common';
 import { SubscriptionsFactory } from './subscriptions.factory';
-import { UserEntity, UserFactory, UserModel } from '@project/users-lib';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { SubscriptionModel } from './subscription.model';
@@ -28,6 +27,8 @@ export class SubscriptionsRepository extends MongoRepository<
     const subscriptionsDocuments = await this.model
       .find({ createdBy: userId })
       .exec();
-    return subscriptionsDocuments.map(this.createEntityFromDocument);
+    return subscriptionsDocuments.map((document) =>
+      this.createEntityFromDocument(document)
+    );
   }
 }

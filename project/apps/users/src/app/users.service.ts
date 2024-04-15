@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserEntity, UserRepository } from '@project/users-lib';
 import { ErrorMessages } from '@project/core';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
   public async getUser(id: string) {
-    const userEntity = await this.userRepository.findCommentById(id);
+    const userEntity = await this.userRepository.findById(id);
     if (userEntity) {
       return userEntity;
     }
@@ -16,7 +17,7 @@ export class UsersService {
   }
 
   public async updateUserAvatar(id: string, avatarId: string) {
-    const userEntity = await this.userRepository.findCommentById(id);
+    const userEntity = await this.userRepository.findById(id);
 
     if (userEntity) {
       const newUserEntity = new UserEntity({
