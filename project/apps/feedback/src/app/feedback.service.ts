@@ -44,6 +44,22 @@ export class FeedbackService {
 
     if (postEntity) {
       if (postEntity.state === PostState.Published) {
+        return await this.feedbackRepository.saveLike(
+          new LikeEntity({ postId, createdBy: userId })
+        );
+      }
+      throw new BadRequestException(ErrorMessages.PostNotPublish);
+    }
+    throw new NotFoundException(ErrorMessages.PostNotFound);
+  }
+
+  public async unlike(userId: string, postId: string): Promise<void> {
+    const postEntity = await this.feedbackRepository.client.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (postEntity) {
+      if (postEntity.state === PostState.Published) {
         const likeEntity = await this.feedbackRepository.findLike(
           userId,
           postId
@@ -51,9 +67,7 @@ export class FeedbackService {
         if (likeEntity) {
           return await this.feedbackRepository.deleteLike(userId, postId);
         }
-        return await this.feedbackRepository.saveLike(
-          new LikeEntity({ postId, createdBy: userId })
-        );
+        throw new BadRequestException(ErrorMessages.NoLiked);
       }
       throw new BadRequestException(ErrorMessages.PostNotPublish);
     }

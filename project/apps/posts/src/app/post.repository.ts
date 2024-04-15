@@ -43,6 +43,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     const documents = await this.client.post.findMany({
       where: { title, state: PostState.Published },
       take: DEFAULT_NUMBER_OF_POSTS_BY_TITLE,
+      include: { _count: { select: { comments: true } } },
     });
     return documents.map((document) => this.createEntityFromDocument(document));
   }

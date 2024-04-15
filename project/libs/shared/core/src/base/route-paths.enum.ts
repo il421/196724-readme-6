@@ -2,7 +2,7 @@ export enum RoutePaths {
   Auth = 'auth',
   Users = 'users',
   Posts = 'posts',
-  Comments = 'comments',
+  Feedback = 'feedback',
   Subscriptions = 'subscriptions',
   Files = 'files',
 }

@@ -48,7 +48,10 @@ export class FeedbackRepository extends PostgresRepository<
     const document = await this.client.like.findFirst({
       where: { createdBy: userId, postId },
     });
-    return new LikeEntity(document);
+    if (document) {
+      return new LikeEntity(document);
+    }
+    return null;
   }
 
   public async deleteLike(userId: string, postId: string) {

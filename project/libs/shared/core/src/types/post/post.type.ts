@@ -10,7 +10,6 @@ export type Post = ChangeLog & {
   state: PostState;
   isRepost?: boolean;
   tags?: string[];
-  likes?: number;
 
   text?: string;
   announcement?: string;
