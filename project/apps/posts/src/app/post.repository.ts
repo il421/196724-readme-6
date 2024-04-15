@@ -33,7 +33,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     state?: PostState
   ) {
     const documents = await this.client.post.findMany({
-      // where: { title, state: PostState.Published },
+      // where: { title, state: PostState.Published }, // @TODO not done
       take: DEFAULT_NUMBER_OF_POSTS,
     });
     return documents.map((document) => this.createEntityFromDocument(document));
@@ -43,14 +43,14 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     const documents = await this.client.post.findMany({
       where: { title, state: PostState.Published },
       take: DEFAULT_NUMBER_OF_POSTS_BY_TITLE,
-      include: { _count: { select: { comments: true } } },
+      include: { _count: { select: { comments: true } } }, // @TODO not tested
     });
     return documents.map((document) => this.createEntityFromDocument(document));
   }
 
   public async findById(id: string) {
     const document = await this.client.post.findFirst({
-      where: { id: id },
+      where: { id },
     });
     return this.createEntityFromDocument(document);
   }
