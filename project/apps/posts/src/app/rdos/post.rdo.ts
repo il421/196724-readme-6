@@ -44,13 +44,6 @@ export class PostRdo {
   tags!: string[];
 
   @ApiProperty({
-    example: '[c3c05894-c1a9-422d-8752-4dc83b27b7b3]',
-    description: 'Post liked users',
-  })
-  @Expose()
-  likes!: string[];
-
-  @ApiProperty({
     example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
     description: 'Post author identifier',
   })
