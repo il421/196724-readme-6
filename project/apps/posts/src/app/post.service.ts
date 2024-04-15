@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePostDto, UpdatePostDto } from './dtos';
-import { ErrorMessages, PostState, PostTypes } from '@project/core';
+import { ErrorMessages, PostState, PostType } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 
@@ -14,86 +18,78 @@ export class PostService {
       createdBy: userId,
       state: PostState.Draft,
     });
-    await this.postRepository.save(postEntity);
+    await this.postRepository.saveComment(postEntity);
     return postEntity;
   }
 
   public async update(id: string, dto: UpdatePostDto): Promise<PostEntity> {
-    const post = await this.postRepository.findById(id);
+    const post = await this.postRepository.client.post.update({
+      where: { id },
+      data: dto,
+    });
     if (post) {
-      const postEntity = new PostEntity({ ...post.toPlainData(), ...dto });
-      await this.postRepository.update(postEntity);
-      return postEntity;
+      return new PostEntity(post);
     }
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
-  public async publish(id: string): Promise<PostEntity> {
-    const post = await this.postRepository.findById(id);
-    if (post) {
-      const postEntity = new PostEntity({
-        ...post.toPlainData(),
-        state: PostState.Published,
-      });
-      await this.postRepository.update(postEntity);
-      return postEntity;
+  public async publish(id: string, userId: string): Promise<PostEntity> {
+    const postEntity = await this.postRepository.findCommentById(id);
+    if (postEntity) {
+      if (postEntity.createdBy === userId) {
+        const updatedPost = await this.postRepository.client.post.update({
+          where: { id },
+          data: {
+            state: PostState.Published,
+            publishedAt: new Date(),
+            publishedBy: postEntity.createdBy,
+          },
+        });
+        return new PostEntity(updatedPost);
+      } else {
+        new ConflictException(ErrorMessages.PostPublishConflict);
+      }
     }
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
   public async repost(id: string, repostBy: string): Promise<PostEntity> {
-    const post = await this.postRepository.findById(id);
-    if (post) {
-      const { id, ...rest } = post.toPlainData();
-      const postEntity = new PostEntity({
+    const postEntity = await this.postRepository.findCommentById(id);
+    if (postEntity) {
+      const { id, tags, likes, ...rest } = postEntity;
+      const payloadEntity = new PostEntity({
         ...rest,
         isRepost: true,
-        publishedAt: new Date().toISOString(),
+        publishedAt: new Date(),
         publishedBy: repostBy,
       });
-      await this.postRepository.save(postEntity);
-      return postEntity;
+      await this.postRepository.saveComment(payloadEntity);
+      return payloadEntity;
     }
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
-  public async like(id: string, userId: string): Promise<PostEntity> {
-    const post = await this.postRepository.findById(id);
-    if (post) {
-      const { likes = [], ...rest } = post.toPlainData();
-      const postEntity = new PostEntity({
-        ...rest,
-        likes: likes.includes(userId)
-          ? likes.filter((like) => like !== userId)
-          : [...likes, userId],
-      });
-      await this.postRepository.update(postEntity);
-      return postEntity;
-    }
-    throw new NotFoundException(ErrorMessages.PostNotFound);
-  }
-
-  public async getPosts(
+  public async search(
     usersIds?: string[],
     tags?: string[],
-    types?: PostTypes[],
+    types?: PostType[],
     state?: PostState
   ) {
     return this.postRepository.findPosts(usersIds, tags, types, state);
   }
 
-  public async searchByTitle(title: string) {
-    return this.postRepository.search(title);
+  public searchByTitle(title: string) {
+    return this.postRepository.searchByTitle(title);
   }
 
   public async getPost(id: string) {
-    const post = this.postRepository.findById(id);
+    const post = this.postRepository.findCommentById(id);
 
     if (post) return post;
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
   public async delete(id: string) {
-    return this.postRepository.deleteById(id);
+    return this.postRepository.client.post.delete({ where: { id } });
   }
 }

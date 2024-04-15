@@ -18,6 +18,7 @@ import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
+import { PostRdo } from '../../../posts/src/app/rdos';
 
 @ApiTags(SwaggerTags.Feedback)
 @Controller(RoutePaths.Comments)
@@ -37,14 +38,17 @@ export class FeedbackController {
       fillDto(CommentRdo, comment.toPlainData())
     );
   }
-  @Post('create')
+  @Post(':userId/create')
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: CommentRdo,
     description: SuccessMessages.CommentCreated,
   })
-  public async create(@Body() dto: CreateCommentDto) {
-    const newComment = await this.feedbackService.create(dto);
+  public async create(
+    @Param('userId') userId: string,
+    @Body() dto: CreateCommentDto
+  ) {
+    const newComment = await this.feedbackService.create(userId, dto);
     return fillDto(CommentRdo, newComment.toPlainData());
   }
 
@@ -66,5 +70,22 @@ export class FeedbackController {
     @Param('id') id: string
   ) {
     return await this.feedbackService.delete(userId, id);
+  }
+
+  @Post(':userId/like/:postId')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: PostRdo,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ErrorMessages.PostNotFound,
+  })
+  public async like(
+    @Param('userId') userId: string,
+    @Param('postId') postId: string
+  ) {
+    // @TODO need to grab user id from token
+    await this.feedbackService.like(userId, postId);
   }
 }

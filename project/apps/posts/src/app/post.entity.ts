@@ -3,23 +3,26 @@ import {
   IStorableEntity,
   Post,
   PostState,
-  PostTypes,
+  PostType,
 } from '@project/core';
 
 export class PostEntity extends Entity implements IStorableEntity<Post> {
-  public name: string;
-  public type: PostTypes;
+  public title: string;
+  public type: PostType;
   public state: PostState;
   public tags: string[];
   public isRepost?: boolean;
-  public likes: string[];
-  public createdBy?: string;
-  public createdAt?: string;
+  public likes?: number;
+  public createdAt?: Date;
+  public publishedAt?: Date;
+  public createdBy: string;
   public publishedBy?: string;
-  public publishedAt?: string;
-  public semanticData: object;
+  public text: string;
+  public quoteAuthor: string;
+  public url: string;
+  public description: string;
+  public announcement: string;
 
-  private currentDateIso = new Date().toISOString();
   constructor(post: Post) {
     const {
       id,
@@ -32,38 +35,50 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       createdAt,
       publishedBy,
       publishedAt,
+      text,
+      url,
+      description,
+      quoteAuthor,
+      announcement,
       likes,
-      ...semanticData
     } = post;
     super();
     this.id = id;
-    this.name = title;
+    this.title = title;
     this.type = type;
     this.state = state;
-    this.tags = tags ?? [];
+    this.tags = tags;
     this.isRepost = isRepost;
-    this.likes = likes ?? [];
+    this.likes = likes;
     this.createdBy = createdBy;
-    this.createdAt = createdAt ?? this.currentDateIso;
-    this.publishedBy = publishedBy ?? this.currentDateIso;
+    this.createdAt = createdAt;
+    this.publishedBy = publishedBy;
     this.publishedAt = publishedAt;
-    this.semanticData = semanticData;
+    this.text = text;
+    this.url = url;
+    this.description = description;
+    this.quoteAuthor = quoteAuthor;
+    this.announcement = announcement;
   }
 
-  toPlainData(): Post {
+  public toPlainData(): Post {
     return {
       id: this.id,
-      title: this.name,
-      type: this.type,
-      state: this.state,
+      title: this.title,
+      type: this.type as PostType,
+      state: this.state as PostState,
       tags: this.tags,
       isRepost: this.isRepost,
       likes: this.likes,
       createdBy: this.createdBy,
-      createdAt: this.createdAt,
       publishedBy: this.publishedBy,
-      publishedAt: this.publishedAt,
-      ...this.semanticData,
+      createdAt: this.createdAt,
+      publishedAt: this.createdAt,
+      text: this.text,
+      url: this.url,
+      description: this.description,
+      quoteAuthor: this.quoteAuthor,
+      announcement: this.announcement,
     };
   }
 }

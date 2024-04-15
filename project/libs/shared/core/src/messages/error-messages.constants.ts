@@ -1,6 +1,7 @@
 export const ErrorMessages = {
   UserNotFound: 'User not found',
   PostNotFound: 'Post not found',
+  PostPublishConflict: 'User is not able publishing other users posts',
   FileNotFound: 'File not found',
   SubscriptionNotFound: 'Subscription not found',
   SubscriptionExists: 'Subscription exists already',

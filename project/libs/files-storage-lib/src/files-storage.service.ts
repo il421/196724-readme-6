@@ -28,12 +28,12 @@ export class FilesStorageService {
       ),
     };
     const postEntity = new FileEntity(dto);
-    await this.filesStorageRepository.save(postEntity);
+    await this.filesStorageRepository.saveComment(postEntity);
     return postEntity;
   }
 
   public async delete(id: string): Promise<void> {
-    const fileEntity = await this.filesStorageRepository.findById(id);
+    const fileEntity = await this.filesStorageRepository.findCommentById(id);
 
     // TODO not done yet
     if (fileEntity) {
@@ -42,7 +42,7 @@ export class FilesStorageService {
   }
 
   public async findById(id: string): Promise<FileEntity> {
-    const fileEntity = await this.filesStorageRepository.findById(id);
+    const fileEntity = await this.filesStorageRepository.findCommentById(id);
 
     if (fileEntity) return fileEntity;
     throw new NotFoundException(ErrorMessages.FileNotFound);

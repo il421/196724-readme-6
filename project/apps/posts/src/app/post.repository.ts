@@ -1,42 +1,50 @@
-import { MemoryRepository } from '@project/data-access';
+import { MemoryRepository, PostgresRepository } from '@project/data-access';
 import { PostEntity } from './post.entity';
 import { Injectable } from '@nestjs/common';
 import { PostFactory } from './post.factory';
-import { PostState, PostTypes } from '@project/core';
+import { Post, PostState, PostType } from '@project/core';
+import { PrismaClientService } from '@project/prisma-client';
 
 @Injectable()
-export class PostRepository extends MemoryRepository<PostEntity> {
-  constructor(entityFactory: PostFactory) {
-    super(entityFactory);
+export class PostRepository extends PostgresRepository<PostEntity, Post> {
+  constructor(
+    entityFactory: PostFactory,
+    readonly client: PrismaClientService
+  ) {
+    super(entityFactory, client);
   }
 
-  public findPosts(
+  public async saveComment(entity: PostEntity): Promise<void> {
+    const record = await this.client.post.create({
+      data: { ...entity.toPlainData() },
+    });
+
+    entity.id = record.id;
+  }
+
+  public async findPosts(
     usersIds?: string[],
     tags?: string[],
-    types?: PostTypes[],
+    types?: PostType[],
     state?: PostState
   ) {
-    const entities = Array.from(this.entities.values());
-    return entities
-      .filter(
-        (entry) =>
-          // @TODO need to simplify
-          entry.createdBy &&
-          usersIds?.includes(entry.createdBy) &&
-          entry.tags?.some((tag) => tags?.includes(tag)) &&
-          (types?.length ? types.includes(entry.type) : true) &&
-          entry.state === (state ?? PostState.Published)
-      )
-      .map((post) => this.entityFactory.create(post));
+    const documents = await this.client.post.findMany({
+      // where: { title, state: PostState.Published },
+    });
+    return documents.map((document) => this.createEntityFromDocument(document));
   }
 
-  public search(title: string) {
-    const entities = Array.from(this.entities.values());
-    return entities
-      .filter(
-        (entry) =>
-          entry.title.includes(title) && entry.state === PostState.Published
-      )
-      .map((post) => this.entityFactory.create(post));
+  public async searchByTitle(title: string) {
+    const documents = await this.client.post.findMany({
+      where: { title, state: PostState.Published },
+    });
+    return documents.map((document) => this.createEntityFromDocument(document));
+  }
+
+  public async findCommentById(id: string) {
+    const document = await this.client.post.findFirst({
+      where: { id },
+    });
+    return this.createEntityFromDocument(document);
   }
 }
