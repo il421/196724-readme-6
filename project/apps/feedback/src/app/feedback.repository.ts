@@ -5,6 +5,7 @@ import { FeedbackFactory } from './feedback.factory';
 import { Comment } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
 import { LikeEntity } from './like.entity';
+import { DEFAULT_NUMBER_OF_COMMENTS } from './feedback.restrictions';
 
 @Injectable()
 export class FeedbackRepository extends PostgresRepository<
@@ -32,7 +33,10 @@ export class FeedbackRepository extends PostgresRepository<
   }
 
   public async findCommentsByPostId(postId: string) {
-    const documents = await this.client.comment.findMany({ where: { postId } });
+    const documents = await this.client.comment.findMany({
+      where: { postId },
+      take: DEFAULT_NUMBER_OF_COMMENTS,
+    });
     return documents.map((document) => this.createEntityFromDocument(document));
   }
 

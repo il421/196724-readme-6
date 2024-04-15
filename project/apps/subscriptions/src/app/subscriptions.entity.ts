@@ -6,14 +6,14 @@ export class SubscriptionsEntity
 {
   public authorId: string;
   public createdBy?: string;
-  public createdAt?: string;
+  public createdAt?: Date;
   constructor(subscription: Subscription) {
     const { id, authorId, createdBy, createdAt } = subscription;
     super();
     this.id = id;
     this.authorId = authorId;
     this.createdBy = createdBy;
-    this.createdAt = createdAt ?? new Date().toISOString();
+    this.createdAt = createdAt;
   }
 
   toPlainData(): Subscription {

@@ -21,11 +21,11 @@ export abstract class PostgresRepository<
     return this.entityFactory.create(document as ReturnType<T['toPlainData']>);
   }
 
-  public async findCommentById(id: T['id']): Promise<T> {
+  public async findById(id: T['id']): Promise<T> {
     throw new Error('Not implemented');
   }
 
-  public async saveComment(entity: T): Promise<void> {
+  public async save(entity: T): Promise<void> {
     throw new Error('Not implemented');
   }
 
@@ -33,7 +33,7 @@ export abstract class PostgresRepository<
     throw new Error('Not implemented');
   }
 
-  public async deleteCommentById(id: T['id']): Promise<void> {
+  public async deleteById(id: T['id']): Promise<void> {
     throw new Error('Not implemented');
   }
 }
