@@ -1,12 +1,10 @@
 import {
   Entity,
   IStorableEntity,
-  Like,
   Post,
   PostState,
   PostType,
 } from '@project/core';
-import { unique } from '@project/helpers';
 
 export class PostEntity extends Entity implements IStorableEntity<Post> {
   public title: string;
@@ -50,7 +48,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
     this.title = title;
     this.type = type;
     this.state = state;
-    this.tags = this.getUniqueTags(tags);
+    this.tags = tags;
     this.isRepost = !!isRepost;
     this.createdBy = createdBy;
     this.createdAt = createdAt;
@@ -66,9 +64,6 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
     this.commentsCount = _count?.comments || undefined;
     this.likesCount = _count?.likes || undefined;
   }
-
-  private getUniqueTags = (tags: string[]) =>
-    unique(tags?.map((tag) => tag.trim().toLowerCase()));
 
   public toPlainData(): Post {
     return {
