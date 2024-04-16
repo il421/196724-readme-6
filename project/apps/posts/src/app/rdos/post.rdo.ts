@@ -16,7 +16,7 @@ export class PostRdo {
 
   @ApiProperty({
     enum: PostType,
-    enumName: 'PostTypes',
+    enumName: 'PostType',
     example: 'video',
     description: 'Post type',
   })

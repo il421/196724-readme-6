@@ -13,13 +13,13 @@ export abstract class PostgresRepository<
     protected readonly client: PrismaClientService
   ) {}
 
-  protected createEntityFromDocument(document: DocumentType): T | null {
+  protected createEntityFromDocument = (document: DocumentType): T | null => {
     if (!document) {
       return null;
     }
 
     return this.entityFactory.create(document as ReturnType<T['toPlainData']>);
-  }
+  };
 
   public async findById(id: T['id']): Promise<T> {
     throw new Error('Not implemented');

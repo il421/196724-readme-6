@@ -4,10 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PostFactory } from './post.factory';
 import { Post, PostState, PostType } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
-import {
-  DEFAULT_NUMBER_OF_POSTS,
-  DEFAULT_NUMBER_OF_POSTS_BY_TITLE,
-} from './post.restrictions';
+import { DEFAULT_NUMBER_OF_POSTS } from './post.restrictions';
 
 @Injectable()
 export class PostRepository extends PostgresRepository<PostEntity, Post> {
@@ -42,28 +39,29 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     return this.createEntityFromDocument(document);
   }
 
-  public async findPosts(
-    usersIds?: string[],
-    tags?: string[],
-    types?: PostType[],
-    state?: PostState
-  ) {
-    // @TODO not done yet
-    const documents = await this.client.post.findMany({
-      // where: { title, state: PostState.Published },
-      take: DEFAULT_NUMBER_OF_POSTS,
-      include: this.include,
-    });
-    return documents.map((document) => this.createEntityFromDocument(document));
-  }
+  public async findPosts(args: {
+    usersIds?: string[];
+    tags?: string[];
+    types?: PostType[];
+    state?: PostState;
+    title?: string;
+  }) {
+    const { usersIds = [], tags = [], state, types = [], title } = args;
 
-  public async searchByTitle(title: string) {
     const documents = await this.client.post.findMany({
-      where: { title, state: PostState.Published },
-      take: DEFAULT_NUMBER_OF_POSTS_BY_TITLE,
+      where: {
+        ...(usersIds?.length && { createdBy: { in: usersIds } }),
+        ...(tags?.length && { tags: { hasSome: tags } }),
+        ...(types?.length && { type: { in: types } }),
+        ...(title && { title: { contains: title } }),
+        state: state ?? PostState.Published,
+      },
+      take: DEFAULT_NUMBER_OF_POSTS, // @TODO just a default for now
       include: this.include,
+      orderBy: { publishedAt: 'desc' }, // @TODO desc is default, but should be possible a user pass an extra param
+      // @TODO also need o have an option to sort my likes and comments
     });
-    return documents.map((document) => this.createEntityFromDocument(document));
+    return documents.map(this.createEntityFromDocument);
   }
 
   public async findById(id: string) {

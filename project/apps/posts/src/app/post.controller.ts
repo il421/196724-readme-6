@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseArrayPipe,
   Post,
   Put,
   Query,
@@ -12,7 +13,6 @@ import {
 import {
   ErrorMessages,
   SwaggerTags,
-  PostState,
   PostType,
   RoutePaths,
   SuccessMessages,
@@ -20,30 +20,13 @@ import {
 import { CreatePostDto, UpdatePostDto } from './dtos';
 import { fillDto } from '@project/helpers';
 import { PostRdo } from './rdos';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
 
 @ApiTags(SwaggerTags.Posts)
 @Controller(RoutePaths.Posts)
 export class PostController {
   constructor(private readonly postService: PostService) {}
-
-  @Get('/')
-  @ApiResponse({
-    status: HttpStatus.OK,
-    isArray: true,
-    type: PostRdo,
-    description: SuccessMessages.Posts,
-  })
-  public async getPosts(
-    @Query('usersIds') usersIds?: string[],
-    @Query('tags') tags?: string[],
-    @Query('type') type?: PostType[],
-    @Query('state') state?: PostState
-  ) {
-    // const posts = await this.postService.getPosts(usersIds, tags, type, state);
-    // return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
-  }
 
   @Get('/search')
   @ApiResponse({
@@ -52,8 +35,53 @@ export class PostController {
     type: PostRdo,
     description: SuccessMessages.Posts,
   })
-  public async search(@Query('title') title: string) {
-    const posts = await this.postService.searchByTitle(title);
+  @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'userIds', required: false, type: Array<String> })
+  @ApiQuery({
+    name: 'types',
+    required: false,
+    type: String,
+    isArray: true,
+    enumName: 'PostType',
+  })
+  @ApiQuery({ name: 'tags', required: false, type: Array<String> })
+  public async search(
+    @Query('title') title?: string,
+    @Query(
+      'userIds',
+      new ParseArrayPipe({ items: String, separator: ',', optional: true })
+    )
+    usersIds?: string[],
+    @Query(
+      'types',
+      new ParseArrayPipe({ items: String, separator: ',', optional: true })
+    )
+    types?: PostType[],
+    @Query(
+      'tags',
+      new ParseArrayPipe({ items: String, separator: ',', optional: true })
+    )
+    tags?: string[]
+  ) {
+    const posts = await this.postService.search({
+      types,
+      title,
+      tags,
+      usersIds,
+    });
+    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
+  }
+
+  @Get('drafts/:userId')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: PostRdo,
+    isArray: true,
+    description: SuccessMessages.Posts,
+  })
+  public async getDraftPosts(@Param('userId') userId: string) {
+    // @TODO need to grab user id from token later
+    const posts = await this.postService.getDrafts(userId);
     return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
   }
 
