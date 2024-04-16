@@ -97,7 +97,10 @@ export class PostService {
   public async delete(id: string, userId: string) {
     const post = await this.postRepository.findById(id);
     if (post) {
-      if (post.createdBy === userId) {
+      const isOwnPost: boolean = !post.isRepost && post.createdBy === userId;
+      const isRepost: boolean = post.isRepost && post.publishedBy === userId;
+
+      if (isOwnPost || isRepost) {
         return void (await this.postRepository.delete(id));
       }
       throw new BadRequestException(ErrorMessages.PostDelete);
