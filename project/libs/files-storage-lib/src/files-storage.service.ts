@@ -35,7 +35,7 @@ export class FilesStorageService {
   public async delete(id: string): Promise<void> {
     const fileEntity = await this.filesStorageRepository.findById(id);
 
-    // TODO not done yet
+    // TODO not done yet, not sure what is the best way to delete document from my local storage
     if (fileEntity) {
       fs.unlinkSync(fileEntity.path);
     }

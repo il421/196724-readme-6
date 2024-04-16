@@ -48,8 +48,9 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     types?: PostType[],
     state?: PostState
   ) {
+    // @TODO not done yet
     const documents = await this.client.post.findMany({
-      // where: { title, state: PostState.Published }, // @TODO not done
+      // where: { title, state: PostState.Published },
       take: DEFAULT_NUMBER_OF_POSTS,
       include: this.include,
     });
