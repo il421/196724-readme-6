@@ -18,7 +18,7 @@ model Post {
   id           String    @id @default(uuid()) @map("id")
   title        String
   type         PostType
-  state        PostState
+  state        PostState @default(draft)
   isRepost     Boolean?
   tags         String[]
   createdAt    DateTime  @default(now())
@@ -42,7 +42,7 @@ model Comment {
   text      String
   postId    String   @map("post_id")
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now())
   createdBy String
 
   @@map("comments")

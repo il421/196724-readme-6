@@ -44,6 +44,10 @@ export class FeedbackController {
     type: CommentRdo,
     description: SuccessMessages.CommentCreated,
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ErrorMessages.PostNotFound,
+  })
   public async create(
     @Param('userId') userId: string,
     @Body() dto: CreateCommentDto
@@ -78,12 +82,16 @@ export class FeedbackController {
     description: SuccessMessages.CommentCreated,
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
+    status: HttpStatus.BAD_REQUEST,
     description: ErrorMessages.PostNotFound,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: ErrorMessages.PostNotPublish,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ErrorMessages.Liked,
   })
   public async like(
     @Param('userId') userId: string,

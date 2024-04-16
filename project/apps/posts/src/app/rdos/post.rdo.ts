@@ -126,4 +126,18 @@ export class PostRdo {
     obj.type === PostType.Text ? value : undefined
   )
   announcement!: string;
+
+  @ApiProperty({
+    example: 'Number of comments',
+    description: '1',
+  })
+  @Expose()
+  commentsCount!: number;
+
+  @ApiProperty({
+    example: 'Number of likes',
+    description: '1',
+  })
+  @Expose()
+  likesCount!: number;
 }

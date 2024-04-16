@@ -8,28 +8,33 @@ import { CreatePostDto, UpdatePostDto } from './dtos';
 import { ErrorMessages, PostState, PostType } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
+import { fillDto } from '@project/helpers';
 
 @Injectable()
 export class PostService {
   constructor(private postRepository: PostRepository) {}
 
   public async create(userId: string, dto: CreatePostDto): Promise<PostEntity> {
-    const postEntity = new PostEntity({
-      ...dto,
-      createdBy: userId,
-      state: PostState.Draft,
-    });
-    await this.postRepository.save(postEntity);
-    return postEntity;
+    const postEntity = new PostEntity({ ...dto, createdBy: userId });
+
+    const payload = fillDto(CreatePostDto, postEntity.toPlainData());
+    return await this.postRepository.create(payload);
   }
 
-  public async update(id: string, dto: UpdatePostDto): Promise<PostEntity> {
-    const post = await this.postRepository.client.post.update({
-      where: { id },
-      data: dto,
-    });
-    if (post) {
-      return new PostEntity(post);
+  public async update(
+    userId: string,
+    id: string,
+    dto: UpdatePostDto
+  ): Promise<PostEntity> {
+    const postEntity = await this.postRepository.findById(id);
+
+    if (postEntity) {
+      if (postEntity.createdBy === userId) {
+        const payload = fillDto(UpdatePostDto, { ...dto, createdBy: userId });
+
+        return await this.postRepository.adjust(id, payload);
+      }
+      throw new BadRequestException(ErrorMessages.PostUpdate);
     }
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
@@ -39,36 +44,32 @@ export class PostService {
     if (postEntity) {
       if (postEntity.createdBy === userId) {
         if (postEntity.state === PostState.Draft) {
-          const updatedPost = await this.postRepository.client.post.update({
-            where: { id },
-            data: {
-              state: PostState.Published,
-              publishedAt: new Date(),
-              publishedBy: postEntity.createdBy,
-            },
+          return await this.postRepository.adjust(id, {
+            createdBy: postEntity.createdBy,
+            state: PostState.Published,
+            publishedAt: new Date(),
+            publishedBy: postEntity.createdBy,
           });
-          return new PostEntity(updatedPost);
         }
         throw new BadRequestException(ErrorMessages.PostPublish);
       } else {
-        throw new ConflictException(ErrorMessages.PostPublishConflict);
+        throw new ConflictException(ErrorMessages.PostUpdate);
       }
     }
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
   public async repost(id: string, repostBy: string): Promise<PostEntity> {
-    const postEntity = await this.postRepository.findById(id);
-    if (postEntity) {
-      const { id, tags, ...rest } = postEntity;
-      const payloadEntity = new PostEntity({
+    const post = await this.postRepository.findById(id);
+    if (post) {
+      const { id, tags, ...rest } = post;
+
+      return await this.postRepository.create({
         ...rest,
         isRepost: true,
         publishedAt: new Date(),
         publishedBy: repostBy,
       });
-      await this.postRepository.save(payloadEntity);
-      return payloadEntity;
     }
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
@@ -93,7 +94,14 @@ export class PostService {
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
-  public async delete(id: string) {
-    this.postRepository.client.post.delete({ where: { id } });
+  public async delete(id: string, userId: string) {
+    const post = await this.postRepository.findById(id);
+    if (post) {
+      if (post.createdBy === userId) {
+        return void (await this.postRepository.delete(id));
+      }
+      throw new BadRequestException(ErrorMessages.PostDelete);
+    }
+    throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 }

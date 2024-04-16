@@ -18,9 +18,16 @@ export class FeedbackService {
     userId: string,
     dto: CreateCommentDto
   ): Promise<CommentEntity> {
-    const commentEntity = new CommentEntity({ ...dto, createdBy: userId });
-    await this.feedbackRepository.saveComment(commentEntity);
-    return commentEntity;
+    const post = await this.feedbackRepository.client.post.findUnique({
+      where: { id: dto.postId },
+    });
+    if (post) {
+      const commentEntity = new CommentEntity({ ...dto, createdBy: userId });
+      await this.feedbackRepository.saveComment(commentEntity);
+      return commentEntity;
+    } else {
+      throw new NotFoundException(ErrorMessages.PostNotFound);
+    }
   }
 
   public async getCommentsByPostId(postId: string) {
@@ -31,22 +38,29 @@ export class FeedbackService {
     const comment = await this.feedbackRepository.findCommentById(id);
     if (comment) {
       if (comment.createdBy === userId)
-        return this.feedbackRepository.deleteCommentById(id);
+        return void (await this.feedbackRepository.deleteCommentById(id));
       throw new BadRequestException(ErrorMessages.CommentUserError);
     }
     throw new NotFoundException(ErrorMessages.CommentNotFound);
   }
 
   public async like(userId: string, postId: string): Promise<void> {
-    const postEntity = await this.feedbackRepository.client.post.findUnique({
+    const post = await this.feedbackRepository.client.post.findUnique({
       where: { id: postId },
     });
 
-    if (postEntity) {
-      if (postEntity.state === PostState.Published) {
-        return await this.feedbackRepository.saveLike(
-          new LikeEntity({ postId, createdBy: userId })
-        );
+    if (post) {
+      if (post.state === PostState.Published) {
+        const like = this.feedbackRepository.client.like.findFirst({
+          where: { postId: postId, createdBy: userId },
+        });
+
+        if (!like) {
+          return await this.feedbackRepository.saveLike(
+            new LikeEntity({ postId, createdBy: userId })
+          );
+        }
+        throw new BadRequestException(ErrorMessages.Liked);
       }
       throw new BadRequestException(ErrorMessages.PostNotPublish);
     }
@@ -65,7 +79,10 @@ export class FeedbackService {
           postId
         );
         if (likeEntity) {
-          return await this.feedbackRepository.deleteLike(userId, postId);
+          return void (await this.feedbackRepository.deleteLike(
+            userId,
+            postId
+          ));
         }
         throw new BadRequestException(ErrorMessages.NoLiked);
       }

@@ -6,6 +6,7 @@ import {
   PostState,
   PostType,
 } from '@project/core';
+import { unique } from '@project/helpers';
 
 export class PostEntity extends Entity implements IStorableEntity<Post> {
   public title: string;
@@ -22,6 +23,8 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
   public url: string;
   public description: string;
   public announcement: string;
+  public commentsCount?: number;
+  public likesCount?: number;
 
   constructor(post: Post) {
     const {
@@ -40,24 +43,32 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       description,
       quoteAuthor,
       announcement,
+      _count,
     } = post;
     super();
     this.id = id;
     this.title = title;
     this.type = type;
     this.state = state;
-    this.tags = tags;
-    this.isRepost = isRepost;
+    this.tags = this.getUniqueTags(tags);
+    this.isRepost = !!isRepost;
     this.createdBy = createdBy;
     this.createdAt = createdAt;
     this.publishedBy = publishedBy;
     this.publishedAt = publishedAt;
+
     this.text = text;
     this.url = url;
     this.description = description;
     this.quoteAuthor = quoteAuthor;
     this.announcement = announcement;
+
+    this.commentsCount = _count?.comments || undefined;
+    this.likesCount = _count?.likes || undefined;
   }
+
+  private getUniqueTags = (tags: string[]) =>
+    unique(tags?.map((tag) => tag.trim().toLowerCase()));
 
   public toPlainData(): Post {
     return {
@@ -70,12 +81,14 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       createdBy: this.createdBy,
       publishedBy: this.publishedBy,
       createdAt: this.createdAt,
-      publishedAt: this.createdAt,
+      publishedAt: this.publishedAt,
       text: this.text,
       url: this.url,
       description: this.description,
       quoteAuthor: this.quoteAuthor,
       announcement: this.announcement,
+      likesCount: this.likesCount,
+      commentsCount: this.commentsCount,
     };
   }
 }

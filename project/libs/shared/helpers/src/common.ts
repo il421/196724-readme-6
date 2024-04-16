@@ -26,3 +26,7 @@ export const getMongoConnectionString = ({
 }): string => {
   return `mongodb://${username}:${password}@${host}:${port}/${databaseName}?authSource=${authDatabase}`;
 };
+
+export const unique = <T>(items: T[]): T[] => {
+  return Array.from(new Set(items));
+};
