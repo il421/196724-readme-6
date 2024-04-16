@@ -62,7 +62,7 @@ export class PostService {
   public async repost(id: string, repostBy: string): Promise<PostEntity> {
     const post = await this.postRepository.findById(id);
     if (post) {
-      const { id, tags, ...rest } = post;
+      const { id, tags, ...rest } = post.toPlainData();
 
       return await this.postRepository.create({
         ...rest,
