@@ -9,6 +9,7 @@ import { ErrorMessages, PostState, PostType } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 import { fillDto } from '@project/helpers';
+import * as path from 'path';
 
 @Injectable()
 export class PostService {
@@ -79,22 +80,22 @@ export class PostService {
     tags?: string[],
     types?: PostType[],
     state?: PostState
-  ) {
+  ): Promise<PostEntity[]> {
     return this.postRepository.findPosts(usersIds, tags, types, state);
   }
 
-  public searchByTitle(title: string) {
+  public searchByTitle(title: string): Promise<PostEntity[]> {
     return this.postRepository.searchByTitle(title);
   }
 
-  public async getPost(id: string) {
+  public async getPost(id: string): Promise<PostEntity> {
     const post = this.postRepository.findById(id);
 
     if (post) return post;
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
-  public async delete(id: string, userId: string) {
+  public async delete(id: string, userId: string): Promise<void> {
     const post = await this.postRepository.findById(id);
     if (post) {
       const isOwnPost: boolean = !post.isRepost && post.createdBy === userId;
