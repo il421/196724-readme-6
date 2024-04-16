@@ -87,7 +87,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Put('update/:id')
+  @Put(':userId/update/:id')
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -97,8 +97,12 @@ export class PostController {
     status: HttpStatus.NOT_FOUND,
     description: ErrorMessages.PostNotFound,
   })
-  public async update(@Param('id') id: string, @Body() dto: UpdatePostDto) {
-    const newPost = await this.postService.update(id, dto);
+  public async update(
+    @Param('userId') userId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdatePostDto
+  ) {
+    const newPost = await this.postService.update(userId, id, dto);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
@@ -110,7 +114,7 @@ export class PostController {
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: ErrorMessages.PostPublishConflict,
+    description: ErrorMessages.PostUpdate,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -147,7 +151,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Delete(':id/delete')
+  @Delete(':userId/delete/:id')
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SuccessMessages.PostDeleted,
@@ -156,7 +160,14 @@ export class PostController {
     status: HttpStatus.NOT_FOUND,
     description: ErrorMessages.PostNotFound,
   })
-  public async delete(@Param('id') id: string) {
-    return await this.postService.delete(id);
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ErrorMessages.PostDelete,
+  })
+  public async delete(
+    @Param('userId') userId: string,
+    @Param('id') id: string
+  ) {
+    return await this.postService.delete(id, userId);
   }
 }
