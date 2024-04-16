@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostType } from '@project/core';
 import { Expose, Transform } from 'class-transformer';
+import { getUniqueTags } from '../utils';
 
 export class CreatePostDto {
   @ApiProperty({ example: 'My new post', description: 'Post title' })
@@ -9,7 +10,7 @@ export class CreatePostDto {
 
   @ApiProperty({
     enum: PostType,
-    enumName: 'PostTypes',
+    enumName: 'PostType',
     example: 'video',
     description: 'Post type',
   })
@@ -18,6 +19,7 @@ export class CreatePostDto {
 
   @ApiProperty({ example: '[personal, business]', description: 'Post tags' })
   @Expose()
+  @Transform(({ value: tags }) => getUniqueTags(tags))
   tags?: string[];
 
   @ApiProperty({
