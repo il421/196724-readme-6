@@ -60,6 +60,7 @@ export class PostController {
     @Query(
       'tags',
       new ParseArrayPipe({ items: String, separator: ',', optional: true })
+      // @TODO need to transform tags to get unique lowercase strings
     )
     tags?: string[]
   ) {
