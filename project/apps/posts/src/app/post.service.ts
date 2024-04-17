@@ -9,6 +9,7 @@ import { ErrorMessages, PostState, PostType } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 import { fillDto } from '@project/helpers';
+import { SearchPostsArgs } from './post.search.interface';
 
 @Injectable()
 export class PostService {
@@ -74,13 +75,7 @@ export class PostService {
     throw new NotFoundException(ErrorMessages.PostNotFound);
   }
 
-  public search(args: {
-    usersIds?: string[];
-    tags?: string[];
-    types?: PostType[];
-    state?: PostState;
-    title?: string;
-  }): Promise<PostEntity[]> {
+  public search(args: SearchPostsArgs): Promise<PostEntity[]> {
     return this.postRepository.findPosts(args);
   }
 

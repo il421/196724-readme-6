@@ -4,7 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { PostFactory } from './post.factory';
 import { Post, PostState, PostType } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
-import { DEFAULT_NUMBER_OF_POSTS } from './post.restrictions';
+import { DEFAULT_NUMBER_OF_POSTS } from './post.constants';
+import { SearchPostsArgs } from './post.search.interface';
 
 @Injectable()
 export class PostRepository extends PostgresRepository<PostEntity, Post> {
@@ -39,13 +40,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     return this.createEntityFromDocument(document);
   }
 
-  public async findPosts(args: {
-    usersIds?: string[];
-    tags?: string[];
-    types?: PostType[];
-    state?: PostState;
-    title?: string;
-  }) {
+  public async findPosts(args: SearchPostsArgs) {
     const { usersIds = [], tags = [], state, types = [], title } = args;
 
     const documents = await this.client.post.findMany({
