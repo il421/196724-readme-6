@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   ParseArrayPipe,
+  ParseArrayOptions,
   Post,
   Put,
   Query,
@@ -22,11 +23,18 @@ import { fillDto } from '@project/helpers';
 import { FullPostRdo, PostRdo } from './rdos';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
+import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from './post.constants';
 
 @ApiTags(SwaggerTags.Posts)
 @Controller(RoutePaths.Posts)
 export class PostController {
   constructor(private readonly postService: PostService) {}
+
+  readonly parseQueryArrayPipeOptions: ParseArrayOptions = {
+    items: String,
+    separator: ',',
+    optional: true,
+  };
 
   @Get('/search')
   @ApiResponse({
@@ -47,21 +55,11 @@ export class PostController {
   @ApiQuery({ name: 'tags', required: false, type: Array<String> })
   public async search(
     @Query('title') title?: string,
-    @Query(
-      'userIds',
-      new ParseArrayPipe({ items: String, separator: ',', optional: true })
-    )
+    @Query('userIds', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS))
     usersIds?: string[],
-    @Query(
-      'types',
-      new ParseArrayPipe({ items: String, separator: ',', optional: true })
-    )
+    @Query('types', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS))
     types?: PostType[],
-    @Query(
-      'tags',
-      new ParseArrayPipe({ items: String, separator: ',', optional: true })
-      // @TODO need to transform tags to get unique lowercase strings
-    )
+    @Query('tags', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS)) // @TODO need to transform tags to get unique lowercase strings
     tags?: string[]
   ) {
     const posts = await this.postService.search({
