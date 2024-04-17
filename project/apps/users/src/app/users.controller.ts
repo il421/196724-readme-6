@@ -55,6 +55,7 @@ export class UsersController {
     id: string,
     @Body() dto: UpdateUserAvatarDto
   ) {
+    // @TODO need to grab user id from token
     return await this.usersService.updateUserAvatar(id, dto.avatarId);
   }
 }

@@ -52,6 +52,7 @@ export class FeedbackController {
     @Param('userId') userId: string,
     @Body() dto: CreateCommentDto
   ) {
+    // @TODO need to grab user id from token
     const newComment = await this.feedbackService.createComment(userId, dto);
     return fillDto(CommentRdo, newComment.toPlainData());
   }
@@ -73,6 +74,7 @@ export class FeedbackController {
     @Param('userId') userId: string,
     @Param('id') id: string
   ) {
+    // @TODO need to grab user id from token
     return await this.feedbackService.deleteComment(userId, id);
   }
 

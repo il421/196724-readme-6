@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePostDto, UpdatePostDto } from './dtos';
-import { ErrorMessages, PostState, PostType } from '@project/core';
+import { ErrorMessages, PostState } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 import { fillDto } from '@project/helpers';
