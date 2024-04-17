@@ -32,13 +32,6 @@ export class PostRdo {
   @Expose()
   state!: PostState;
 
-  @ApiProperty({
-    description: 'Flag to show if a post is reposted',
-    example: true,
-  })
-  @Expose()
-  isRepost!: boolean;
-
   @ApiProperty({ example: '[personal, business]', description: 'Post tags' })
   @Expose()
   tags!: string[];

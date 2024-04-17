@@ -19,7 +19,7 @@ import {
 } from '@project/core';
 import { CreatePostDto, UpdatePostDto } from './dtos';
 import { fillDto } from '@project/helpers';
-import { PostRdo } from './rdos';
+import { FullPostRdo, PostRdo } from './rdos';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
 
@@ -97,7 +97,7 @@ export class PostController {
   })
   public async getPostById(@Param('id') id: string) {
     const post = await this.postService.getPost(id);
-    return fillDto(PostRdo, post?.toPlainData());
+    return fillDto(FullPostRdo, post?.toPlainData());
   }
 
   @Post(':userId/create')
@@ -130,6 +130,7 @@ export class PostController {
     @Param('id') id: string,
     @Body() dto: UpdatePostDto
   ) {
+    // @TODO need to grab user id from token
     const newPost = await this.postService.update(userId, id, dto);
     return fillDto(PostRdo, newPost.toPlainData());
   }
@@ -156,6 +157,7 @@ export class PostController {
     @Param('userId') userId: string,
     @Param('id') id: string
   ) {
+    // @TODO need to grab user id from token
     const newPost = await this.postService.publish(id, userId);
     return fillDto(PostRdo, newPost.toPlainData());
   }
@@ -196,6 +198,7 @@ export class PostController {
     @Param('userId') userId: string,
     @Param('id') id: string
   ) {
+    // @TODO need to grab user id from token
     return await this.postService.delete(id, userId);
   }
 }
