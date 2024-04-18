@@ -4,8 +4,8 @@ export class LikeEntity extends Entity implements IStorableEntity<Like> {
   public postId: string;
   public createdBy?: string;
   constructor(comment: Like) {
-    const { postId, createdBy } = comment;
     super();
+    const { postId, createdBy } = comment;
     this.postId = postId;
     this.createdBy = createdBy;
   }

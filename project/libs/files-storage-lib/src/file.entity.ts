@@ -3,16 +3,16 @@ import { Entity, File, IStorableEntity } from '@project/core';
 export class FileEntity extends Entity implements IStorableEntity<File> {
   public format: string;
   public path: string;
-  public createdBy?: string;
-  public createdAt?: string;
+  public createdBy: string;
+  public createdAt?: Date;
   constructor(file: File) {
-    const { id, format, path, createdBy, createdAt } = file;
     super();
+    const { id, format, path, createdBy, createdAt } = file;
     this.id = id;
     this.format = format;
     this.path = path;
     this.createdBy = createdBy;
-    this.createdAt = createdAt ?? new Date().toISOString();
+    this.createdAt = createdAt ?? new Date();
   }
 
   toPlainData(): File {
