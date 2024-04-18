@@ -1,19 +1,13 @@
 import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
-import { validateConfig } from './utils';
-import { DEFAULT_MONGO_PORT, DEFAULT_MONGO_UI_PORT } from './config.constants';
-import { Registers } from './registers.enum';
-
-const VALIDATION_ERROR = 'DB Config Validation Error';
-export interface MongoConfig {
-  host: string;
-  name: string;
-  port: number;
-  uiPort: number;
-  user: string;
-  password: string;
-  authBase: string;
-}
+import { validateConfig } from '../utils';
+import { Registers } from '../registers.enum';
+import { MongoConfig } from './mongo.interface';
+import {
+  DEFAULT_MONGO_PORT,
+  DEFAULT_MONGO_UI_PORT,
+  MONGO_VALIDATION_ERROR,
+} from './mongo.constants';
 
 const dbValidationSchema = Joi.object({
   host: Joi.string().hostname().required(),
@@ -39,8 +33,8 @@ const getDbConfig = (): MongoConfig => {
     authBase: process.env['MONGO_AUTH_BASE'] ?? '',
   };
 
-  validateConfig(dbValidationSchema, config, VALIDATION_ERROR);
+  validateConfig(dbValidationSchema, config, MONGO_VALIDATION_ERROR);
   return config;
 };
 
-export default registerAs(Registers.Mongo, getDbConfig);
+export const mongoConfig = registerAs(Registers.Mongo, getDbConfig);

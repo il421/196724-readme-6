@@ -1,9 +1,9 @@
 import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
-import { DEFAULT_HOST, DEFAULT_PORT, ENVIRONMENTS } from './config.constants';
-import { validateConfig } from './utils';
+import { DEFAULT_HOST, DEFAULT_PORT, ENVIRONMENTS } from './app.constants';
+import { validateConfig } from '../utils';
 import { Environment } from './environment.type';
-import { Registers } from './registers.enum';
+import { Registers } from '../registers.enum';
 
 const VALIDATION_ERROR = 'Application Config Validation Error';
 
@@ -32,4 +32,4 @@ const getConfig = (): ApplicationConfig => {
   return config;
 };
 
-export default registerAs(Registers.Application, getConfig);
+export const applicationConfig = registerAs(Registers.Application, getConfig);
