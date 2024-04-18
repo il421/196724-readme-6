@@ -28,43 +28,35 @@ export class PostService {
     dto: UpdatePostDto
   ): Promise<PostEntity> {
     const postEntity = await this.postRepository.findById(id);
+    if (!postEntity) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
+    if (postEntity.createdBy !== userId)
+      throw new BadRequestException(ERROR_MESSAGES.POST_UPDATE_OTHER_USERS);
 
-    if (postEntity) {
-      if (postEntity.createdBy === userId) {
-        const payload = fillDto(UpdatePostDto, { ...dto, createdBy: userId });
-
-        return await this.postRepository.adjust(id, payload);
-      }
-      throw new BadRequestException(ERROR_MESSAGES.POST_UPDATED);
-    }
-    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
+    const payload = fillDto(UpdatePostDto, { ...dto, createdBy: userId });
+    return await this.postRepository.adjust(id, payload);
   }
 
   public async publish(id: string, userId: string): Promise<PostEntity> {
     const postEntity = await this.postRepository.findById(id);
-    if (postEntity) {
-      if (postEntity.createdBy === userId) {
-        if (postEntity.state === PostState.Draft) {
-          return await this.postRepository.adjust(id, {
-            createdBy: postEntity.createdBy,
-            state: PostState.Published,
-            publishedAt: new Date(),
-            publishedBy: postEntity.createdBy,
-          });
-        }
-        throw new BadRequestException(ERROR_MESSAGES.POST_PUBLISHED);
-      } else {
-        throw new ConflictException(ERROR_MESSAGES.POST_UPDATED);
-      }
-    }
-    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
+    if (!postEntity) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
+    if (postEntity.createdBy !== userId)
+      throw new ConflictException(ERROR_MESSAGES.POST_UPDATE_OTHER_USERS);
+
+    if (postEntity.state !== PostState.Draft)
+      throw new BadRequestException(ERROR_MESSAGES.POST_PUBLISHED);
+
+    return await this.postRepository.adjust(id, {
+      createdBy: postEntity.createdBy,
+      state: PostState.Published,
+      publishedAt: new Date(),
+      publishedBy: postEntity.createdBy,
+    });
   }
 
   public async repost(id: string, repostBy: string): Promise<PostEntity> {
     const post = await this.postRepository.findById(id);
     if (post) {
       const { id, tags, ...rest } = post.toPlainData();
-
       return await this.postRepository.create({
         ...rest,
         isRepost: true,
@@ -81,9 +73,8 @@ export class PostService {
 
   public async getPost(id: string): Promise<PostEntity> {
     const post = this.postRepository.findById(id);
-
-    if (post) return post;
-    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
+    if (!post) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
+    return post;
   }
 
   public async getDrafts(userId: string): Promise<PostEntity[]> {
@@ -95,15 +86,14 @@ export class PostService {
 
   public async delete(id: string, userId: string): Promise<void> {
     const post = await this.postRepository.findById(id);
-    if (post) {
-      const isOwnPost: boolean = !post.isRepost && post.createdBy === userId;
-      const isRepost: boolean = post.isRepost && post.publishedBy === userId;
+    if (!post) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
 
-      if (isOwnPost || isRepost) {
-        return void (await this.postRepository.delete(id));
-      }
-      throw new BadRequestException(ERROR_MESSAGES.POST_DELETED);
+    const isOwnPost: boolean = !post.isRepost && post.createdBy === userId;
+    const isRepost: boolean = post.isRepost && post.publishedBy === userId;
+
+    if (isOwnPost || isRepost) {
+      return void (await this.postRepository.delete(id));
     }
-    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
+    throw new BadRequestException(ERROR_MESSAGES.POST_DELETE);
   }
 }

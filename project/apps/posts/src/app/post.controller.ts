@@ -135,7 +135,7 @@ export class PostController {
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: ERROR_MESSAGES.POST_UPDATED,
+    description: ERROR_MESSAGES.POST_UPDATE_OTHER_USERS,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -184,7 +184,7 @@ export class PostController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ERROR_MESSAGES.POST_DELETED,
+    description: ERROR_MESSAGES.POST_DELETE,
   })
   public async delete(
     @Param('userId') userId: string,
