@@ -7,7 +7,7 @@ import {
   Post,
   HttpStatus,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES, SwaggerTags } from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
 import { CreateSubscriptionDto } from './dtos';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -15,7 +15,7 @@ import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionRdo } from './rdos';
 import { SubscriptionsPaths } from './subscriptions-paths.enum';
 
-@ApiTags(SwaggerTags.Subscriptions)
+@ApiTags(SWAGGER_TAGS.SUBSCRIPTIONS)
 @Controller(SubscriptionsPaths.Base)
 export class SubscriptionsController {
   constructor(private readonly subscriptionService: SubscriptionsService) {}

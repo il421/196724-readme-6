@@ -7,7 +7,7 @@ import {
   Post,
   HttpStatus,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES, SwaggerTags } from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
 import { CreateCommentDto } from './dtos';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -15,7 +15,7 @@ import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
 import { FeedbackPaths } from './feedback-paths.enum';
 
-@ApiTags(SwaggerTags.Feedback)
+@ApiTags(SWAGGER_TAGS.FEEDBACK)
 @Controller(FeedbackPaths.Base)
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}

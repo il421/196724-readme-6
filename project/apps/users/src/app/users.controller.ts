@@ -6,14 +6,14 @@ import {
   Patch,
   Body,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES, SwaggerTags } from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateUserAvatarDto, UserRdo } from '@project/users-lib';
 import { UsersService } from './users.service';
 import { UsersPaths } from './users-paths.enum';
 
-@ApiTags(SwaggerTags.Users)
+@ApiTags(SWAGGER_TAGS.USERS)
 @Controller(UsersPaths.Base)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

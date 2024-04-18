@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
-  SwaggerTags,
+  SWAGGER_TAGS,
   PostType,
   SUCCESS_MESSAGES,
 } from '@project/core';
@@ -24,7 +24,7 @@ import { PostService } from './post.service';
 import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from './post.constants';
 import { PostPaths } from './post-paths.enum';
 
-@ApiTags(SwaggerTags.Posts)
+@ApiTags(SWAGGER_TAGS.POSTS)
 @Controller(PostPaths.Base)
 export class PostController {
   constructor(private readonly postService: PostService) {}
