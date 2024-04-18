@@ -3,7 +3,7 @@ import { FilesStorageRepository } from './files-storage.repository';
 import { FileEntity } from './file.entity';
 import { File, ERROR_MESSAGES } from '@project/core';
 import * as fs from 'fs';
-import { path } from './utils';
+import { getPath } from './utils';
 import 'multer';
 import { ConfigService } from '@nestjs/config';
 
@@ -21,7 +21,7 @@ export class FilesStorageService {
     const dto: File = {
       createdBy: userId,
       format: file.mimetype,
-      path: path(
+      path: getPath(
         file.filename,
         this.config.get('application.host'),
         this.config.get('application.port')
