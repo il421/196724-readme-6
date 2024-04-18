@@ -13,6 +13,9 @@ export class FileModel extends Document implements File {
   @Prop({ required: true })
   public path!: string;
 
+  @Prop({ required: true })
+  public name!: string;
+
   @Prop({
     required: true,
   })

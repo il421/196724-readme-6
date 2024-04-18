@@ -17,6 +17,13 @@ export class FileRdo {
   readonly format!: string;
 
   @ApiProperty({
+    description: 'File name',
+    example: 'file.png',
+  })
+  @Expose()
+  readonly name!: string;
+
+  @ApiProperty({
     description: 'File path',
     example: 'http://localhost:3000/assets/file.png',
   })

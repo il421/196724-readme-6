@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { getMongoConnectionString } from '@project/helpers';
 import { ServeStaticModuleAsyncOptions } from '@nestjs/serve-static/dist/interfaces/serve-static-options.interface';
 import { ObjectSchema } from 'joi';
-import { resolve, dirname } from 'node:path';
+import { resolve } from 'node:path';
 
 export const getMongooseOptions = (): MongooseModuleAsyncOptions => {
   return {
@@ -27,7 +27,7 @@ export const getStaticStorageOptions = (): ServeStaticModuleAsyncOptions => {
   return {
     useFactory: async (config: ConfigService) => [
       {
-        rootPath: resolve(dirname(config.get('storage.rootPath'))),
+        rootPath: resolve(config.get('storage.rootPath')),
       },
     ],
     inject: [ConfigService],
