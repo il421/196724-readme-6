@@ -8,9 +8,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
-  ErrorMessages,
+  ERROR_MESSAGES,
   RoutePaths,
-  SuccessMessages,
+  SUCCESS_MESSAGES,
   SwaggerTags,
 } from '@project/core';
 import { CreateSubscriptionDto } from './dtos';
@@ -29,11 +29,11 @@ export class SubscriptionsController {
     status: HttpStatus.OK,
     isArray: true,
     type: SubscriptionRdo,
-    description: SuccessMessages.Subscriptions,
+    description: SUCCESS_MESSAGES.SUBSCRIPTIONS,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.UserNotFound,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   public async getSubscriptions(@Param('userId') userId: string) {
     // @TODO need to get userId from token
@@ -46,15 +46,15 @@ export class SubscriptionsController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: SubscriptionRdo,
-    description: SuccessMessages.Subscribed,
+    description: SUCCESS_MESSAGES.SUBSCRIBED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.UserNotFound,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: ErrorMessages.SubscriptionExists,
+    description: ERROR_MESSAGES.SUBSCRIPTION_EXISTS,
   })
   @Post(':userId/create')
   public async subscribe(
@@ -68,15 +68,15 @@ export class SubscriptionsController {
 
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
-    description: SuccessMessages.Unsubscribed,
+    description: SUCCESS_MESSAGES.UNSUBSCRIBED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.SubscriptionNotFound,
+    description: ERROR_MESSAGES.SUBSCRIPTION_NOT_FOUND,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.UserNotFound,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   @Delete(':userId/delete/:authorId')
   public async unsubscribe(

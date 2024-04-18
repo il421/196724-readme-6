@@ -12,11 +12,11 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  ErrorMessages,
+  ERROR_MESSAGES,
   SwaggerTags,
   PostType,
   RoutePaths,
-  SuccessMessages,
+  SUCCESS_MESSAGES,
 } from '@project/core';
 import { CreatePostDto, UpdatePostDto } from './dtos';
 import { fillDto } from '@project/helpers';
@@ -41,7 +41,7 @@ export class PostController {
     status: HttpStatus.OK,
     isArray: true,
     type: PostRdo,
-    description: SuccessMessages.Posts,
+    description: SUCCESS_MESSAGES.POSTS,
   })
   @ApiQuery({ name: 'title', required: false, type: String })
   @ApiQuery({ name: 'userIds', required: false, type: Array<String> })
@@ -76,7 +76,7 @@ export class PostController {
     status: HttpStatus.OK,
     type: PostRdo,
     isArray: true,
-    description: SuccessMessages.Posts,
+    description: SUCCESS_MESSAGES.POSTS,
   })
   public async getDraftPosts(@Param('userId') userId: string) {
     // @TODO need to grab user id from token later
@@ -88,11 +88,11 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
-    description: SuccessMessages.Posts,
+    description: SUCCESS_MESSAGES.POSTS,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.PostNotFound,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
   public async getPostById(@Param('id') id: string) {
     const post = await this.postService.getPost(id);
@@ -103,7 +103,7 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: PostRdo,
-    description: SuccessMessages.PostCreated,
+    description: SUCCESS_MESSAGES.POST_CREATED,
   })
   public async create(
     @Param('userId') userId: string,
@@ -118,11 +118,11 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
-    description: SuccessMessages.PostUpdated,
+    description: SUCCESS_MESSAGES.POST_UPDATED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.PostNotFound,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
   public async update(
     @Param('userId') userId: string,
@@ -138,19 +138,19 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
-    description: SuccessMessages.PostPublished,
+    description: SUCCESS_MESSAGES.POST_PUBLISHED,
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: ErrorMessages.PostUpdate,
+    description: ERROR_MESSAGES.POST_UPDATED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.PostNotFound,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ErrorMessages.PostPublish,
+    description: ERROR_MESSAGES.POST_PUBLISHED,
   })
   public async publish(
     @Param('userId') userId: string,
@@ -165,11 +165,11 @@ export class PostController {
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
-    description: SuccessMessages.PostReposted,
+    description: SUCCESS_MESSAGES.POST_REPOSTED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.PostNotFound,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
   public async repost(
     @Param('userId') userId: string,
@@ -183,15 +183,15 @@ export class PostController {
   @Delete(':userId/delete/:id')
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
-    description: SuccessMessages.PostDeleted,
+    description: SUCCESS_MESSAGES.POST_DELETED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.PostNotFound,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ErrorMessages.PostDelete,
+    description: ERROR_MESSAGES.POST_DELETED,
   })
   public async delete(
     @Param('userId') userId: string,

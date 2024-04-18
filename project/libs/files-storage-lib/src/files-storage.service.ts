@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FilesStorageRepository } from './files-storage.repository';
 import { FileEntity } from './file.entity';
-import { File, ErrorMessages } from '@project/core';
+import { File, ERROR_MESSAGES } from '@project/core';
 import * as fs from 'fs';
 import { path } from './utils';
 import 'multer';
@@ -45,6 +45,6 @@ export class FilesStorageService {
     const fileEntity = await this.filesStorageRepository.findById(id);
 
     if (fileEntity) return fileEntity;
-    throw new NotFoundException(ErrorMessages.FileNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.FILE_NOT_FOUND);
   }
 }

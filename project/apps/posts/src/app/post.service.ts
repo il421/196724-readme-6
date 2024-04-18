@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePostDto, UpdatePostDto } from './dtos';
-import { ErrorMessages, PostState } from '@project/core';
+import { ERROR_MESSAGES, PostState } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 import { fillDto } from '@project/helpers';
@@ -35,9 +35,9 @@ export class PostService {
 
         return await this.postRepository.adjust(id, payload);
       }
-      throw new BadRequestException(ErrorMessages.PostUpdate);
+      throw new BadRequestException(ERROR_MESSAGES.POST_UPDATED);
     }
-    throw new NotFoundException(ErrorMessages.PostNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 
   public async publish(id: string, userId: string): Promise<PostEntity> {
@@ -52,12 +52,12 @@ export class PostService {
             publishedBy: postEntity.createdBy,
           });
         }
-        throw new BadRequestException(ErrorMessages.PostPublish);
+        throw new BadRequestException(ERROR_MESSAGES.POST_PUBLISHED);
       } else {
-        throw new ConflictException(ErrorMessages.PostUpdate);
+        throw new ConflictException(ERROR_MESSAGES.POST_UPDATED);
       }
     }
-    throw new NotFoundException(ErrorMessages.PostNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 
   public async repost(id: string, repostBy: string): Promise<PostEntity> {
@@ -72,7 +72,7 @@ export class PostService {
         publishedBy: repostBy,
       });
     }
-    throw new NotFoundException(ErrorMessages.PostNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 
   public search(args: SearchPostsArgs): Promise<PostEntity[]> {
@@ -83,7 +83,7 @@ export class PostService {
     const post = this.postRepository.findById(id);
 
     if (post) return post;
-    throw new NotFoundException(ErrorMessages.PostNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 
   public async getDrafts(userId: string): Promise<PostEntity[]> {
@@ -102,8 +102,8 @@ export class PostService {
       if (isOwnPost || isRepost) {
         return void (await this.postRepository.delete(id));
       }
-      throw new BadRequestException(ErrorMessages.PostDelete);
+      throw new BadRequestException(ERROR_MESSAGES.POST_DELETED);
     }
-    throw new NotFoundException(ErrorMessages.PostNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 }

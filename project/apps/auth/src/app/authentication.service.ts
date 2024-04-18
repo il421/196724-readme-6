@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserEntity, UserRepository } from '@project/users-lib';
-import { ErrorMessages } from '@project/core';
+import { ERROR_MESSAGES } from '@project/core';
 import {
   CreateUserDto,
   LoginUserDto,
@@ -21,12 +21,12 @@ export class AuthenticationService {
     const { email, firstName, lastName, password } = dto;
 
     if (!email || !password || !firstName || !lastName) {
-      throw new BadRequestException(ErrorMessages.NoEmailOrPassword);
+      throw new BadRequestException(ERROR_MESSAGES.NO_EMAIL_OR_PASSWORD);
     }
 
     const user = await this.userRepository.findByEmail(email);
     if (user) {
-      throw new ConflictException(ErrorMessages.DuplicatedUser);
+      throw new ConflictException(ERROR_MESSAGES.DUPLICATED_USER);
     }
 
     const userEntity = await new UserEntity(dto).setPassword(password);
@@ -39,11 +39,11 @@ export class AuthenticationService {
     const existUser = await this.userRepository.findByEmail(email);
 
     if (!existUser) {
-      throw new NotFoundException(ErrorMessages.UserNotFound);
+      throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
     }
 
     if (!password || !(await existUser.comparePassword(password))) {
-      throw new UnauthorizedException(ErrorMessages.UserBadPassword);
+      throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
     }
 
     return existUser;
@@ -56,13 +56,13 @@ export class AuthenticationService {
         !payload.password ||
         !(await user.comparePassword(payload.password))
       ) {
-        throw new UnauthorizedException(ErrorMessages.UserBadPassword);
+        throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
       }
       const userEntity = await new UserEntity(user.toPlainData()).setPassword(
         payload.newPassword
       );
       return await this.userRepository.update(userEntity);
     }
-    throw new NotFoundException(ErrorMessages.UserNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
   }
 }

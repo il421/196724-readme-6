@@ -6,7 +6,7 @@ import {
 import { CreateCommentDto } from './dtos';
 import { FeedbackRepository } from './feedback.repository';
 import { CommentEntity } from './comment.entity';
-import { ErrorMessages, PostState } from '@project/core';
+import { ERROR_MESSAGES, PostState } from '@project/core';
 import { PostEntity } from '../../../posts/src/app/post.entity';
 import { LikeEntity } from './like.entity';
 
@@ -26,7 +26,7 @@ export class FeedbackService {
       await this.feedbackRepository.saveComment(commentEntity);
       return commentEntity;
     } else {
-      throw new NotFoundException(ErrorMessages.PostNotFound);
+      throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
     }
   }
 
@@ -39,9 +39,9 @@ export class FeedbackService {
     if (comment) {
       if (comment.createdBy === userId)
         return void (await this.feedbackRepository.deleteCommentById(id));
-      throw new BadRequestException(ErrorMessages.CommentUserError);
+      throw new BadRequestException(ERROR_MESSAGES.COMMENT_OTHER_USERS_DELETE);
     }
-    throw new NotFoundException(ErrorMessages.CommentNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.COMMENT_NOT_FOUND);
   }
 
   public async like(userId: string, postId: string): Promise<void> {
@@ -60,11 +60,11 @@ export class FeedbackService {
             new LikeEntity({ postId, createdBy: userId })
           );
         }
-        throw new BadRequestException(ErrorMessages.Liked);
+        throw new BadRequestException(ERROR_MESSAGES.POST_ALREADY_LIKED);
       }
-      throw new BadRequestException(ErrorMessages.PostNotPublish);
+      throw new BadRequestException(ERROR_MESSAGES.POST_NOT_PUBLISHED);
     }
-    throw new NotFoundException(ErrorMessages.PostNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 
   public async unlike(userId: string, postId: string): Promise<void> {
@@ -84,10 +84,10 @@ export class FeedbackService {
             postId
           ));
         }
-        throw new BadRequestException(ErrorMessages.NoLiked);
+        throw new BadRequestException(ERROR_MESSAGES.POST_NOT_LIKED);
       }
-      throw new BadRequestException(ErrorMessages.PostNotPublish);
+      throw new BadRequestException(ERROR_MESSAGES.POST_NOT_PUBLISHED);
     }
-    throw new NotFoundException(ErrorMessages.PostNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 }

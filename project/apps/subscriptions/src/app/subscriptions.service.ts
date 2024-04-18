@@ -6,7 +6,7 @@ import {
 import { CreateSubscriptionDto } from './dtos';
 import { SubscriptionsRepository } from './subscriptions.repository';
 import { SubscriptionsEntity } from './subscriptions.entity';
-import { ErrorMessages } from '@project/core';
+import { ERROR_MESSAGES } from '@project/core';
 
 @Injectable()
 export class SubscriptionsService {
@@ -28,7 +28,7 @@ export class SubscriptionsService {
       await this.subscriptionsRepository.save(subEntity);
       return subEntity;
     }
-    throw new ConflictException(ErrorMessages.SubscriptionExists);
+    throw new ConflictException(ERROR_MESSAGES.SUBSCRIPTION_EXISTS);
   }
 
   public async delete(userId: string, authorId: string) {
@@ -39,6 +39,6 @@ export class SubscriptionsService {
     if (subscription) {
       return this.subscriptionsRepository.deleteById(subscription.id);
     }
-    throw new NotFoundException(ErrorMessages.SubscriptionNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.SUBSCRIPTION_NOT_FOUND);
   }
 }
