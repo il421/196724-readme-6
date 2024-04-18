@@ -3,24 +3,29 @@ import {
   IStorableEntity,
   Post,
   PostState,
-  PostTypes,
+  PostType,
 } from '@project/core';
 
 export class PostEntity extends Entity implements IStorableEntity<Post> {
-  public name: string;
-  public type: PostTypes;
+  public title: string;
+  public type: PostType;
   public state: PostState;
   public tags: string[];
   public isRepost?: boolean;
-  public likes: string[];
-  public createdBy?: string;
-  public createdAt?: string;
+  public createdAt?: Date;
+  public publishedAt?: Date;
+  public createdBy: string;
   public publishedBy?: string;
-  public publishedAt?: string;
-  public semanticData: object;
+  public text: string;
+  public quoteAuthor: string;
+  public url: string;
+  public description: string;
+  public announcement: string;
+  public commentsCount?: number;
+  public likesCount?: number;
 
-  private currentDateIso = new Date().toISOString();
   constructor(post: Post) {
+    super();
     const {
       id,
       title,
@@ -32,38 +37,53 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       createdAt,
       publishedBy,
       publishedAt,
-      likes,
-      ...semanticData
+      text,
+      url,
+      description,
+      quoteAuthor,
+      announcement,
+      _count,
     } = post;
-    super();
     this.id = id;
-    this.name = title;
+    this.title = title;
     this.type = type;
     this.state = state;
-    this.tags = tags ?? [];
-    this.isRepost = isRepost;
-    this.likes = likes ?? [];
+    this.tags = tags;
+    this.isRepost = !!isRepost;
     this.createdBy = createdBy;
-    this.createdAt = createdAt ?? this.currentDateIso;
-    this.publishedBy = publishedBy ?? this.currentDateIso;
+    this.createdAt = createdAt;
+    this.publishedBy = publishedBy;
     this.publishedAt = publishedAt;
-    this.semanticData = semanticData;
+
+    this.text = text;
+    this.url = url;
+    this.description = description;
+    this.quoteAuthor = quoteAuthor;
+    this.announcement = announcement;
+
+    this.commentsCount = _count?.comments || undefined;
+    this.likesCount = _count?.likes || undefined;
   }
 
-  toPlainData(): Post {
+  public toPlainData(): Post {
     return {
       id: this.id,
-      title: this.name,
-      type: this.type,
-      state: this.state,
+      title: this.title,
+      type: this.type as PostType,
+      state: this.state as PostState,
       tags: this.tags,
       isRepost: this.isRepost,
-      likes: this.likes,
       createdBy: this.createdBy,
-      createdAt: this.createdAt,
       publishedBy: this.publishedBy,
+      createdAt: this.createdAt,
       publishedAt: this.publishedAt,
-      ...this.semanticData,
+      text: this.text,
+      url: this.url,
+      description: this.description,
+      quoteAuthor: this.quoteAuthor,
+      announcement: this.announcement,
+      likesCount: this.likesCount,
+      commentsCount: this.commentsCount,
     };
   }
 }

@@ -1,9 +1,9 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from '@project/core';
+import { MongoCollections, User } from '@project/core';
 
 @Schema({
-  collection: 'users',
+  collection: MongoCollections.Users,
   timestamps: true,
 })
 export class UserModel extends Document implements User {
@@ -25,7 +25,7 @@ export class UserModel extends Document implements User {
   public password!: string;
 
   @Prop()
-  public avatarUrl?: string;
+  public avatarId?: string;
 
   @Prop({ default: 0 })
   public posts?: number;

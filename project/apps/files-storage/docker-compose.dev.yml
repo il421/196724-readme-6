@@ -1,0 +1,43 @@
+version: '3.9'
+services:
+  readme-files-mongo:
+    image: mongo:4.4
+    command: --port ${MONGO_PORT}
+    restart: always
+
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:${MONGO_PORT}/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+    container_name: readme-files-mongo
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+
+    ports:
+      - ${MONGO_PORT}:${MONGO_PORT}
+
+    volumes:
+      - readme-mongo-files:/data/db
+
+  users.mongo.ui:
+    image: mongo-express:1.0.2-20
+    restart: always
+    container_name: readme-files-mongo-ui
+    ports:
+      - ${MONGO_UI_PORT}:${MONGO_UI_PORT}
+    environment:
+      PORT: ${MONGO_UI_PORT}
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@readme-files-mongo:${MONGO_PORT}/
+
+volumes:
+  readme-mongo-files:

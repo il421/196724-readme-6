@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import applicationConfig from '../../../../shared/core/src/config/app.config';
+import { applicationConfig } from '@project/core';
 const ENV_FEEDBACK_FILE_PATH = 'apps/posts/.env';
 
 @Module({

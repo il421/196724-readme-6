@@ -10,7 +10,7 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
   public avatarId?: string;
   public posts?: number;
   public followers?: number;
-  public createdAt?: string;
+  public createdAt?: Date;
   public avatarUrl?: string;
   constructor(user: User) {
     super();
@@ -20,6 +20,7 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
     this.firstName = user.firstName;
     this.lastName = user.lastName;
     this.avatarId = user.avatarId;
+    this.avatarUrl = user.avatarUrl;
     this.posts = user.posts;
     this.followers = user.followers;
     this.createdAt = user.createdAt;
@@ -33,8 +34,9 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
       lastName: this.lastName ?? '',
       password: this.password ?? '',
       avatarId: this.avatarId,
-      posts: this.posts ?? 0,
-      followers: this.followers ?? 0,
+      avatarUrl: this.avatarUrl,
+      posts: this.posts,
+      followers: this.followers,
     };
   }
 

@@ -6,7 +6,7 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SubscriptionsModule } from './app/subscriptions.module';
-import { buildSwagger, GLOBAL_PREFIX, SwaggerTags } from '@project/core';
+import { buildSwagger, GLOBAL_PREFIX, SWAGGER_TAGS } from '@project/core';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
@@ -14,7 +14,7 @@ async function bootstrap() {
   app.setGlobalPrefix(GLOBAL_PREFIX);
   const configService = app.get(ConfigService);
   const port = configService.get('application.port');
-  buildSwagger(app, SwaggerTags.Subscriptions);
+  buildSwagger(app, SWAGGER_TAGS.SUBSCRIPTIONS);
   await app.listen(port);
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${GLOBAL_PREFIX}`

@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserEntity, UserRepository } from '@project/users-lib';
-import { SwaggerErrorMessages } from '@project/core';
+import { ERROR_MESSAGES } from '@project/core';
 import {
   CreateUserDto,
   LoginUserDto,
@@ -21,15 +21,14 @@ export class AuthenticationService {
     const { email, firstName, lastName, password } = dto;
 
     if (!email || !password || !firstName || !lastName) {
-      throw new BadRequestException(SwaggerErrorMessages.NoEmailOrPassword);
+      throw new BadRequestException(ERROR_MESSAGES.NO_EMAIL_OR_PASSWORD);
     }
 
     const user = await this.userRepository.findByEmail(email);
-    if (user) {
-      throw new ConflictException(SwaggerErrorMessages.DuplicatedUser);
-    }
+    if (user) throw new ConflictException(ERROR_MESSAGES.DUPLICATED_USER);
 
-    const userEntity = await new UserEntity(dto).setPassword(password);
+    const userEntity = new UserEntity(dto);
+    await userEntity.setPassword(password);
     await this.userRepository.save(userEntity);
     return userEntity;
   }
@@ -38,31 +37,22 @@ export class AuthenticationService {
     const { email, password } = dto;
     const existUser = await this.userRepository.findByEmail(email);
 
-    if (!existUser) {
-      throw new NotFoundException(SwaggerErrorMessages.UserNotFound);
-    }
-
-    if (!password || !(await existUser.comparePassword(password))) {
-      throw new UnauthorizedException(SwaggerErrorMessages.UserBadPassword);
-    }
+    if (!existUser) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+    if (!password || !(await existUser.comparePassword(password)))
+      throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
 
     return existUser;
   }
 
   public async updatePassword(id: string, payload: UpdateUserPasswordDto) {
     const user = await this.userRepository.findById(id);
-    if (user) {
-      if (
-        !payload.password ||
-        !(await user.comparePassword(payload.password))
-      ) {
-        throw new UnauthorizedException(SwaggerErrorMessages.UserBadPassword);
-      }
-      const userEntity = await new UserEntity(user.toPlainData()).setPassword(
-        payload.newPassword
-      );
-      return await this.userRepository.update(userEntity);
+    if (!user) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+
+    if (!payload.password || !(await user.comparePassword(payload.password))) {
+      throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
     }
-    throw new NotFoundException(SwaggerErrorMessages.UserNotFound);
+    const userEntity = new UserEntity(user.toPlainData());
+    await userEntity.setPassword(payload.newPassword);
+    return await this.userRepository.update(userEntity);
   }
 }

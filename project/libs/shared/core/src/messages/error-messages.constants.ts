@@ -1,0 +1,20 @@
+export const ERROR_MESSAGES = {
+  USER_NOT_FOUND: 'User not found',
+  POST_NOT_FOUND: 'Post not found',
+  POST_DELETE: 'Not able to delete other users posts',
+  POST_UPDATE_OTHER_USERS: 'User is not able update other users posts',
+  POST_NOT_PUBLISHED: 'Post is not published',
+  POST_PUBLISHED: 'Post is published already',
+  POST_REPOSTED: 'Post exists already',
+  POST_NOT_LIKED: 'Post is not liked',
+  POST_ALREADY_LIKED: 'Post is liked already',
+  FILE_NOT_FOUND: 'File not found',
+  SUBSCRIPTION_NOT_FOUND: 'Subscription not found',
+  SUBSCRIPTION_EXISTS: 'Subscription exists already',
+  COMMENT_NOT_FOUND: 'Comment not found',
+  COMMENT_OTHER_USERS_DELETE: 'Not able to delete other users comments',
+  USER_BAD_PASSWORD: 'User password is invalid',
+  DUPLICATED_USER: 'User with this email exists',
+  NO_EMAIL_OR_PASSWORD:
+    'Either email or passwords is not provided or incorrect',
+} as const;

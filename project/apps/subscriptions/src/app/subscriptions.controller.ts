@@ -7,29 +7,29 @@ import {
   Post,
   HttpStatus,
 } from '@nestjs/common';
-import {
-  SwaggerErrorMessages,
-  RoutePaths,
-  SwaggerSuccessMessages,
-  SwaggerTags,
-} from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
 import { CreateSubscriptionDto } from './dtos';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionRdo } from './rdos';
+import { SubscriptionsPaths } from './subscriptions-paths.enum';
 
-@ApiTags(SwaggerTags.Subscriptions)
-@Controller(RoutePaths.Subscriptions)
+@ApiTags(SWAGGER_TAGS.SUBSCRIPTIONS)
+@Controller(SubscriptionsPaths.Base)
 export class SubscriptionsController {
   constructor(private readonly subscriptionService: SubscriptionsService) {}
 
-  @Get('/:userId')
+  @Get(SubscriptionsPaths.Subscriptions)
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
     type: SubscriptionRdo,
-    description: SwaggerSuccessMessages.Subscriptions,
+    description: SUCCESS_MESSAGES.SUBSCRIPTIONS,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   public async getSubscriptions(@Param('userId') userId: string) {
     // @TODO need to get userId from token
@@ -42,9 +42,17 @@ export class SubscriptionsController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: SubscriptionRdo,
-    description: SwaggerSuccessMessages.Subscribed,
+    description: SUCCESS_MESSAGES.SUBSCRIBED,
   })
-  @Post(':userId/create')
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: ERROR_MESSAGES.SUBSCRIPTION_EXISTS,
+  })
+  @Post(SubscriptionsPaths.Create)
   public async subscribe(
     @Param('userId') userId: string,
     @Body() dto: CreateSubscriptionDto
@@ -55,19 +63,23 @@ export class SubscriptionsController {
   }
 
   @ApiResponse({
-    status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.Unsubscribed,
+    status: HttpStatus.NO_CONTENT,
+    description: SUCCESS_MESSAGES.UNSUBSCRIBED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.SubscriptionNotFound,
+    description: ERROR_MESSAGES.SUBSCRIPTION_NOT_FOUND,
   })
-  @Delete(':userId/delete/:authorId')
-  public async unsubscribe(
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
+  })
+  @Delete(SubscriptionsPaths.Delete)
+  public unsubscribe(
     @Param('userId') userId: string,
     @Param('authorId') authorId: string
   ) {
     // @TODO need to get userId from token
-    return await this.subscriptionService.delete(userId, authorId);
+    return this.subscriptionService.delete(userId, authorId);
   }
 }

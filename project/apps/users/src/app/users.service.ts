@@ -1,31 +1,25 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserEntity, UserRepository } from '@project/users-lib';
-import { SwaggerErrorMessages } from '@project/core';
-import { FilesStorageService } from '@project/files-storage-lib';
+import { ERROR_MESSAGES } from '@project/core';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly userRepository: UserRepository,
-    private readonly filesStorageService: FilesStorageService
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   public async getUser(id: string) {
+    const userEntity = await this.userRepository.searchById(id);
+    if (!userEntity) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+    return userEntity;
+  }
+
+  public async updateUserAvatar(id: string, avatarId: string) {
     const userEntity = await this.userRepository.findById(id);
-    if (userEntity) {
-      if (userEntity?.avatarId) {
-        const avatarEntity = await this.filesStorageService.findById(
-          userEntity.avatarId
-        );
+    if (!userEntity) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
 
-        return new UserEntity({
-          ...userEntity.toPlainData(),
-          avatarUrl: avatarEntity?.path,
-        });
-      }
-      return userEntity;
-    }
-
-    throw new NotFoundException(SwaggerErrorMessages.UserNotFound);
+    const newUserEntity = new UserEntity({
+      ...userEntity.toPlainData(),
+      avatarId,
+    });
+    return await this.userRepository.update(newUserEntity);
   }
 }

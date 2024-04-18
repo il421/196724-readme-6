@@ -8,12 +8,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  RoutePaths,
-  SwaggerErrorMessages,
-  SwaggerSuccessMessages,
-  SwaggerTags,
-} from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -28,13 +23,14 @@ import {
   FileSwaggerSchema,
   MIME_TYPE,
 } from '@project/files-storage-lib';
+import { FilesStoragePaths } from './files-storage-paths.enum';
 
-@ApiTags(SwaggerTags.Files)
-@Controller(RoutePaths.Files)
+@ApiTags(SWAGGER_TAGS.FILES)
+@Controller(FilesStoragePaths.Base)
 export class FilesStorageController {
   constructor(private readonly filesStorageService: FilesStorageService) {}
 
-  @Post(':userId')
+  @Post(FilesStoragePaths.FileUpload)
   @UseInterceptors(
     FileInterceptor(FIELD_NAME, {
       storage: diskStorage({ destination: FILES_DESTINATION, filename }),
@@ -43,7 +39,7 @@ export class FilesStorageController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: FileRdo,
-    description: SwaggerSuccessMessages.FileUploaded,
+    description: SUCCESS_MESSAGES.FILE_UPLOADED,
   })
   @ApiConsumes(MIME_TYPE)
   @ApiBody({
@@ -58,31 +54,31 @@ export class FilesStorageController {
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Get(':id')
+  @Get(FilesStoragePaths.File)
   @ApiResponse({
     status: HttpStatus.OK,
     type: FileRdo,
-    description: SwaggerSuccessMessages.File,
+    description: SUCCESS_MESSAGES.FILE,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.FileNotFound,
+    description: ERROR_MESSAGES.FILE_NOT_FOUND,
   })
   public async getById(@Param('id') id: string) {
     const newFile = await this.filesStorageService.findById(id);
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Delete(':id')
+  @Delete(FilesStoragePaths.FileDeleted)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.FileDeleted,
+    description: SUCCESS_MESSAGES.FILE_DELETED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.FileNotFound,
+    description: ERROR_MESSAGES.FILE_NOT_FOUND,
   })
-  public async delete(@Param('id') id: string) {
-    return await this.filesStorageService.delete(id);
+  public delete(@Param('id') id: string) {
+    return this.filesStorageService.delete(id);
   }
 }

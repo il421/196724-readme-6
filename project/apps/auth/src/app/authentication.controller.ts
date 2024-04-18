@@ -1,18 +1,12 @@
 import {
   Body,
   Controller,
-  Get,
   Param,
   Post,
   HttpStatus,
   Patch,
 } from '@nestjs/common';
-import {
-  SwaggerErrorMessages,
-  SwaggerTags,
-  RoutePaths,
-  SwaggerSuccessMessages,
-} from '@project/core';
+import { ERROR_MESSAGES, SWAGGER_TAGS, SUCCESS_MESSAGES } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -23,24 +17,25 @@ import {
   UpdateUserPasswordDto,
 } from '@project/users-lib';
 import { AuthenticationService } from './authentication.service';
+import { AuthenticationPaths } from './authentication-paths.enum';
 
-@ApiTags(SwaggerTags.Auth)
-@Controller(RoutePaths.Auth)
+@ApiTags(SWAGGER_TAGS.AUTH)
+@Controller(AuthenticationPaths.Base)
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
-  @Post('create')
+  @Post(AuthenticationPaths.Create)
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: SwaggerSuccessMessages.UserCreate,
+    description: SUCCESS_MESSAGES.USER_CREATE,
     type: UserRdo,
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: SwaggerErrorMessages.DuplicatedUser,
+    description: ERROR_MESSAGES.DUPLICATED_USER,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: SwaggerErrorMessages.UserBadPassword,
+    description: ERROR_MESSAGES.USER_BAD_PASSWORD,
   })
   public async create(
     @Body()
@@ -50,18 +45,18 @@ export class AuthenticationController {
     return fillDto(UserRdo, newUser.toPlainData());
   }
 
-  @Post('login')
+  @Post(AuthenticationPaths.Login)
   @ApiResponse({
     type: LoggedUserRdo,
     status: HttpStatus.OK,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: SwaggerErrorMessages.UserBadPassword,
+    description: ERROR_MESSAGES.USER_BAD_PASSWORD,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: SwaggerErrorMessages.UserNotFound,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   public async login(
     @Body()
@@ -71,15 +66,15 @@ export class AuthenticationController {
     return fillDto(LoggedUserRdo, { accessToken: '123' }); // @TODO not completed
   }
 
-  @Patch(':id/password/update')
+  @Patch(AuthenticationPaths.PasswordUpdate)
   @ApiResponse({
     type: LoggedUserRdo,
     status: HttpStatus.OK,
-    description: SwaggerSuccessMessages.UserPasswordUpdated,
+    description: SUCCESS_MESSAGES.USER_PASSWORD_UPDATE,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: SwaggerErrorMessages.UserBadPassword,
+    description: ERROR_MESSAGES.USER_BAD_PASSWORD,
   })
   public async updatePassword(
     @Param('id') id: string,

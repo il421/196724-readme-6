@@ -4,9 +4,10 @@ import { FeedbackService } from './feedback.service';
 import { FeedbackRepository } from './feedback.repository';
 import { FeedbackFactory } from './feedback.factory';
 import { FeedbackConfigModule } from '@project/feedback-lib';
+import { PrismaClientModule } from '@project/prisma-client';
 
 @Module({
-  imports: [FeedbackConfigModule],
+  imports: [FeedbackConfigModule, PrismaClientModule],
   controllers: [FeedbackController],
   providers: [FeedbackService, FeedbackRepository, FeedbackFactory],
 })
