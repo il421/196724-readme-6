@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { FilesStorageRepository } from './files-storage.repository';
 import { FileEntity } from './file.entity';
 import { File, ERROR_MESSAGES } from '@project/core';
@@ -42,10 +46,14 @@ export class FilesStorageService {
 
     const storagePath = resolve(this.config.get('storage.rootPath') ?? '');
     if (fileEntity) {
-      await this.filesStorageRepository.deleteById(id);
-
       const path = `${storagePath}/${fileEntity.name}`;
-      await fs.promises.unlink(path);
+      try {
+        await fs.promises.unlink(path);
+      } catch (e) {
+        throw new BadRequestException(e);
+      }
+
+      return void (await this.filesStorageRepository.deleteById(id));
     }
   }
 

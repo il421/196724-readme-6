@@ -1,5 +1,4 @@
 import { Document, Model } from 'mongoose';
-import { NotFoundException } from '@nestjs/common';
 import { Entity, IEntityFactory, IStorableEntity } from '@project/core';
 import { IRepository } from '@project/data-access';
 
@@ -40,21 +39,14 @@ export abstract class MongoRepository<
   }
 
   public async update(entity: T): Promise<void> {
-    const updatedDocument = await this.model
+    return void (await this.model
       .findByIdAndUpdate(entity.id, entity, {
         new: true,
       })
-      .exec();
-
-    if (!updatedDocument) {
-      throw new NotFoundException(`Entity with id ${entity.id} not found`);
-    }
+      .exec());
   }
 
   public async deleteById(id: T['id']): Promise<void> {
-    const deletedDocument = await this.model.findByIdAndDelete(id).exec();
-    if (!deletedDocument) {
-      throw new NotFoundException(`Entity with id ${id} not found.`);
-    }
+    return void (await this.model.findByIdAndDelete(id).exec());
   }
 }
