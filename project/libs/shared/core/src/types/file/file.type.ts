@@ -4,4 +4,5 @@ export type File = Pick<ChangeLog, 'createdAt' | 'createdBy'> & {
   id?: string;
   format: string;
   path: string;
+  name: string;
 };
