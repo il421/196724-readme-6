@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Param,
   ParseArrayPipe,
-  ParseArrayOptions,
   Post,
   Put,
   Query,
@@ -15,7 +14,6 @@ import {
   ERROR_MESSAGES,
   SwaggerTags,
   PostType,
-  RoutePaths,
   SUCCESS_MESSAGES,
 } from '@project/core';
 import { CreatePostDto, UpdatePostDto } from './dtos';
@@ -24,19 +22,14 @@ import { FullPostRdo, PostRdo } from './rdos';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
 import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from './post.constants';
+import { PostPaths } from './post-paths.enum';
 
 @ApiTags(SwaggerTags.Posts)
-@Controller(RoutePaths.Posts)
+@Controller(PostPaths.Base)
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  readonly parseQueryArrayPipeOptions: ParseArrayOptions = {
-    items: String,
-    separator: ',',
-    optional: true,
-  };
-
-  @Get('/search')
+  @Get(PostPaths.Search)
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
@@ -71,7 +64,7 @@ export class PostController {
     return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
   }
 
-  @Get('drafts/:userId')
+  @Get(PostPaths.Drafts)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -84,7 +77,7 @@ export class PostController {
     return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
   }
 
-  @Get(':id')
+  @Get(PostPaths.Post)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -99,7 +92,7 @@ export class PostController {
     return fillDto(FullPostRdo, post?.toPlainData());
   }
 
-  @Post(':userId/create')
+  @Post(PostPaths.Create)
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: PostRdo,
@@ -114,7 +107,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Put(':userId/update/:id')
+  @Put(PostPaths.Update)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -134,7 +127,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Put(':userId/publish/:id')
+  @Put(PostPaths.Publish)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -161,7 +154,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Post(':userId/repost/:id')
+  @Post(PostPaths.Repost)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -180,7 +173,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Delete(':userId/delete/:id')
+  @Delete(PostPaths.Delete)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SUCCESS_MESSAGES.POST_DELETED,
