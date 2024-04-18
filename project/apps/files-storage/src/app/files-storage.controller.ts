@@ -8,7 +8,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES, SwaggerTags } from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -25,7 +25,7 @@ import {
 } from '@project/files-storage-lib';
 import { FilesStoragePaths } from './files-storage-paths.enum';
 
-@ApiTags(SwaggerTags.Files)
+@ApiTags(SWAGGER_TAGS.FILES)
 @Controller(FilesStoragePaths.Base)
 export class FilesStorageController {
   constructor(private readonly filesStorageService: FilesStorageService) {}

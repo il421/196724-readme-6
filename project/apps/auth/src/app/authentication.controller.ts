@@ -6,7 +6,7 @@ import {
   HttpStatus,
   Patch,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SwaggerTags, SUCCESS_MESSAGES } from '@project/core';
+import { ERROR_MESSAGES, SWAGGER_TAGS, SUCCESS_MESSAGES } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -19,7 +19,7 @@ import {
 import { AuthenticationService } from './authentication.service';
 import { AuthenticationPaths } from './authentication-paths.enum';
 
-@ApiTags(SwaggerTags.Auth)
+@ApiTags(SWAGGER_TAGS.AUTH)
 @Controller(AuthenticationPaths.Base)
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
