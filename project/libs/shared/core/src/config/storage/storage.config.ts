@@ -1,13 +1,9 @@
 import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
-import { Registers } from './registers.enum';
+import { Registers } from '../registers.enum';
 import { validateConfig } from '@project/core';
-
-const VALIDATION_ERROR = 'Uploads Storage Validation Error';
-
-export interface StorageConfig {
-  rootPath: string;
-}
+import { StorageConfig } from './storage.interface';
+import { STORAGE_VALIDATION_ERROR } from './storage.constants';
 
 const validationSchema = Joi.object({
   rootPath: Joi.string().required(),
@@ -18,8 +14,8 @@ const getConfig = (): StorageConfig => {
     rootPath: process.env['STORAGE_DIRECTORY'],
   };
 
-  validateConfig(validationSchema, config, VALIDATION_ERROR);
+  validateConfig(validationSchema, config, STORAGE_VALIDATION_ERROR);
   return config;
 };
 
-export default registerAs(Registers.Storage, getConfig);
+export const storageConfig = registerAs(Registers.Storage, getConfig);
