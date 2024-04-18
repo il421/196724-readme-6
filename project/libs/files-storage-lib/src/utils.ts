@@ -12,5 +12,8 @@ export const filename = (
   callback(null, getFileName(file));
 };
 
-export const path = (fileName: string, host?: string, port?: number): string =>
-  `http://${host}:${port}/${fileName}`;
+export const getPath = (
+  fileName: string,
+  host?: string,
+  port?: number
+): string => `http://${host}:${port}/${fileName}`;
