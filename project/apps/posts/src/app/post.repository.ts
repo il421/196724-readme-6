@@ -2,10 +2,11 @@ import { PostgresRepository } from '@project/data-access';
 import { PostEntity } from './post.entity';
 import { Injectable } from '@nestjs/common';
 import { PostFactory } from './post.factory';
-import { Post, PostState, PostType } from '@project/core';
+import { Post, PostState } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
 import { DEFAULT_NUMBER_OF_POSTS } from './post.constants';
 import { SearchPostsArgs } from './post.search.interface';
+import { Prisma } from '.prisma/client';
 
 @Injectable()
 export class PostRepository extends PostgresRepository<PostEntity, Post> {
@@ -42,15 +43,17 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
 
   public async findPosts(args: SearchPostsArgs) {
     const { usersIds = [], tags = [], state, types = [], title } = args;
+    const where: Prisma.PostWhereInput = {
+      state: state ?? PostState.Published,
+    };
+
+    if (usersIds?.length) where.createdBy = { in: usersIds };
+    if (tags?.length) where.tags = { hasSome: tags };
+    if (types?.length) where.type = { in: types };
+    if (title) where.title = { contains: title };
 
     const documents = await this.client.post.findMany({
-      where: {
-        ...(usersIds?.length && { createdBy: { in: usersIds } }),
-        ...(tags?.length && { tags: { hasSome: tags } }),
-        ...(types?.length && { type: { in: types } }),
-        ...(title && { title: { contains: title } }),
-        state: state ?? PostState.Published,
-      },
+      where,
       take: DEFAULT_NUMBER_OF_POSTS, // @TODO just a default for now
       include: this.include,
       orderBy: { publishedAt: 'desc' }, // @TODO desc is default, but should be possible a user pass an extra param
@@ -67,7 +70,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     return this.createEntityFromDocument(document);
   }
 
-  public async delete(id: string) {
+  public delete(id: string) {
     return this.client.post.delete({
       where: { id },
     });

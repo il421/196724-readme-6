@@ -75,11 +75,11 @@ export class SubscriptionsController {
     description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   @Delete(SubscriptionsPaths.Delete)
-  public async unsubscribe(
+  public unsubscribe(
     @Param('userId') userId: string,
     @Param('authorId') authorId: string
   ) {
     // @TODO need to get userId from token
-    return await this.subscriptionService.delete(userId, authorId);
+    return this.subscriptionService.delete(userId, authorId);
   }
 }

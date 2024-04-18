@@ -78,7 +78,7 @@ export class FilesStorageController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.FILE_NOT_FOUND,
   })
-  public async delete(@Param('id') id: string) {
-    return await this.filesStorageService.delete(id);
+  public delete(@Param('id') id: string) {
+    return this.filesStorageService.delete(id);
   }
 }

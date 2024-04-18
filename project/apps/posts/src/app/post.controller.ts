@@ -186,11 +186,8 @@ export class PostController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.POST_DELETE,
   })
-  public async delete(
-    @Param('userId') userId: string,
-    @Param('id') id: string
-  ) {
+  public delete(@Param('userId') userId: string, @Param('id') id: string) {
     // @TODO need to grab user id from token
-    return await this.postService.delete(id, userId);
+    return this.postService.delete(id, userId);
   }
 }

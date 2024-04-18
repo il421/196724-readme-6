@@ -65,12 +65,9 @@ export class FeedbackController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.COMMENT_OTHER_USERS_DELETE,
   })
-  public async delete(
-    @Param('userId') userId: string,
-    @Param('id') id: string
-  ) {
+  public delete(@Param('userId') userId: string, @Param('id') id: string) {
     // @TODO need to grab user id from token
-    return await this.feedbackService.deleteComment(userId, id);
+    return this.feedbackService.deleteComment(userId, id);
   }
 
   @Post(FeedbackPaths.LikeCreate)
@@ -90,12 +87,12 @@ export class FeedbackController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.POST_ALREADY_LIKED,
   })
-  public async like(
+  public like(
     @Param('userId') userId: string,
     @Param('postId') postId: string
   ) {
     // @TODO need to grab user id from token
-    await this.feedbackService.like(userId, postId);
+    return this.feedbackService.like(userId, postId);
   }
 
   @Delete(FeedbackPaths.LikeDelete)
@@ -111,11 +108,11 @@ export class FeedbackController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.POST_NOT_PUBLISHED,
   })
-  public async unlike(
+  public unlike(
     @Param('userId') userId: string,
     @Param('postId') postId: string
   ) {
     // @TODO need to grab user id from token
-    await this.feedbackService.unlike(userId, postId);
+    return this.feedbackService.unlike(userId, postId);
   }
 }

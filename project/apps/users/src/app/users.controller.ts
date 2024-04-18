@@ -46,12 +46,12 @@ export class UsersController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
-  public async updateAvatar(
+  public updateAvatar(
     @Param('id')
     id: string,
     @Body() dto: UpdateUserAvatarDto
   ) {
     // @TODO need to grab user id from token
-    return await this.usersService.updateUserAvatar(id, dto.avatarId);
+    return this.usersService.updateUserAvatar(id, dto.avatarId);
   }
 }
