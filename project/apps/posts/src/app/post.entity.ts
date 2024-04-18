@@ -25,6 +25,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
   public likesCount?: number;
 
   constructor(post: Post) {
+    super();
     const {
       id,
       title,
@@ -43,7 +44,6 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       announcement,
       _count,
     } = post;
-    super();
     this.id = id;
     this.title = title;
     this.type = type;

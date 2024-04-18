@@ -6,8 +6,8 @@ export class CommentEntity extends Entity implements IStorableEntity<Comment> {
   public createdBy?: string;
   public createdAt?: Date;
   constructor(comment: Comment) {
-    const { id, text, postId, createdBy, createdAt } = comment;
     super();
+    const { id, text, postId, createdBy, createdAt } = comment;
     this.id = id;
     this.text = text;
     this.postId = postId;
