@@ -1,8 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
-import { DEFAULT_HOST, DEFAULT_PORT, ENVIRONMENTS } from './app.constants';
 import { validateConfig } from '../utils';
-import { Environment } from './environment.type';
+import { Environments } from './environments.enum';
 import { Registers } from '../registers.enum';
 
 const VALIDATION_ERROR = 'Application Config Validation Error';
@@ -15,16 +14,16 @@ export interface ApplicationConfig {
 
 const validationSchema = Joi.object({
   environment: Joi.string()
-    .valid(...ENVIRONMENTS)
+    .valid(...Object.values(Environments))
     .required(),
-  port: Joi.number().port().default(DEFAULT_PORT),
-  host: Joi.string().required().default(DEFAULT_HOST),
+  port: Joi.number().port(),
+  host: Joi.string().required(),
 });
 
 const getConfig = (): ApplicationConfig => {
   const config: ApplicationConfig = {
-    environment: process.env['NODE_ENV'] as Environment,
-    port: parseInt(process.env['PORT'] || `${DEFAULT_PORT}`, 10),
+    environment: process.env['NODE_ENV'] as Environments,
+    port: parseInt(process.env['PORT'], 10),
     host: process.env['HOST'],
   };
 

@@ -16,7 +16,7 @@ export class FileModel extends Document implements File {
   @Prop({
     required: true,
   })
-  public createdAt!: string;
+  public createdAt!: Date;
 
   @Prop({ required: true })
   public createdBy!: string;
