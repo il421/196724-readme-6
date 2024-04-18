@@ -7,9 +7,9 @@ import {
   Body,
 } from '@nestjs/common';
 import {
-  ErrorMessages,
+  ERROR_MESSAGES,
   RoutePaths,
-  SuccessMessages,
+  SUCCESS_MESSAGES,
   SwaggerTags,
 } from '@project/core';
 import { fillDto } from '@project/helpers';
@@ -26,11 +26,11 @@ export class UsersController {
   @ApiResponse({
     type: UserRdo,
     status: HttpStatus.OK,
-    description: SuccessMessages.UserFound,
+    description: SUCCESS_MESSAGES.USER_FOUND,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.UserNotFound,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   public async getUser(
     @Param('id')
@@ -44,11 +44,11 @@ export class UsersController {
   @ApiResponse({
     type: UserRdo,
     status: HttpStatus.OK,
-    description: SuccessMessages.UserAvatar,
+    description: SUCCESS_MESSAGES.USER_AVATAR,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.UserNotFound,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   public async updateAvatar(
     @Param('id')

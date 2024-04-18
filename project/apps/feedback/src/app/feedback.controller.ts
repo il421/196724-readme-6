@@ -8,9 +8,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
-  ErrorMessages,
+  ERROR_MESSAGES,
   RoutePaths,
-  SuccessMessages,
+  SUCCESS_MESSAGES,
   SwaggerTags,
 } from '@project/core';
 import { CreateCommentDto } from './dtos';
@@ -30,7 +30,7 @@ export class FeedbackController {
     status: HttpStatus.OK,
     isArray: true,
     type: CommentRdo,
-    description: SuccessMessages.Comments,
+    description: SUCCESS_MESSAGES.COMMENTS,
   })
   public async getPostComments(@Param('postId') postId: string) {
     const comments = await this.feedbackService.getCommentsByPostId(postId);
@@ -42,11 +42,11 @@ export class FeedbackController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: CommentRdo,
-    description: SuccessMessages.CommentCreated,
+    description: SUCCESS_MESSAGES.COMMENT_CREATED,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ErrorMessages.PostNotFound,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
   public async create(
     @Param('userId') userId: string,
@@ -60,15 +60,15 @@ export class FeedbackController {
   @Delete(':userId/comments/:id/delete')
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
-    description: SuccessMessages.CommentDeleted,
+    description: SUCCESS_MESSAGES.COMMENT_DELETED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.CommentNotFound,
+    description: ERROR_MESSAGES.COMMENT_NOT_FOUND,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ErrorMessages.CommentUserError,
+    description: ERROR_MESSAGES.COMMENT_OTHER_USERS_DELETE,
   })
   public async delete(
     @Param('userId') userId: string,
@@ -81,19 +81,19 @@ export class FeedbackController {
   @Post(':userId/likes/:postId/create')
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: SuccessMessages.CommentCreated,
+    description: SUCCESS_MESSAGES.COMMENT_CREATED,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ErrorMessages.PostNotFound,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ErrorMessages.PostNotPublish,
+    description: ERROR_MESSAGES.POST_NOT_PUBLISHED,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ErrorMessages.Liked,
+    description: ERROR_MESSAGES.POST_ALREADY_LIKED,
   })
   public async like(
     @Param('userId') userId: string,
@@ -106,15 +106,15 @@ export class FeedbackController {
   @Delete(':userId/likes/:postId/delete')
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
-    description: SuccessMessages.CommentDeleted,
+    description: SUCCESS_MESSAGES.COMMENT_DELETED,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: ErrorMessages.PostNotFound,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: ErrorMessages.PostNotPublish,
+    description: ERROR_MESSAGES.POST_NOT_PUBLISHED,
   })
   public async unlike(
     @Param('userId') userId: string,

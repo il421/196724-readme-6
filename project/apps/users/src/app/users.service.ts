@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserEntity, UserRepository } from '@project/users-lib';
-import { ErrorMessages } from '@project/core';
+import { ERROR_MESSAGES } from '@project/core';
 import mongoose from 'mongoose';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class UsersService {
       return userEntity;
     }
 
-    throw new NotFoundException(ErrorMessages.UserNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
   }
 
   public async updateUserAvatar(id: string, avatarId: string) {
@@ -26,6 +26,6 @@ export class UsersService {
       });
       return await this.userRepository.update(newUserEntity);
     }
-    throw new NotFoundException(ErrorMessages.UserNotFound);
+    throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
   }
 }
