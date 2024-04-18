@@ -6,12 +6,7 @@ import {
   HttpStatus,
   Patch,
 } from '@nestjs/common';
-import {
-  ERROR_MESSAGES,
-  SwaggerTags,
-  RoutePaths,
-  SUCCESS_MESSAGES,
-} from '@project/core';
+import { ERROR_MESSAGES, SwaggerTags, SUCCESS_MESSAGES } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -22,12 +17,13 @@ import {
   UpdateUserPasswordDto,
 } from '@project/users-lib';
 import { AuthenticationService } from './authentication.service';
+import { AuthenticationPaths } from './authentication-paths.enum';
 
 @ApiTags(SwaggerTags.Auth)
-@Controller(RoutePaths.Auth)
+@Controller(AuthenticationPaths.Base)
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
-  @Post('create')
+  @Post(AuthenticationPaths.Create)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS_MESSAGES.USER_CREATE,
@@ -49,7 +45,7 @@ export class AuthenticationController {
     return fillDto(UserRdo, newUser.toPlainData());
   }
 
-  @Post('login')
+  @Post(AuthenticationPaths.Login)
   @ApiResponse({
     type: LoggedUserRdo,
     status: HttpStatus.OK,
@@ -70,7 +66,7 @@ export class AuthenticationController {
     return fillDto(LoggedUserRdo, { accessToken: '123' }); // @TODO not completed
   }
 
-  @Patch(':id/password/update')
+  @Patch(AuthenticationPaths.PasswordUpdate)
   @ApiResponse({
     type: LoggedUserRdo,
     status: HttpStatus.OK,

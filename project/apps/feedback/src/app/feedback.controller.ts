@@ -7,25 +7,20 @@ import {
   Post,
   HttpStatus,
 } from '@nestjs/common';
-import {
-  ERROR_MESSAGES,
-  RoutePaths,
-  SUCCESS_MESSAGES,
-  SwaggerTags,
-} from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SwaggerTags } from '@project/core';
 import { CreateCommentDto } from './dtos';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
-import { PostRdo } from '../../../posts/src/app/rdos';
+import { FeedbackPaths } from './feedback-paths.enum';
 
 @ApiTags(SwaggerTags.Feedback)
-@Controller(RoutePaths.Feedback)
+@Controller(FeedbackPaths.Base)
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
-  @Get('/comments')
+  @Get(FeedbackPaths.Comments)
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
@@ -38,7 +33,7 @@ export class FeedbackController {
       fillDto(CommentRdo, comment.toPlainData())
     );
   }
-  @Post(':userId/comments/create')
+  @Post(FeedbackPaths.CommentCreate)
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: CommentRdo,
@@ -57,7 +52,7 @@ export class FeedbackController {
     return fillDto(CommentRdo, newComment.toPlainData());
   }
 
-  @Delete(':userId/comments/:id/delete')
+  @Delete(FeedbackPaths.CommentDelete)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SUCCESS_MESSAGES.COMMENT_DELETED,
@@ -78,7 +73,7 @@ export class FeedbackController {
     return await this.feedbackService.deleteComment(userId, id);
   }
 
-  @Post(':userId/likes/:postId/create')
+  @Post(FeedbackPaths.LikeCreate)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS_MESSAGES.COMMENT_CREATED,
@@ -103,7 +98,7 @@ export class FeedbackController {
     await this.feedbackService.like(userId, postId);
   }
 
-  @Delete(':userId/likes/:postId/delete')
+  @Delete(FeedbackPaths.LikeDelete)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SUCCESS_MESSAGES.COMMENT_DELETED,

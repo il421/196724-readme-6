@@ -8,12 +8,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  RoutePaths,
-  ERROR_MESSAGES,
-  SUCCESS_MESSAGES,
-  SwaggerTags,
-} from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SwaggerTags } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -28,13 +23,14 @@ import {
   FileSwaggerSchema,
   MIME_TYPE,
 } from '@project/files-storage-lib';
+import { FilesStoragePaths } from './files-storage-paths.enum';
 
 @ApiTags(SwaggerTags.Files)
-@Controller(RoutePaths.Files)
+@Controller(FilesStoragePaths.Base)
 export class FilesStorageController {
   constructor(private readonly filesStorageService: FilesStorageService) {}
 
-  @Post(':userId')
+  @Post(FilesStoragePaths.FileUpload)
   @UseInterceptors(
     FileInterceptor(FIELD_NAME, {
       storage: diskStorage({ destination: FILES_DESTINATION, filename }),
@@ -58,7 +54,7 @@ export class FilesStorageController {
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Get(':id')
+  @Get(FilesStoragePaths.File)
   @ApiResponse({
     status: HttpStatus.OK,
     type: FileRdo,
@@ -73,7 +69,7 @@ export class FilesStorageController {
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Delete(':id')
+  @Delete(FilesStoragePaths.FileDeleted)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS_MESSAGES.FILE_DELETED,

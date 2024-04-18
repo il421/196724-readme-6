@@ -6,23 +6,19 @@ import {
   Patch,
   Body,
 } from '@nestjs/common';
-import {
-  ERROR_MESSAGES,
-  RoutePaths,
-  SUCCESS_MESSAGES,
-  SwaggerTags,
-} from '@project/core';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SwaggerTags } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateUserAvatarDto, UserRdo } from '@project/users-lib';
 import { UsersService } from './users.service';
+import { UsersPaths } from './users-paths.enum';
 
 @ApiTags(SwaggerTags.Users)
-@Controller(RoutePaths.Users)
+@Controller(UsersPaths.Base)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id')
+  @Get(UsersPaths.User)
   @ApiResponse({
     type: UserRdo,
     status: HttpStatus.OK,
@@ -40,7 +36,7 @@ export class UsersController {
     return fillDto(UserRdo, user?.toPlainData());
   }
 
-  @Patch(':id/update-avatar')
+  @Patch(UsersPaths.UpdateAvatar)
   @ApiResponse({
     type: UserRdo,
     status: HttpStatus.OK,
