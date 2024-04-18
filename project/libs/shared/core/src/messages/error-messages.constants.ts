@@ -1,8 +1,8 @@
 export const ERROR_MESSAGES = {
   USER_NOT_FOUND: 'User not found',
   POST_NOT_FOUND: 'Post not found',
-  POST_DELETED: 'Not able to delete other users posts',
-  POST_UPDATED: 'User is not able update other users posts',
+  POST_DELETE: 'Not able to delete other users posts',
+  POST_UPDATE_OTHER_USERS: 'User is not able update other users posts',
   POST_NOT_PUBLISHED: 'Post is not published',
   POST_PUBLISHED: 'Post is published already',
   POST_REPOSTED: 'Post exists already',

@@ -43,8 +43,7 @@ export class FilesStorageService {
 
   public async findById(id: string): Promise<FileEntity> {
     const fileEntity = await this.filesStorageRepository.findById(id);
-
-    if (fileEntity) return fileEntity;
-    throw new NotFoundException(ERROR_MESSAGES.FILE_NOT_FOUND);
+    if (!fileEntity) throw new NotFoundException(ERROR_MESSAGES.FILE_NOT_FOUND);
+    return fileEntity;
   }
 }

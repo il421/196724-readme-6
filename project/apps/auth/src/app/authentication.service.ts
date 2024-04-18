@@ -25,11 +25,10 @@ export class AuthenticationService {
     }
 
     const user = await this.userRepository.findByEmail(email);
-    if (user) {
-      throw new ConflictException(ERROR_MESSAGES.DUPLICATED_USER);
-    }
+    if (user) throw new ConflictException(ERROR_MESSAGES.DUPLICATED_USER);
 
-    const userEntity = await new UserEntity(dto).setPassword(password);
+    const userEntity = new UserEntity(dto);
+    await userEntity.setPassword(password);
     await this.userRepository.save(userEntity);
     return userEntity;
   }
@@ -38,31 +37,22 @@ export class AuthenticationService {
     const { email, password } = dto;
     const existUser = await this.userRepository.findByEmail(email);
 
-    if (!existUser) {
-      throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
-    }
-
-    if (!password || !(await existUser.comparePassword(password))) {
+    if (!existUser) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+    if (!password || !(await existUser.comparePassword(password)))
       throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
-    }
 
     return existUser;
   }
 
   public async updatePassword(id: string, payload: UpdateUserPasswordDto) {
     const user = await this.userRepository.findById(id);
-    if (user) {
-      if (
-        !payload.password ||
-        !(await user.comparePassword(payload.password))
-      ) {
-        throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
-      }
-      const userEntity = await new UserEntity(user.toPlainData()).setPassword(
-        payload.newPassword
-      );
-      return await this.userRepository.update(userEntity);
+    if (!user) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+
+    if (!payload.password || !(await user.comparePassword(payload.password))) {
+      throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
     }
-    throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
+    const userEntity = new UserEntity(user.toPlainData());
+    await userEntity.setPassword(payload.newPassword);
+    return await this.userRepository.update(userEntity);
   }
 }
