@@ -17,9 +17,7 @@ export class PostService {
 
   public async create(userId: string, dto: CreatePostDto): Promise<PostEntity> {
     const postEntity = new PostEntity({ ...dto, createdBy: userId });
-
-    const payload = fillDto(CreatePostDto, postEntity.toPlainData());
-    return await this.postRepository.create(payload);
+    return await this.postRepository.create(postEntity.toPlainData());
   }
 
   public async update(

@@ -7,7 +7,7 @@ import {
 } from '@project/core';
 
 export class PostEntity extends Entity implements IStorableEntity<Post> {
-  public title: string;
+  public title?: string;
   public type: PostType;
   public state: PostState;
   public tags: string[];

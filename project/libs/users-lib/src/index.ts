@@ -7,3 +7,4 @@ export * from './user.pipelines';
 export * from './config';
 export * from './rdos';
 export * from './dtos';
+export * from './validator';

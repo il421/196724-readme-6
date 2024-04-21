@@ -11,6 +11,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
@@ -28,7 +29,10 @@ import { PostService } from './post.service';
 import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from './post.constants';
 import { PostPaths } from './post-paths.enum';
 import { JwtService } from '@nestjs/jwt';
-import { JwtAuthGuard } from '@project/data-access';
+import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
+// import { CreatePostValidator, UpdatePostValidator } from './validator';
+import { TagsTransformPipe } from './pipes/tags-transform.pipe';
+import { CreatePostValidator } from './validator';
 
 @ApiTags(SWAGGER_TAGS.POSTS)
 @ApiBearerAuth()
@@ -109,6 +113,10 @@ export class PostController {
 
   @Post(PostPaths.Create)
   @UseGuards(JwtAuthGuard)
+  @UsePipes(
+    new TagsTransformPipe(),
+    new DtoValidationPipe<CreatePostDto>(CreatePostValidator)
+  )
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: PostRdo,
@@ -123,12 +131,15 @@ export class PostController {
     @Headers() headers: IHeaders
   ) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const newPost = await this.postService.create(sub, dto);
+    const payload = fillDto(CreatePostDto, dto);
+    const newPost = await this.postService.create(sub, payload);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
   @Put(PostPaths.Update)
   @UseGuards(JwtAuthGuard)
+  @UsePipes(TagsTransformPipe)
+  // @UsePipes(new DtoValidationPipe<UpdatePostDto>(UpdatePostValidator))
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,

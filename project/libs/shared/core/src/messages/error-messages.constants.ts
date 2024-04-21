@@ -1,5 +1,6 @@
 export const ERROR_MESSAGES = {
   TOKEN: 'Create token error',
+  BAD_MONGO_ID_ERROR: 'Bad entity ID',
   UNAUTHORIZED: 'Unauthorised',
   USER_NOT_FOUND: 'User not found',
   POST_NOT_FOUND: 'Post not found',

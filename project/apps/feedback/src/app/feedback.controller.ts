@@ -8,6 +8,7 @@ import {
   HttpStatus,
   Headers,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
@@ -22,8 +23,9 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
 import { FeedbackPaths } from './feedback-paths.enum';
-import { JwtAuthGuard } from '@project/data-access';
+import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
 import { JwtService } from '@nestjs/jwt';
+import { CreateCommentValidator } from './validator';
 
 @ApiTags(SWAGGER_TAGS.FEEDBACK)
 @ApiBearerAuth()
@@ -96,6 +98,7 @@ export class FeedbackController {
 
   @Post(FeedbackPaths.LikeCreate)
   @UseGuards(JwtAuthGuard)
+  @UsePipes(new DtoValidationPipe<CreateCommentDto>(CreateCommentValidator))
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS_MESSAGES.COMMENT_CREATED,
