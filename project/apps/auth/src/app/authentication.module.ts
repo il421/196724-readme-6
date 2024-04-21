@@ -9,15 +9,27 @@ import {
   UsersConfigModule,
 } from '@project/users-lib';
 import { MongooseModule } from '@nestjs/mongoose';
-import { getMongooseOptions } from '@project/core';
+import { getJwtOptions, getMongooseOptions } from '@project/core';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { JwtAccessStrategy } from '@project/data-access';
 
 @Module({
   imports: [
     UsersConfigModule,
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: getJwtOptions,
+    }),
     MongooseModule.forRootAsync(getMongooseOptions()),
     MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
   ],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService, UserRepository, UserFactory],
+  providers: [
+    AuthenticationService,
+    UserRepository,
+    UserFactory,
+    JwtAccessStrategy,
+  ],
 })
 export class AuthenticationModule {}

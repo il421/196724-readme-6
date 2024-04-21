@@ -1,6 +1,6 @@
 export enum FilesStoragePaths {
   Base = 'files',
-  FileUpload = ':userId/upload',
+  FileUpload = 'upload',
   File = ':id',
   FileDeleted = ':id/delete',
 }

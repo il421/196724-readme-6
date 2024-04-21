@@ -1,10 +1,10 @@
 import { PostgresRepository } from '@project/data-access';
-import { CommentEntity } from './comment.entity';
+import { CommentEntity } from './entities/comment.entity';
 import { Injectable } from '@nestjs/common';
 import { FeedbackFactory } from './feedback.factory';
 import { Comment } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
-import { LikeEntity } from './like.entity';
+import { LikeEntity } from './entities/like.entity';
 import { DEFAULT_NUMBER_OF_COMMENTS } from './feedback.restrictions';
 
 @Injectable()
