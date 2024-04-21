@@ -6,21 +6,36 @@ import {
   Param,
   Post,
   HttpStatus,
+  UseGuards,
+  Headers,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
+import {
+  ERROR_MESSAGES,
+  IHeaders,
+  ITokenPayload,
+  SUCCESS_MESSAGES,
+  SWAGGER_TAGS,
+} from '@project/core';
 import { CreateSubscriptionDto } from './dtos';
-import { fillDto } from '@project/helpers';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { fillDto, getToken } from '@project/helpers';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionRdo } from './rdos';
 import { SubscriptionsPaths } from './subscriptions-paths.enum';
+import { JwtAuthGuard } from '@project/data-access';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags(SWAGGER_TAGS.SUBSCRIPTIONS)
+@ApiBearerAuth()
 @Controller(SubscriptionsPaths.Base)
 export class SubscriptionsController {
-  constructor(private readonly subscriptionService: SubscriptionsService) {}
+  constructor(
+    private readonly subscriptionService: SubscriptionsService,
+    private readonly jwtService: JwtService
+  ) {}
 
   @Get(SubscriptionsPaths.Subscriptions)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
@@ -31,14 +46,16 @@ export class SubscriptionsController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
-  public async getSubscriptions(@Param('userId') userId: string) {
-    // @TODO need to get userId from token
-    const subscription = await this.subscriptionService.find(userId);
+  public async getSubscriptions(@Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const subscription = await this.subscriptionService.find(sub);
     return subscription.map((subscription) =>
       fillDto(SubscriptionRdo, subscription.toPlainData())
     );
   }
 
+  @Post(SubscriptionsPaths.Create)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: SubscriptionRdo,
@@ -52,16 +69,17 @@ export class SubscriptionsController {
     status: HttpStatus.CONFLICT,
     description: ERROR_MESSAGES.SUBSCRIPTION_EXISTS,
   })
-  @Post(SubscriptionsPaths.Create)
   public async subscribe(
-    @Param('userId') userId: string,
-    @Body() dto: CreateSubscriptionDto
+    @Body() dto: CreateSubscriptionDto,
+    @Headers() headers: IHeaders
   ) {
-    // @TODO need to get userId from token
-    const newSubscription = await this.subscriptionService.create(userId, dto);
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newSubscription = await this.subscriptionService.create(sub, dto);
     return fillDto(SubscriptionRdo, newSubscription.toPlainData());
   }
 
+  @Delete(SubscriptionsPaths.Delete)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SUCCESS_MESSAGES.UNSUBSCRIBED,
@@ -74,12 +92,11 @@ export class SubscriptionsController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
-  @Delete(SubscriptionsPaths.Delete)
   public unsubscribe(
-    @Param('userId') userId: string,
-    @Param('authorId') authorId: string
+    @Param('authorId') authorId: string,
+    @Headers() headers: IHeaders
   ) {
-    // @TODO need to get userId from token
-    return this.subscriptionService.delete(userId, authorId);
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    return this.subscriptionService.delete(sub, authorId);
   }
 }

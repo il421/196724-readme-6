@@ -2,15 +2,29 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpStatus,
   Param,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
-import { fillDto } from '@project/helpers';
-import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ERROR_MESSAGES,
+  IHeaders,
+  ITokenPayload,
+  SUCCESS_MESSAGES,
+  SWAGGER_TAGS,
+} from '@project/core';
+import { fillDto, getToken } from '@project/helpers';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -24,13 +38,20 @@ import {
   MIME_TYPE,
 } from '@project/files-storage-lib';
 import { FilesStoragePaths } from './files-storage-paths.enum';
+import { JwtService } from '@nestjs/jwt';
+import { JwtAuthGuard } from '@project/data-access';
 
 @ApiTags(SWAGGER_TAGS.FILES)
+@ApiBearerAuth()
 @Controller(FilesStoragePaths.Base)
 export class FilesStorageController {
-  constructor(private readonly filesStorageService: FilesStorageService) {}
+  constructor(
+    private readonly filesStorageService: FilesStorageService,
+    private readonly jwtService: JwtService
+  ) {}
 
   @Post(FilesStoragePaths.FileUpload)
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor(FIELD_NAME, {
       storage: diskStorage({ destination: FILES_DESTINATION, filename }),
@@ -46,11 +67,11 @@ export class FilesStorageController {
     schema: FileSwaggerSchema,
   })
   public async upload(
-    // @TODO files format and size validator
     @UploadedFile() file: Express.Multer.File,
-    @Param('userId') userId: string
+    @Headers() headers: IHeaders
   ) {
-    const newFile = await this.filesStorageService.upload(file, userId);
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newFile = await this.filesStorageService.upload(file, sub);
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
@@ -70,6 +91,7 @@ export class FilesStorageController {
   }
 
   @Delete(FilesStoragePaths.FileDeleted)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS_MESSAGES.FILE_DELETED,

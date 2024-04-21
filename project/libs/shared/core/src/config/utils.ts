@@ -4,7 +4,7 @@ import { getMongoConnectionString } from '@project/helpers';
 import { ServeStaticModuleAsyncOptions } from '@nestjs/serve-static/dist/interfaces/serve-static-options.interface';
 import { ObjectSchema } from 'joi';
 import { resolve } from 'node:path';
-
+import { JwtModuleOptions } from '@nestjs/jwt';
 export const getMongooseOptions = (): MongooseModuleAsyncOptions => {
   return {
     useFactory: async (config: ConfigService) => {
@@ -33,6 +33,18 @@ export const getStaticStorageOptions = (): ServeStaticModuleAsyncOptions => {
     inject: [ConfigService],
   };
 };
+
+export async function getJwtOptions(
+  configService: ConfigService
+): Promise<JwtModuleOptions> {
+  return {
+    secret: configService.get<string>('jwt.accessTokenSecret'),
+    signOptions: {
+      expiresIn: configService.get<string>('jwt.accessTokenExpiresIn'),
+      algorithm: 'HS256',
+    },
+  };
+}
 
 export const validateConfig = (
   schema: ObjectSchema,

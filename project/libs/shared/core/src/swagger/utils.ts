@@ -6,6 +6,7 @@ export const buildSwagger = (app: INestApplication, appName: string) => {
   const swaggerConfig = new DocumentBuilder()
     .setTitle(`${appName} API`)
     .setVersion(APP_VERSION)
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup(GLOBAL_PREFIX, app, document);

@@ -1,11 +1,11 @@
 export enum PostPaths {
   Base = 'posts',
   Search = 'search',
-  Drafts = 'drafts/:userId',
+  Drafts = 'drafts',
   Post = ':id',
-  Create = ':userId/create',
-  Update = ':userId/update/:id',
-  Publish = ':userId/publish/:id',
-  Repost = ':userId/repost/:id',
-  Delete = ':userId/delete/:id',
+  Create = 'create',
+  Update = 'update/:id',
+  Publish = 'publish/:id',
+  Repost = 'repost/:id',
+  Delete = 'delete/:id',
 }

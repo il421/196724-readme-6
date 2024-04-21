@@ -1,4 +1,6 @@
 export const ERROR_MESSAGES = {
+  TOKEN: 'Create token error',
+  UNAUTHORIZED: 'Unauthorised',
   USER_NOT_FOUND: 'User not found',
   POST_NOT_FOUND: 'Post not found',
   POST_DELETE: 'Not able to delete other users posts',

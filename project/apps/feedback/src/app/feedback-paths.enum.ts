@@ -1,8 +1,8 @@
 export enum FeedbackPaths {
   Base = 'feedback',
   Comments = 'comments',
-  CommentCreate = ':userId/comments/create',
-  CommentDelete = ':userId/comments/:id/delete',
-  LikeCreate = ':userId/likes/create',
-  LikeDelete = ':userId/likes/:postId/create',
+  CommentCreate = 'comments/create',
+  CommentDelete = 'comments/:id/delete',
+  LikeCreate = 'likes/:postId/create',
+  LikeDelete = 'likes/:postId/delete',
 }
