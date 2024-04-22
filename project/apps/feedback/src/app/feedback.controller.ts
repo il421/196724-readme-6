@@ -24,7 +24,11 @@ import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
 import { FeedbackPaths } from './feedback-paths.enum';
-import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
+import {
+  DtoValidationPipe,
+  JwtAuthGuard,
+  ParseStringPipe,
+} from '@project/data-access';
 import { JwtService } from '@nestjs/jwt';
 import { CreateCommentValidator } from './validator';
 
@@ -52,7 +56,7 @@ export class FeedbackController {
   })
   public async getPostComments(
     @Param('postId') postId: string,
-    @Query('limit') limit?: number
+    @Query('limit', ParseStringPipe) limit?: number
   ) {
     const comments = await this.feedbackService.getCommentsByPostId(
       postId,

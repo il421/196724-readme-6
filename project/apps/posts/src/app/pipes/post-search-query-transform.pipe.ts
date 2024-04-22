@@ -5,7 +5,7 @@ import {
   PipeTransform,
 } from '@nestjs/common';
 import { SearchPostsQuery } from '../serach-post.query';
-import { MongoIdValidationPipe } from '@project/data-access';
+import { MongoIdValidationPipe, ParseStringPipe } from '@project/data-access';
 import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from '../post.constants';
 
 @Injectable()
@@ -15,6 +15,7 @@ export class PostSearchQueryTransformPipe implements PipeTransform {
     metadata: ArgumentMetadata
   ): Promise<SearchPostsQuery> {
     const arrayPipe = new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS);
+    const stringPipe = new ParseStringPipe();
     const mongoIdValidationPipe = new MongoIdValidationPipe();
 
     return {
@@ -22,10 +23,8 @@ export class PostSearchQueryTransformPipe implements PipeTransform {
       tags: await arrayPipe.transform(dto?.tags ?? [], metadata),
       usersIds: mongoIdValidationPipe.transform(dto?.usersIds ?? [], metadata),
       types: await arrayPipe.transform(dto?.types ?? [], metadata),
-      limit:
-        dto?.limit && !isNaN(Number(dto.limit)) ? Number(dto.limit) : undefined,
-      page:
-        dto?.page && !isNaN(Number(dto.page)) ? Number(dto.page) : undefined,
+      limit: stringPipe.transform(dto.limit),
+      page: stringPipe.transform(dto.page),
     };
   }
 }
