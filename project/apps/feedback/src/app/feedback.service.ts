@@ -28,8 +28,8 @@ export class FeedbackService {
     }
   }
 
-  public async getCommentsByPostId(postId: string) {
-    return this.feedbackRepository.findCommentsByPostId(postId);
+  public async getCommentsByPostId(postId: string, limit?: number) {
+    return this.feedbackRepository.findCommentsByPostId(postId, limit);
   }
 
   public async deleteComment(userId: string, id: string) {

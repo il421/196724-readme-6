@@ -62,10 +62,10 @@ export class PostController {
   @ApiQuery({
     name: 'limit',
     required: false,
-    type: String,
+    type: Number,
     description: 'Default is 25',
   })
-  @ApiQuery({ name: 'page', required: false, type: String })
+  @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({
     name: 'sortDirection',
     required: false,

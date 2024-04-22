@@ -32,10 +32,10 @@ export class FeedbackRepository extends PostgresRepository<
     return this.createEntityFromDocument(document);
   }
 
-  public async findCommentsByPostId(postId: string) {
+  public async findCommentsByPostId(postId: string, limit?: number) {
     const documents = await this.client.comment.findMany({
       where: { postId },
-      take: DEFAULT_NUMBER_OF_COMMENTS,
+      take: limit ?? DEFAULT_NUMBER_OF_COMMENTS,
     });
     return documents.map((document) => this.createEntityFromDocument(document));
   }
