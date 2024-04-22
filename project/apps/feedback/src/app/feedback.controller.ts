@@ -9,6 +9,7 @@ import {
   Headers,
   UseGuards,
   UsePipes,
+  Query,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
@@ -19,7 +20,7 @@ import {
 } from '@project/core';
 import { CreateCommentDto } from './dtos';
 import { fillDto, getToken } from '@project/helpers';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
 import { FeedbackPaths } from './feedback-paths.enum';
@@ -37,14 +38,26 @@ export class FeedbackController {
   ) {}
 
   @Get(FeedbackPaths.Comments)
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Default is 50',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
     type: CommentRdo,
     description: SUCCESS_MESSAGES.COMMENTS,
   })
-  public async getPostComments(@Param('postId') postId: string) {
-    const comments = await this.feedbackService.getCommentsByPostId(postId);
+  public async getPostComments(
+    @Param('postId') postId: string,
+    @Query('limit') limit?: number
+  ) {
+    const comments = await this.feedbackService.getCommentsByPostId(
+      postId,
+      limit
+    );
     return comments.map((comment) =>
       fillDto(CommentRdo, comment.toPlainData())
     );
