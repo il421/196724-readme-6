@@ -21,7 +21,7 @@ export class PostSearchQueryTransformPipe implements PipeTransform {
     return {
       ...dto,
       tags: await arrayPipe.transform(dto?.tags ?? [], metadata),
-      usersIds: mongoIdValidationPipe.transform(dto?.usersIds ?? [], metadata),
+      usersIds: mongoIdValidationPipe.transform(dto?.usersIds, metadata),
       types: await arrayPipe.transform(dto?.types ?? [], metadata),
       limit: stringPipe.transform(dto.limit),
       page: stringPipe.transform(dto.page),
