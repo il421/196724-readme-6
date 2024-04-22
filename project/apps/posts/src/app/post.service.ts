@@ -5,11 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePostDto, UpdatePostDto } from './dtos';
-import { ERROR_MESSAGES, PostState } from '@project/core';
+import { ERROR_MESSAGES, PaginationResult, PostState } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 import { fillDto } from '@project/helpers';
-import { SearchPostsArgs } from './post.search.interface';
+import { SearchPostsQuery } from './serach-post.query';
 
 @Injectable()
 export class PostService {
@@ -65,7 +65,7 @@ export class PostService {
     throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 
-  public search(args: SearchPostsArgs): Promise<PostEntity[]> {
+  public search(args: SearchPostsQuery): Promise<PaginationResult<PostEntity>> {
     return this.postRepository.findPosts(args);
   }
 
@@ -75,7 +75,9 @@ export class PostService {
     return post;
   }
 
-  public async getDrafts(userId: string): Promise<PostEntity[]> {
+  public async getDrafts(
+    userId: string
+  ): Promise<PaginationResult<PostEntity>> {
     return this.postRepository.findPosts({
       usersIds: [userId],
       state: PostState.Draft,

@@ -6,33 +6,32 @@ import {
   Headers,
   HttpStatus,
   Param,
-  ParseArrayPipe,
   Post,
   Put,
   Query,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
   SWAGGER_TAGS,
-  PostType,
   SUCCESS_MESSAGES,
   IHeaders,
   ITokenPayload,
+  SortDirection,
 } from '@project/core';
 import { CreatePostDto, UpdatePostDto } from './dtos';
 import { fillDto, getToken } from '@project/helpers';
 import { FullPostRdo, PostRdo } from './rdos';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
-import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from './post.constants';
 import { PostPaths } from './post-paths.enum';
 import { JwtService } from '@nestjs/jwt';
 import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
-// import { CreatePostValidator, UpdatePostValidator } from './validator';
-import { TagsTransformPipe } from './pipes/tags-transform.pipe';
-import { CreatePostValidator } from './validator';
+import { TagsTransformPipe } from './pipes';
+import { CreatePostValidator, UpdatePostValidator } from './validator';
+import { SearchPostsQuery } from './serach-post.query';
+import { PostSearchQueryTransformPipe } from './pipes';
+import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from './post.constants';
 
 @ApiTags(SWAGGER_TAGS.POSTS)
 @ApiBearerAuth()
@@ -51,7 +50,7 @@ export class PostController {
     description: SUCCESS_MESSAGES.POSTS,
   })
   @ApiQuery({ name: 'title', required: false, type: String })
-  @ApiQuery({ name: 'userIds', required: false, type: Array<String> })
+  @ApiQuery({ name: 'usersIds', required: false, type: Array<String> })
   @ApiQuery({
     name: 'types',
     required: false,
@@ -60,22 +59,30 @@ export class PostController {
     enumName: 'PostType',
   })
   @ApiQuery({ name: 'tags', required: false, type: Array<String> })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: String,
+    description: 'Default is 25',
+  })
+  @ApiQuery({ name: 'page', required: false, type: String })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    type: String,
+    enum: SortDirection,
+  })
   public async search(
-    @Query('title') title?: string,
-    @Query('userIds', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS))
-    usersIds?: string[],
-    @Query('types', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS))
-    types?: PostType[],
-    @Query('tags', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS)) // @TODO need to transform tags to get unique lowercase strings
-    tags?: string[]
+    @Query(PostSearchQueryTransformPipe)
+    query?: SearchPostsQuery
   ) {
-    const posts = await this.postService.search({
-      types,
-      title,
-      tags,
-      usersIds,
-    });
-    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
+    const postsQueryResult = await this.postService.search(query);
+    return {
+      ...postsQueryResult,
+      entities: postsQueryResult.entities.map((post) =>
+        fillDto(PostRdo, post?.toPlainData())
+      ),
+    };
   }
 
   @Get(PostPaths.Drafts)
@@ -92,8 +99,13 @@ export class PostController {
   })
   public async getDraftPosts(@Headers() headers: IHeaders) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const posts = await this.postService.getDrafts(sub);
-    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
+    const postsQueryResult = await this.postService.getDrafts(sub);
+    return {
+      ...postsQueryResult,
+      entities: postsQueryResult.entities.map((post) =>
+        fillDto(PostRdo, post?.toPlainData())
+      ),
+    };
   }
 
   @Get(PostPaths.Post)
@@ -113,10 +125,6 @@ export class PostController {
 
   @Post(PostPaths.Create)
   @UseGuards(JwtAuthGuard)
-  @UsePipes(
-    new TagsTransformPipe(),
-    new DtoValidationPipe<CreatePostDto>(CreatePostValidator)
-  )
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: PostRdo,
@@ -127,7 +135,11 @@ export class PostController {
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
   public async create(
-    @Body() dto: CreatePostDto,
+    @Body(
+      TagsTransformPipe,
+      new DtoValidationPipe<CreatePostDto>(CreatePostValidator)
+    )
+    dto: CreatePostDto,
     @Headers() headers: IHeaders
   ) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
@@ -138,8 +150,6 @@ export class PostController {
 
   @Put(PostPaths.Update)
   @UseGuards(JwtAuthGuard)
-  @UsePipes(TagsTransformPipe)
-  // @UsePipes(new DtoValidationPipe<UpdatePostDto>(UpdatePostValidator))
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -155,7 +165,11 @@ export class PostController {
   })
   public async update(
     @Param('id') id: string,
-    @Body() dto: UpdatePostDto,
+    @Body(
+      TagsTransformPipe,
+      new DtoValidationPipe<UpdatePostDto>(UpdatePostValidator)
+    )
+    dto: UpdatePostDto,
     @Headers() headers: IHeaders
   ) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));

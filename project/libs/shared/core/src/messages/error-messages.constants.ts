@@ -1,6 +1,7 @@
 export const ERROR_MESSAGES = {
   TOKEN: 'Create token error',
-  BAD_MONGO_ID_ERROR: 'Bad entity ID',
+  PIPE: 'This pipe must used only with params or query',
+  BAD_MONGO_ID_ERROR: 'Bad MongoDB ID',
   UNAUTHORIZED: 'Unauthorised',
   USER_NOT_FOUND: 'User not found',
   POST_NOT_FOUND: 'Post not found',
