@@ -70,6 +70,6 @@ export class UsersController {
     @Headers() headers: IHeaders
   ) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    return this.usersService.updateUserAvatar(sub, dto.avatarId);
+    return this.usersService.updateUserAvatar(sub, dto.avatarUrl);
   }
 }

@@ -25,7 +25,7 @@ export class UserModel extends Document implements User {
   public password!: string;
 
   @Prop()
-  public avatarId?: string;
+  public avatarUrl?: string;
 
   @Prop({ default: 0 })
   public posts?: number;
