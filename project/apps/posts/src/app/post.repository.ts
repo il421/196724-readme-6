@@ -85,7 +85,11 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
         take,
         skip,
         include: this.include,
-        orderBy: { publishedAt: sortDirection },
+        orderBy: {
+          publishedAt: sortDirection,
+          likes: { _count: SortDirection.Asc },
+          comments: { _count: SortDirection.Asc },
+        },
       }),
       this.getPostCount(where),
     ]);
