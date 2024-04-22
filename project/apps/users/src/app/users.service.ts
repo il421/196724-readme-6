@@ -12,13 +12,13 @@ export class UsersService {
     return userEntity;
   }
 
-  public async updateUserAvatar(id: string, avatarId: string) {
+  public async updateUserAvatar(id: string, avatarUrl: string) {
     const userEntity = await this.userRepository.findById(id);
     if (!userEntity) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
 
     const newUserEntity = new UserEntity({
       ...userEntity.toPlainData(),
-      avatarId,
+      avatarUrl,
     });
     return await this.userRepository.update(newUserEntity);
   }

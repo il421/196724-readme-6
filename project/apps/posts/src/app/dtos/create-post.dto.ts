@@ -19,7 +19,7 @@ export class CreatePostDto {
   @Expose()
   public type!: PostType;
 
-  @ApiProperty({ example: '[personal, business]', description: 'Post tags' })
+  @ApiProperty({ example: ['personal', 'business'], description: 'Post tags' })
   @Expose()
   tags?: string[];
 
