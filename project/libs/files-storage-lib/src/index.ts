@@ -7,3 +7,4 @@ export * from './rdos';
 export * from './config';
 export * from './file.model';
 export * from './utils';
+export * from './validator';

@@ -9,12 +9,19 @@ import { ERROR_MESSAGES } from '@project/core';
 
 @Injectable()
 export class MongoIdValidationPipe implements PipeTransform {
-  public transform(value: string, { type }: ArgumentMetadata) {
-    if (type !== 'param') {
-      throw new Error('This pipe must used only with params!');
+  public transform<T extends unknown = string | string[]>(
+    value: T,
+    { type }: ArgumentMetadata
+  ) {
+    if (type === 'body') {
+      throw new BadRequestException(ERROR_MESSAGES.PIPE);
     }
 
-    if (!Types.ObjectId.isValid(value)) {
+    const isValueValid: boolean = Array.isArray(value)
+      ? value.every((v) => Types.ObjectId.isValid(v))
+      : Types.ObjectId.isValid(value as string);
+
+    if (!isValueValid) {
       throw new BadRequestException(ERROR_MESSAGES.BAD_MONGO_ID_ERROR);
     }
 

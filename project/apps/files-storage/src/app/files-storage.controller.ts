@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
@@ -36,10 +37,16 @@ import {
   FilesStorageService,
   FileSwaggerSchema,
   MIME_TYPE,
+  UploadAvatarValidator,
+  UploadPhotoValidator,
 } from '@project/files-storage-lib';
 import { FilesStoragePaths } from './files-storage-paths.enum';
 import { JwtService } from '@nestjs/jwt';
-import { JwtAuthGuard } from '@project/data-access';
+import {
+  DtoValidationPipe,
+  JwtAuthGuard,
+  MongoIdValidationPipe,
+} from '@project/data-access';
 
 @ApiTags(SWAGGER_TAGS.FILES)
 @ApiBearerAuth()
@@ -50,8 +57,9 @@ export class FilesStorageController {
     private readonly jwtService: JwtService
   ) {}
 
-  @Post(FilesStoragePaths.FileUpload)
+  @Post(FilesStoragePaths.AvatarUpload)
   @UseGuards(JwtAuthGuard)
+  @UsePipes(new DtoValidationPipe<Express.Multer.File>(UploadAvatarValidator))
   @UseInterceptors(
     FileInterceptor(FIELD_NAME, {
       storage: diskStorage({ destination: FILES_DESTINATION, filename }),
@@ -66,7 +74,33 @@ export class FilesStorageController {
   @ApiBody({
     schema: FileSwaggerSchema,
   })
-  public async upload(
+  public async uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @Headers() headers: IHeaders
+  ) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newFile = await this.filesStorageService.upload(file, sub);
+    return fillDto(FileRdo, newFile.toPlainData());
+  }
+
+  @Post(FilesStoragePaths.PhotoUpload)
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new DtoValidationPipe<Express.Multer.File>(UploadPhotoValidator))
+  @UseInterceptors(
+    FileInterceptor(FIELD_NAME, {
+      storage: diskStorage({ destination: FILES_DESTINATION, filename }),
+    })
+  )
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: FileRdo,
+    description: SUCCESS_MESSAGES.FILE_UPLOADED,
+  })
+  @ApiConsumes(MIME_TYPE)
+  @ApiBody({
+    schema: FileSwaggerSchema,
+  })
+  public async uploadPhoto(
     @UploadedFile() file: Express.Multer.File,
     @Headers() headers: IHeaders
   ) {
@@ -85,7 +119,11 @@ export class FilesStorageController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.FILE_NOT_FOUND,
   })
-  public async getById(@Param('id') id: string) {
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.BAD_MONGO_ID_ERROR,
+  })
+  public async getById(@Param('id', MongoIdValidationPipe) id: string) {
     const newFile = await this.filesStorageService.findById(id);
     return fillDto(FileRdo, newFile.toPlainData());
   }
@@ -100,7 +138,11 @@ export class FilesStorageController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.FILE_NOT_FOUND,
   })
-  public delete(@Param('id') id: string) {
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.BAD_MONGO_ID_ERROR,
+  })
+  public delete(@Param('id', MongoIdValidationPipe) id: string) {
     return this.filesStorageService.delete(id);
   }
 }
