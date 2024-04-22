@@ -9,7 +9,6 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  UsePipes,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
@@ -59,7 +58,6 @@ export class FilesStorageController {
 
   @Post(FilesStoragePaths.AvatarUpload)
   @UseGuards(JwtAuthGuard)
-  @UsePipes(new DtoValidationPipe<Express.Multer.File>(UploadAvatarValidator))
   @UseInterceptors(
     FileInterceptor(FIELD_NAME, {
       storage: diskStorage({ destination: FILES_DESTINATION, filename }),
@@ -75,7 +73,10 @@ export class FilesStorageController {
     schema: FileSwaggerSchema,
   })
   public async uploadAvatar(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new DtoValidationPipe<Express.Multer.File>(UploadAvatarValidator)
+    )
+    file: Express.Multer.File,
     @Headers() headers: IHeaders
   ) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
@@ -85,8 +86,8 @@ export class FilesStorageController {
 
   @Post(FilesStoragePaths.PhotoUpload)
   @UseGuards(JwtAuthGuard)
-  @UsePipes(new DtoValidationPipe<Express.Multer.File>(UploadPhotoValidator))
   @UseInterceptors(
+    // @TODO it is ignoring validations at the moment
     FileInterceptor(FIELD_NAME, {
       storage: diskStorage({ destination: FILES_DESTINATION, filename }),
     })
@@ -101,7 +102,10 @@ export class FilesStorageController {
     schema: FileSwaggerSchema,
   })
   public async uploadPhoto(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new DtoValidationPipe<Express.Multer.File>(UploadPhotoValidator)
+    )
+    file: Express.Multer.File,
     @Headers() headers: IHeaders
   ) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
