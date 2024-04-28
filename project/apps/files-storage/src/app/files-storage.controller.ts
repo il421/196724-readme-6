@@ -39,7 +39,7 @@ import {
   UploadAvatarValidator,
   UploadPhotoValidator,
 } from '@project/files-storage-lib';
-import { FilesStoragePaths } from './files-storage-paths.enum';
+import { FILES_STORAGE_PATHS } from './files-storage.constants';
 import { JwtService } from '@nestjs/jwt';
 import {
   DtoValidationPipe,
@@ -49,14 +49,14 @@ import {
 
 @ApiTags(SWAGGER_TAGS.FILES)
 @ApiBearerAuth()
-@Controller(FilesStoragePaths.Base)
+@Controller(FILES_STORAGE_PATHS.BASE)
 export class FilesStorageController {
   constructor(
     private readonly filesStorageService: FilesStorageService,
     private readonly jwtService: JwtService
   ) {}
 
-  @Post(FilesStoragePaths.AvatarUpload)
+  @Post(FILES_STORAGE_PATHS.AVATAR_UPLOAD)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor(FIELD_NAME, {
@@ -84,7 +84,7 @@ export class FilesStorageController {
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Post(FilesStoragePaths.PhotoUpload)
+  @Post(FILES_STORAGE_PATHS.PHOTO_UPLOAD)
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     // @TODO it is ignoring validations at the moment
@@ -113,7 +113,7 @@ export class FilesStorageController {
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Get(FilesStoragePaths.File)
+  @Get(FILES_STORAGE_PATHS.FILE)
   @ApiResponse({
     status: HttpStatus.OK,
     type: FileRdo,
@@ -132,7 +132,7 @@ export class FilesStorageController {
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Delete(FilesStoragePaths.FileDeleted)
+  @Delete(FILES_STORAGE_PATHS.DELETE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,

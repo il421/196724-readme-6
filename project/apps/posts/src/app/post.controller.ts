@@ -24,25 +24,24 @@ import { fillDto, getToken } from '@project/helpers';
 import { FullPostRdo, PostRdo } from './rdos';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
-import { PostPaths } from './post-paths.enum';
 import { JwtService } from '@nestjs/jwt';
 import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
 import { TagsTransformPipe } from './pipes';
 import { CreatePostValidator, UpdatePostValidator } from './validator';
 import { SearchPostsQuery } from './serach-post.query';
 import { PostSearchQueryTransformPipe } from './pipes';
-import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from './post.constants';
+import { POST_PATHS } from './post.constants';
 
 @ApiTags(SWAGGER_TAGS.POSTS)
 @ApiBearerAuth()
-@Controller(PostPaths.Base)
+@Controller(POST_PATHS.BASE)
 export class PostController {
   constructor(
     private readonly postService: PostService,
     private readonly jwtService: JwtService
   ) {}
 
-  @Get(PostPaths.Search)
+  @Get(POST_PATHS.SEARCH)
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
@@ -85,7 +84,7 @@ export class PostController {
     };
   }
 
-  @Get(PostPaths.Drafts)
+  @Get(POST_PATHS.DRAFTS)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -108,7 +107,7 @@ export class PostController {
     };
   }
 
-  @Get(PostPaths.Post)
+  @Get(POST_PATHS.POST)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -123,7 +122,7 @@ export class PostController {
     return fillDto(FullPostRdo, post?.toPlainData());
   }
 
-  @Post(PostPaths.Create)
+  @Post(POST_PATHS.CREATE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -148,7 +147,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Put(PostPaths.Update)
+  @Put(POST_PATHS.UPDATE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -177,7 +176,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Put(PostPaths.Publish)
+  @Put(POST_PATHS.PUBLISH)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -206,7 +205,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Post(PostPaths.Repost)
+  @Post(POST_PATHS.REPOST)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -227,7 +226,7 @@ export class PostController {
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Delete(PostPaths.Delete)
+  @Delete(POST_PATHS.DELETE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,

@@ -11,7 +11,6 @@ import {
 import {
   ERROR_MESSAGES,
   IHeaders,
-  IToken,
   ITokenPayload,
   SUCCESS_MESSAGES,
   SWAGGER_TAGS,
@@ -20,20 +19,20 @@ import { fillDto, getToken } from '@project/helpers';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateUserAvatarDto, UserRdo } from '@project/users-lib';
 import { UsersService } from './users.service';
-import { UsersPaths } from './users-paths.enum';
+import { USERS_PATHS } from './users.constants';
 import { JwtAuthGuard } from '@project/data-access';
 import { JwtService } from '@nestjs/jwt';
 
 @ApiTags(SWAGGER_TAGS.USERS)
 @ApiBearerAuth()
-@Controller(UsersPaths.Base)
+@Controller(USERS_PATHS.BASE)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService
   ) {}
 
-  @Get(UsersPaths.User)
+  @Get(USERS_PATHS.USER)
   @ApiResponse({
     type: UserRdo,
     status: HttpStatus.OK,
@@ -51,7 +50,7 @@ export class UsersController {
     return fillDto(UserRdo, user?.toPlainData());
   }
 
-  @Patch(UsersPaths.UpdateAvatar)
+  @Patch(USERS_PATHS.UPDATE_AVATAR)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
