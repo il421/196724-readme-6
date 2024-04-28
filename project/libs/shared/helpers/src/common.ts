@@ -3,6 +3,7 @@ import {
   ClassTransformOptions,
   plainToInstance,
 } from 'class-transformer';
+import { IHeaders } from '@project/core';
 
 export function fillDto<T, V>(
   someDto: ClassConstructor<T>,
@@ -30,3 +31,6 @@ export const getMongoConnectionString = ({
 export const unique = <T>(items: T[]): T[] => {
   return Array.from(new Set(items));
 };
+
+export const getToken = (headers: IHeaders): string =>
+  headers.authorization.split(' ')[1];

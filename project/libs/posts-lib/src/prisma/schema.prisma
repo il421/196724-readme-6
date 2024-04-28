@@ -16,7 +16,7 @@ datasource db {
 
 model Post {
   id           String    @id @default(uuid()) @map("id")
-  title        String
+  title        String?
   type         PostType
   state        PostState @default(draft)
   isRepost     Boolean?

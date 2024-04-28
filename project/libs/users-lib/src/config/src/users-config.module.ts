@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { applicationConfig, mongoConfig } from '@project/core';
+import { applicationConfig, jwtConfig, mongoConfig } from '@project/core';
 const ENV_USERS_FILE_PATH = 'apps/users/.env';
+const ENV_AUTH_FILE_PATH = 'apps/.env';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [applicationConfig, mongoConfig],
-      envFilePath: ENV_USERS_FILE_PATH,
+      load: [applicationConfig, mongoConfig, jwtConfig],
+      envFilePath: [ENV_USERS_FILE_PATH, ENV_AUTH_FILE_PATH],
     }),
   ],
 })

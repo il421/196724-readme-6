@@ -1,4 +1,9 @@
 export const ERROR_MESSAGES = {
+  TOKEN: 'Create token error',
+  INVALID_QUERY_PARAM: 'Invalid query param',
+  PIPE: 'This pipe must used only with params or query',
+  BAD_MONGO_ID_ERROR: 'Bad MongoDB ID',
+  UNAUTHORIZED: 'Unauthorised',
   USER_NOT_FOUND: 'User not found',
   POST_NOT_FOUND: 'Post not found',
   POST_DELETE: 'Not able to delete other users posts',

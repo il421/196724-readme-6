@@ -1,10 +1,10 @@
 import { PostgresRepository } from '@project/data-access';
-import { CommentEntity } from './comment.entity';
+import { CommentEntity } from './entities/comment.entity';
 import { Injectable } from '@nestjs/common';
 import { FeedbackFactory } from './feedback.factory';
 import { Comment } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
-import { LikeEntity } from './like.entity';
+import { LikeEntity } from './entities/like.entity';
 import { DEFAULT_NUMBER_OF_COMMENTS } from './feedback.restrictions';
 
 @Injectable()
@@ -32,10 +32,10 @@ export class FeedbackRepository extends PostgresRepository<
     return this.createEntityFromDocument(document);
   }
 
-  public async findCommentsByPostId(postId: string) {
+  public async findCommentsByPostId(postId: string, limit?: number) {
     const documents = await this.client.comment.findMany({
       where: { postId },
-      take: DEFAULT_NUMBER_OF_COMMENTS,
+      take: limit ?? DEFAULT_NUMBER_OF_COMMENTS,
     });
     return documents.map((document) => this.createEntityFromDocument(document));
   }

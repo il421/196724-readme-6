@@ -3,33 +3,45 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpStatus,
   Param,
-  ParseArrayPipe,
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
   SWAGGER_TAGS,
-  PostType,
   SUCCESS_MESSAGES,
+  IHeaders,
+  ITokenPayload,
+  SortDirection,
 } from '@project/core';
 import { CreatePostDto, UpdatePostDto } from './dtos';
-import { fillDto } from '@project/helpers';
+import { fillDto, getToken } from '@project/helpers';
 import { FullPostRdo, PostRdo } from './rdos';
-import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
-import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from './post.constants';
-import { PostPaths } from './post-paths.enum';
+import { JwtService } from '@nestjs/jwt';
+import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
+import { TagsTransformPipe } from './pipes';
+import { CreatePostValidator, UpdatePostValidator } from './validator';
+import { SearchPostsQuery } from './serach-post.query';
+import { PostSearchQueryTransformPipe } from './pipes';
+import { POST_PATHS } from './post.constants';
 
 @ApiTags(SWAGGER_TAGS.POSTS)
-@Controller(PostPaths.Base)
+@ApiBearerAuth()
+@Controller(POST_PATHS.BASE)
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly jwtService: JwtService
+  ) {}
 
-  @Get(PostPaths.Search)
+  @Get(POST_PATHS.SEARCH)
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
@@ -37,7 +49,7 @@ export class PostController {
     description: SUCCESS_MESSAGES.POSTS,
   })
   @ApiQuery({ name: 'title', required: false, type: String })
-  @ApiQuery({ name: 'userIds', required: false, type: Array<String> })
+  @ApiQuery({ name: 'usersIds', required: false, type: Array<String> })
   @ApiQuery({
     name: 'types',
     required: false,
@@ -46,38 +58,56 @@ export class PostController {
     enumName: 'PostType',
   })
   @ApiQuery({ name: 'tags', required: false, type: Array<String> })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Default is 25',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    type: String,
+    enum: SortDirection,
+  })
   public async search(
-    @Query('title') title?: string,
-    @Query('userIds', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS))
-    usersIds?: string[],
-    @Query('types', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS))
-    types?: PostType[],
-    @Query('tags', new ParseArrayPipe(PARSE_QUERY_ARRAY_PIPE_OPTIONS)) // @TODO need to transform tags to get unique lowercase strings
-    tags?: string[]
+    @Query(PostSearchQueryTransformPipe)
+    query?: SearchPostsQuery
   ) {
-    const posts = await this.postService.search({
-      types,
-      title,
-      tags,
-      usersIds,
-    });
-    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
+    const postsQueryResult = await this.postService.search(query);
+    return {
+      ...postsQueryResult,
+      entities: postsQueryResult.entities.map((post) =>
+        fillDto(PostRdo, post?.toPlainData())
+      ),
+    };
   }
 
-  @Get(PostPaths.Drafts)
+  @Get(POST_PATHS.DRAFTS)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
     isArray: true,
     description: SUCCESS_MESSAGES.POSTS,
   })
-  public async getDraftPosts(@Param('userId') userId: string) {
-    // @TODO need to grab user id from token later
-    const posts = await this.postService.getDrafts(userId);
-    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
+  public async getDraftPosts(@Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const postsQueryResult = await this.postService.getDrafts(sub);
+    return {
+      ...postsQueryResult,
+      entities: postsQueryResult.entities.map((post) =>
+        fillDto(PostRdo, post?.toPlainData())
+      ),
+    };
   }
 
-  @Get(PostPaths.Post)
+  @Get(POST_PATHS.POST)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -92,22 +122,33 @@ export class PostController {
     return fillDto(FullPostRdo, post?.toPlainData());
   }
 
-  @Post(PostPaths.Create)
+  @Post(POST_PATHS.CREATE)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: PostRdo,
     description: SUCCESS_MESSAGES.POST_CREATED,
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async create(
-    @Param('userId') userId: string,
-    @Body() dto: CreatePostDto
+    @Body(
+      TagsTransformPipe,
+      new DtoValidationPipe<CreatePostDto>(CreatePostValidator)
+    )
+    dto: CreatePostDto,
+    @Headers() headers: IHeaders
   ) {
-    // @TODO need to grab user id from token later
-    const newPost = await this.postService.create(userId, dto);
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const payload = fillDto(CreatePostDto, dto);
+    const newPost = await this.postService.create(sub, payload);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Put(PostPaths.Update)
+  @Put(POST_PATHS.UPDATE)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -117,17 +158,26 @@ export class PostController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async update(
-    @Param('userId') userId: string,
     @Param('id') id: string,
-    @Body() dto: UpdatePostDto
+    @Body(
+      TagsTransformPipe,
+      new DtoValidationPipe<UpdatePostDto>(UpdatePostValidator)
+    )
+    dto: UpdatePostDto,
+    @Headers() headers: IHeaders
   ) {
-    // @TODO need to grab user id from token
-    const newPost = await this.postService.update(userId, id, dto);
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newPost = await this.postService.update(sub, id, dto);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Put(PostPaths.Publish)
+  @Put(POST_PATHS.PUBLISH)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -145,16 +195,18 @@ export class PostController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.POST_PUBLISHED,
   })
-  public async publish(
-    @Param('userId') userId: string,
-    @Param('id') id: string
-  ) {
-    // @TODO need to grab user id from token
-    const newPost = await this.postService.publish(id, userId);
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
+  public async publish(@Param('id') id: string, @Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newPost = await this.postService.publish(id, sub);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Post(PostPaths.Repost)
+  @Post(POST_PATHS.REPOST)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     type: PostRdo,
@@ -164,16 +216,18 @@ export class PostController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
-  public async repost(
-    @Param('userId') userId: string,
-    @Param('id') id: string
-  ) {
-    // @TODO need to grab user id from token
-    const newPost = await this.postService.repost(id, userId);
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
+  public async repost(@Param('id') id: string, @Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newPost = await this.postService.repost(id, sub);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
-  @Delete(PostPaths.Delete)
+  @Delete(POST_PATHS.DELETE)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SUCCESS_MESSAGES.POST_DELETED,
@@ -186,8 +240,12 @@ export class PostController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.POST_DELETE,
   })
-  public delete(@Param('userId') userId: string, @Param('id') id: string) {
-    // @TODO need to grab user id from token
-    return this.postService.delete(id, userId);
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
+  public delete(@Param('id') id: string, @Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    return this.postService.delete(id, sub);
   }
 }

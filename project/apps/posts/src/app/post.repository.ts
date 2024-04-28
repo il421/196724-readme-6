@@ -2,10 +2,15 @@ import { PostgresRepository } from '@project/data-access';
 import { PostEntity } from './post.entity';
 import { Injectable } from '@nestjs/common';
 import { PostFactory } from './post.factory';
-import { Post, PostState } from '@project/core';
+import {
+  PaginationResult,
+  Post,
+  PostState,
+  SortDirection,
+} from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
 import { DEFAULT_NUMBER_OF_POSTS } from './post.constants';
-import { SearchPostsArgs } from './post.search.interface';
+import { SearchPostsQuery } from './serach-post.query';
 import { Prisma } from '.prisma/client';
 
 @Injectable()
@@ -20,6 +25,14 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
   private readonly include = {
     _count: { select: { comments: true, likes: true } },
   };
+
+  private calculatePostsPage(totalCount: number, limit: number): number {
+    return Math.ceil(totalCount / limit);
+  }
+
+  private async getPostCount(where: Prisma.PostWhereInput): Promise<number> {
+    return this.client.post.count({ where });
+  }
 
   public async create(data: Post): Promise<PostEntity> {
     const document = await this.client.post.create({
@@ -41,8 +54,22 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     return this.createEntityFromDocument(document);
   }
 
-  public async findPosts(args: SearchPostsArgs) {
-    const { usersIds = [], tags = [], state, types = [], title } = args;
+  public async findPosts(
+    args: SearchPostsQuery
+  ): Promise<PaginationResult<PostEntity>> {
+    const {
+      usersIds = [],
+      tags = [],
+      state,
+      types = [],
+      title,
+      page,
+      limit = DEFAULT_NUMBER_OF_POSTS,
+      sortDirection = SortDirection.Desc,
+    } = args;
+    const skip = page && limit ? (page - 1) * limit : undefined;
+    const take = limit;
+
     const where: Prisma.PostWhereInput = {
       state: state ?? PostState.Published,
     };
@@ -52,14 +79,28 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     if (types?.length) where.type = { in: types };
     if (title) where.title = { contains: title };
 
-    const documents = await this.client.post.findMany({
-      where,
-      take: DEFAULT_NUMBER_OF_POSTS, // @TODO just a default for now
-      include: this.include,
-      orderBy: { publishedAt: 'desc' }, // @TODO desc is default, but should be possible a user pass an extra param
-      // @TODO also need o have an option to sort my likes and comments
-    });
-    return documents.map(this.createEntityFromDocument);
+    const [documents, totalItems] = await Promise.all([
+      this.client.post.findMany({
+        where,
+        take,
+        skip,
+        include: this.include,
+        orderBy: {
+          publishedAt: sortDirection,
+          likes: { _count: SortDirection.Asc },
+          comments: { _count: SortDirection.Asc },
+        },
+      }),
+      this.getPostCount(where),
+    ]);
+
+    return {
+      entities: documents.map(this.createEntityFromDocument),
+      currentPage: page,
+      totalPages: this.calculatePostsPage(totalItems, take),
+      itemsPerPage: take,
+      totalItems,
+    };
   }
 
   public async findById(id: string) {

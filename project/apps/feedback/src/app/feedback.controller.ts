@@ -6,34 +6,68 @@ import {
   Param,
   Post,
   HttpStatus,
+  Headers,
+  UseGuards,
+  UsePipes,
+  Query,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
+import {
+  ERROR_MESSAGES,
+  IHeaders,
+  ITokenPayload,
+  SUCCESS_MESSAGES,
+  SWAGGER_TAGS,
+} from '@project/core';
 import { CreateCommentDto } from './dtos';
-import { fillDto } from '@project/helpers';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { fillDto, getToken } from '@project/helpers';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
-import { FeedbackPaths } from './feedback-paths.enum';
+import { FEEDBACK_PATHS } from './feedback.constants';
+import {
+  DtoValidationPipe,
+  JwtAuthGuard,
+  ParseStringPipe,
+} from '@project/data-access';
+import { JwtService } from '@nestjs/jwt';
+import { CreateCommentValidator } from './validator';
 
 @ApiTags(SWAGGER_TAGS.FEEDBACK)
-@Controller(FeedbackPaths.Base)
+@ApiBearerAuth()
+@Controller(FEEDBACK_PATHS.BASE)
 export class FeedbackController {
-  constructor(private readonly feedbackService: FeedbackService) {}
+  constructor(
+    private readonly feedbackService: FeedbackService,
+    private readonly jwtService: JwtService
+  ) {}
 
-  @Get(FeedbackPaths.Comments)
+  @Get(FEEDBACK_PATHS.COMMENTS)
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Default is 50',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
     type: CommentRdo,
     description: SUCCESS_MESSAGES.COMMENTS,
   })
-  public async getPostComments(@Param('postId') postId: string) {
-    const comments = await this.feedbackService.getCommentsByPostId(postId);
+  public async getPostComments(
+    @Param('postId') postId: string,
+    @Query('limit', ParseStringPipe) limit?: number
+  ) {
+    const comments = await this.feedbackService.getCommentsByPostId(
+      postId,
+      limit
+    );
     return comments.map((comment) =>
       fillDto(CommentRdo, comment.toPlainData())
     );
   }
-  @Post(FeedbackPaths.CommentCreate)
+  @Post(FEEDBACK_PATHS.COMMENT_CREATE)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: CommentRdo,
@@ -43,16 +77,21 @@ export class FeedbackController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.POST_NOT_FOUND,
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async create(
-    @Param('userId') userId: string,
-    @Body() dto: CreateCommentDto
+    @Body() dto: CreateCommentDto,
+    @Headers() headers: IHeaders
   ) {
-    // @TODO need to grab user id from token
-    const newComment = await this.feedbackService.createComment(userId, dto);
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newComment = await this.feedbackService.createComment(sub, dto);
     return fillDto(CommentRdo, newComment.toPlainData());
   }
 
-  @Delete(FeedbackPaths.CommentDelete)
+  @Delete(FEEDBACK_PATHS.COMMENT_DELETE)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SUCCESS_MESSAGES.COMMENT_DELETED,
@@ -65,12 +104,18 @@ export class FeedbackController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.COMMENT_OTHER_USERS_DELETE,
   })
-  public delete(@Param('userId') userId: string, @Param('id') id: string) {
-    // @TODO need to grab user id from token
-    return this.feedbackService.deleteComment(userId, id);
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
+  public delete(@Param('id') id: string, @Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    return this.feedbackService.deleteComment(sub, id);
   }
 
-  @Post(FeedbackPaths.LikeCreate)
+  @Post(FEEDBACK_PATHS.LIKE_CREATE)
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new DtoValidationPipe<CreateCommentDto>(CreateCommentValidator))
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS_MESSAGES.COMMENT_CREATED,
@@ -87,15 +132,17 @@ export class FeedbackController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.POST_ALREADY_LIKED,
   })
-  public like(
-    @Param('userId') userId: string,
-    @Param('postId') postId: string
-  ) {
-    // @TODO need to grab user id from token
-    return this.feedbackService.like(userId, postId);
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
+  public like(@Param('postId') postId: string, @Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    return this.feedbackService.like(sub, postId);
   }
 
-  @Delete(FeedbackPaths.LikeDelete)
+  @Delete(FEEDBACK_PATHS.LIKE_DELETE)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: SUCCESS_MESSAGES.COMMENT_DELETED,
@@ -108,11 +155,12 @@ export class FeedbackController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.POST_NOT_PUBLISHED,
   })
-  public unlike(
-    @Param('userId') userId: string,
-    @Param('postId') postId: string
-  ) {
-    // @TODO need to grab user id from token
-    return this.feedbackService.unlike(userId, postId);
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
+  public unlike(@Param('postId') postId: string, @Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    return this.feedbackService.unlike(sub, postId);
   }
 }

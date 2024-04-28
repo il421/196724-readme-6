@@ -4,3 +4,4 @@ export * from './utils';
 export * from './registers.enum';
 export * from './app/environments.enum';
 export * from './storage';
+export * from './jwt';

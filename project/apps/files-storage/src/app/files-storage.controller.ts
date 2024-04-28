@@ -2,15 +2,29 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpStatus,
   Param,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
-import { fillDto } from '@project/helpers';
-import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ERROR_MESSAGES,
+  IHeaders,
+  ITokenPayload,
+  SUCCESS_MESSAGES,
+  SWAGGER_TAGS,
+} from '@project/core';
+import { fillDto, getToken } from '@project/helpers';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -22,15 +36,28 @@ import {
   FilesStorageService,
   FileSwaggerSchema,
   MIME_TYPE,
+  UploadAvatarValidator,
+  UploadPhotoValidator,
 } from '@project/files-storage-lib';
-import { FilesStoragePaths } from './files-storage-paths.enum';
+import { FILES_STORAGE_PATHS } from './files-storage.constants';
+import { JwtService } from '@nestjs/jwt';
+import {
+  DtoValidationPipe,
+  JwtAuthGuard,
+  MongoIdValidationPipe,
+} from '@project/data-access';
 
 @ApiTags(SWAGGER_TAGS.FILES)
-@Controller(FilesStoragePaths.Base)
+@ApiBearerAuth()
+@Controller(FILES_STORAGE_PATHS.BASE)
 export class FilesStorageController {
-  constructor(private readonly filesStorageService: FilesStorageService) {}
+  constructor(
+    private readonly filesStorageService: FilesStorageService,
+    private readonly jwtService: JwtService
+  ) {}
 
-  @Post(FilesStoragePaths.FileUpload)
+  @Post(FILES_STORAGE_PATHS.AVATAR_UPLOAD)
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor(FIELD_NAME, {
       storage: diskStorage({ destination: FILES_DESTINATION, filename }),
@@ -45,16 +72,48 @@ export class FilesStorageController {
   @ApiBody({
     schema: FileSwaggerSchema,
   })
-  public async upload(
-    // @TODO files format and size validator
-    @UploadedFile() file: Express.Multer.File,
-    @Param('userId') userId: string
+  public async uploadAvatar(
+    @UploadedFile(
+      new DtoValidationPipe<Express.Multer.File>(UploadAvatarValidator)
+    )
+    file: Express.Multer.File,
+    @Headers() headers: IHeaders
   ) {
-    const newFile = await this.filesStorageService.upload(file, userId);
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newFile = await this.filesStorageService.upload(file, sub);
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Get(FilesStoragePaths.File)
+  @Post(FILES_STORAGE_PATHS.PHOTO_UPLOAD)
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    // @TODO it is ignoring validations at the moment
+    FileInterceptor(FIELD_NAME, {
+      storage: diskStorage({ destination: FILES_DESTINATION, filename }),
+    })
+  )
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: FileRdo,
+    description: SUCCESS_MESSAGES.FILE_UPLOADED,
+  })
+  @ApiConsumes(MIME_TYPE)
+  @ApiBody({
+    schema: FileSwaggerSchema,
+  })
+  public async uploadPhoto(
+    @UploadedFile(
+      new DtoValidationPipe<Express.Multer.File>(UploadPhotoValidator)
+    )
+    file: Express.Multer.File,
+    @Headers() headers: IHeaders
+  ) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    const newFile = await this.filesStorageService.upload(file, sub);
+    return fillDto(FileRdo, newFile.toPlainData());
+  }
+
+  @Get(FILES_STORAGE_PATHS.FILE)
   @ApiResponse({
     status: HttpStatus.OK,
     type: FileRdo,
@@ -64,12 +123,17 @@ export class FilesStorageController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.FILE_NOT_FOUND,
   })
-  public async getById(@Param('id') id: string) {
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.BAD_MONGO_ID_ERROR,
+  })
+  public async getById(@Param('id', MongoIdValidationPipe) id: string) {
     const newFile = await this.filesStorageService.findById(id);
     return fillDto(FileRdo, newFile.toPlainData());
   }
 
-  @Delete(FilesStoragePaths.FileDeleted)
+  @Delete(FILES_STORAGE_PATHS.DELETE)
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
     description: SUCCESS_MESSAGES.FILE_DELETED,
@@ -78,7 +142,11 @@ export class FilesStorageController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.FILE_NOT_FOUND,
   })
-  public delete(@Param('id') id: string) {
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.BAD_MONGO_ID_ERROR,
+  })
+  public delete(@Param('id', MongoIdValidationPipe) id: string) {
     return this.filesStorageService.delete(id);
   }
 }

@@ -1,29 +1,47 @@
 import {
   Body,
   Controller,
-  Param,
   Post,
   HttpStatus,
   Patch,
+  UseGuards,
+  UsePipes,
+  Headers,
 } from '@nestjs/common';
-import { ERROR_MESSAGES, SWAGGER_TAGS, SUCCESS_MESSAGES } from '@project/core';
-import { fillDto } from '@project/helpers';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ERROR_MESSAGES,
+  SWAGGER_TAGS,
+  SUCCESS_MESSAGES,
+  ITokenPayload,
+  IHeaders,
+} from '@project/core';
+import { fillDto, getToken } from '@project/helpers';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   UserRdo,
   CreateUserDto,
   LoggedUserRdo,
   LoginUserDto,
   UpdateUserPasswordDto,
+  CreateUserValidator,
+  LoginUserValidator,
+  PasswordUpdateValidator,
 } from '@project/users-lib';
 import { AuthenticationService } from './authentication.service';
-import { AuthenticationPaths } from './authentication-paths.enum';
+import { AUTHENTICATION_PATHS } from './authentication.constants';
+import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags(SWAGGER_TAGS.AUTH)
-@Controller(AuthenticationPaths.Base)
+@ApiBearerAuth()
+@Controller(AUTHENTICATION_PATHS.BASE)
 export class AuthenticationController {
-  constructor(private readonly authService: AuthenticationService) {}
-  @Post(AuthenticationPaths.Create)
+  constructor(
+    private readonly authService: AuthenticationService,
+    private readonly jwtService: JwtService
+  ) {}
+  @Post(AUTHENTICATION_PATHS.CREATE)
+  @UsePipes(new DtoValidationPipe<CreateUserDto>(CreateUserValidator))
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS_MESSAGES.USER_CREATE,
@@ -45,7 +63,8 @@ export class AuthenticationController {
     return fillDto(UserRdo, newUser.toPlainData());
   }
 
-  @Post(AuthenticationPaths.Login)
+  @Post(AUTHENTICATION_PATHS.LOGIN)
+  @UsePipes(new DtoValidationPipe<LoginUserDto>(LoginUserValidator))
   @ApiResponse({
     type: LoggedUserRdo,
     status: HttpStatus.OK,
@@ -62,26 +81,36 @@ export class AuthenticationController {
     @Body()
     dto: LoginUserDto
   ) {
-    await this.authService.verifyUser(dto);
-    return fillDto(LoggedUserRdo, { accessToken: '123' }); // @TODO not completed
+    const user = await this.authService.verifyUser(dto);
+    const userToken = await this.authService.createUserToken(
+      user.toPlainData()
+    );
+    return fillDto(LoggedUserRdo, { accessToken: userToken.accessToken });
   }
 
-  @Patch(AuthenticationPaths.PasswordUpdate)
+  @Patch(AUTHENTICATION_PATHS.PASSWORD_UPDATE)
+  @UsePipes(
+    new DtoValidationPipe<UpdateUserPasswordDto>(PasswordUpdateValidator)
+  )
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     type: LoggedUserRdo,
-    status: HttpStatus.OK,
+    status: HttpStatus.NO_CONTENT,
     description: SUCCESS_MESSAGES.USER_PASSWORD_UPDATE,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.USER_BAD_PASSWORD,
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async updatePassword(
-    @Param('id') id: string,
-    @Body()
-    dto: UpdateUserPasswordDto
+    @Body() dto: UpdateUserPasswordDto,
+    @Headers() headers: IHeaders
   ) {
-    await this.authService.updatePassword(id, dto);
-    return fillDto(LoggedUserRdo, { accessToken: '123' }); // @TODO not completed
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+    await this.authService.updatePassword(sub, dto);
   }
 }

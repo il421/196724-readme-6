@@ -5,9 +5,8 @@ import {
 } from '@nestjs/common';
 import { CreateCommentDto } from './dtos';
 import { FeedbackRepository } from './feedback.repository';
-import { CommentEntity } from './comment.entity';
 import { ERROR_MESSAGES, PostState } from '@project/core';
-import { LikeEntity } from './like.entity';
+import { CommentEntity, LikeEntity } from './entities';
 
 @Injectable()
 export class FeedbackService {
@@ -29,8 +28,8 @@ export class FeedbackService {
     }
   }
 
-  public async getCommentsByPostId(postId: string) {
-    return this.feedbackRepository.findCommentsByPostId(postId);
+  public async getCommentsByPostId(postId: string, limit?: number) {
+    return this.feedbackRepository.findCommentsByPostId(postId, limit);
   }
 
   public async deleteComment(userId: string, id: string) {

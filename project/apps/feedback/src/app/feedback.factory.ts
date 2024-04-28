@@ -1,6 +1,6 @@
 import { IEntityFactory, Comment } from '@project/core';
 import { Injectable } from '@nestjs/common';
-import { CommentEntity } from './comment.entity';
+import { CommentEntity } from './entities/comment.entity';
 
 @Injectable()
 export class FeedbackFactory implements IEntityFactory<CommentEntity> {

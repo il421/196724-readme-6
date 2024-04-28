@@ -12,6 +12,12 @@ export class PostRdo {
 
   @ApiProperty({ example: 'My new post', description: 'Post title' })
   @Expose()
+  @Expose()
+  @Transform(({ value, obj }) =>
+    obj.type === PostType.Text || obj.type === PostType.Video
+      ? value
+      : undefined
+  )
   title!: string;
 
   @ApiProperty({
