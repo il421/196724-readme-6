@@ -21,20 +21,20 @@ import { fillDto, getToken } from '@project/helpers';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionRdo } from './rdos';
-import { SubscriptionsPaths } from './subscriptions-paths.enum';
+import { SUBSCRIPTIONS_PATHS } from './subscriptions.constants';
 import { JwtAuthGuard } from '@project/data-access';
 import { JwtService } from '@nestjs/jwt';
 
 @ApiTags(SWAGGER_TAGS.SUBSCRIPTIONS)
 @ApiBearerAuth()
-@Controller(SubscriptionsPaths.Base)
+@Controller(SUBSCRIPTIONS_PATHS.BASE)
 export class SubscriptionsController {
   constructor(
     private readonly subscriptionService: SubscriptionsService,
     private readonly jwtService: JwtService
   ) {}
 
-  @Get(SubscriptionsPaths.Subscriptions)
+  @Get(SUBSCRIPTIONS_PATHS.SUBSCRIPTIONS)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -54,7 +54,7 @@ export class SubscriptionsController {
     );
   }
 
-  @Post(SubscriptionsPaths.Create)
+  @Post(SUBSCRIPTIONS_PATHS.CREATE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -78,7 +78,7 @@ export class SubscriptionsController {
     return fillDto(SubscriptionRdo, newSubscription.toPlainData());
   }
 
-  @Delete(SubscriptionsPaths.Delete)
+  @Delete(SUBSCRIPTIONS_PATHS.DELETE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,

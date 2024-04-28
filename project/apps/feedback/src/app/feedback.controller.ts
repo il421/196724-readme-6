@@ -23,7 +23,7 @@ import { fillDto, getToken } from '@project/helpers';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
-import { FeedbackPaths } from './feedback-paths.enum';
+import { FEEDBACK_PATHS } from './feedback.constants';
 import {
   DtoValidationPipe,
   JwtAuthGuard,
@@ -34,14 +34,14 @@ import { CreateCommentValidator } from './validator';
 
 @ApiTags(SWAGGER_TAGS.FEEDBACK)
 @ApiBearerAuth()
-@Controller(FeedbackPaths.Base)
+@Controller(FEEDBACK_PATHS.BASE)
 export class FeedbackController {
   constructor(
     private readonly feedbackService: FeedbackService,
     private readonly jwtService: JwtService
   ) {}
 
-  @Get(FeedbackPaths.Comments)
+  @Get(FEEDBACK_PATHS.COMMENTS)
   @ApiQuery({
     name: 'limit',
     required: false,
@@ -66,7 +66,7 @@ export class FeedbackController {
       fillDto(CommentRdo, comment.toPlainData())
     );
   }
-  @Post(FeedbackPaths.CommentCreate)
+  @Post(FEEDBACK_PATHS.COMMENT_CREATE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -90,7 +90,7 @@ export class FeedbackController {
     return fillDto(CommentRdo, newComment.toPlainData());
   }
 
-  @Delete(FeedbackPaths.CommentDelete)
+  @Delete(FEEDBACK_PATHS.COMMENT_DELETE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
@@ -113,7 +113,7 @@ export class FeedbackController {
     return this.feedbackService.deleteComment(sub, id);
   }
 
-  @Post(FeedbackPaths.LikeCreate)
+  @Post(FEEDBACK_PATHS.LIKE_CREATE)
   @UseGuards(JwtAuthGuard)
   @UsePipes(new DtoValidationPipe<CreateCommentDto>(CreateCommentValidator))
   @ApiResponse({
@@ -141,7 +141,7 @@ export class FeedbackController {
     return this.feedbackService.like(sub, postId);
   }
 
-  @Delete(FeedbackPaths.LikeDelete)
+  @Delete(FEEDBACK_PATHS.LIKE_DELETE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
