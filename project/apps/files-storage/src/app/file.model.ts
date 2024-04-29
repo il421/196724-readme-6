@@ -14,7 +14,16 @@ export class FileModel extends Document implements File {
   public path!: string;
 
   @Prop({ required: true })
+  public uploadDirectoryPath!: string;
+
+  @Prop({ required: true })
   public name!: string;
+
+  @Prop({ required: true })
+  public originalName!: string;
+
+  @Prop({ required: true })
+  public size!: number;
 
   @Prop({
     required: true,
