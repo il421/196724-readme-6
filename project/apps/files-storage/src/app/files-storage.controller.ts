@@ -6,12 +6,14 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
+  FilesTypes,
   IHeaders,
   ITokenPayload,
   SUCCESS_MESSAGES,
@@ -22,30 +24,29 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+
 import {
   FIELD_NAME,
-  filename,
-  FileRdo,
-  FILES_DESTINATION,
-  FilesStorageService,
+  FILES_STORAGE_PATHS,
   FileSwaggerSchema,
   MIME_TYPE,
-  UploadAvatarValidator,
-  UploadPhotoValidator,
-} from '@project/files-storage-lib';
-import { FILES_STORAGE_PATHS } from './files-storage.constants';
+} from './files-storage.constants';
 import { JwtService } from '@nestjs/jwt';
 import {
   DtoValidationPipe,
   JwtAuthGuard,
   MongoIdValidationPipe,
 } from '@project/data-access';
+import { FilesStorageService } from './files-storage.service';
+
+import { FileRdo } from './rdos';
+import { UploadFileValidator, UploadPhotoValidator } from './validator';
 
 @ApiTags(SWAGGER_TAGS.FILES)
 @ApiBearerAuth()
@@ -56,60 +57,39 @@ export class FilesStorageController {
     private readonly jwtService: JwtService
   ) {}
 
-  @Post(FILES_STORAGE_PATHS.AVATAR_UPLOAD)
+  @Post(FILES_STORAGE_PATHS.UPLOAD)
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileInterceptor(FIELD_NAME, {
-      storage: diskStorage({ destination: FILES_DESTINATION, filename }),
-    })
-  )
+  @UseInterceptors(FileInterceptor(FIELD_NAME))
   @ApiResponse({
     status: HttpStatus.CREATED,
     type: FileRdo,
     description: SUCCESS_MESSAGES.FILE_UPLOADED,
   })
-  @ApiConsumes(MIME_TYPE)
-  @ApiBody({
-    schema: FileSwaggerSchema,
-  })
-  public async uploadAvatar(
-    @UploadedFile(
-      new DtoValidationPipe<Express.Multer.File>(UploadAvatarValidator)
-    )
-    file: Express.Multer.File,
-    @Headers() headers: IHeaders
-  ) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const newFile = await this.filesStorageService.upload(file, sub);
-    return fillDto(FileRdo, newFile.toPlainData());
-  }
-
-  @Post(FILES_STORAGE_PATHS.PHOTO_UPLOAD)
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    // @TODO it is ignoring validations at the moment
-    FileInterceptor(FIELD_NAME, {
-      storage: diskStorage({ destination: FILES_DESTINATION, filename }),
-    })
-  )
   @ApiResponse({
-    status: HttpStatus.CREATED,
-    type: FileRdo,
-    description: SUCCESS_MESSAGES.FILE_UPLOADED,
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.FILE_NOT_UPLOADED,
   })
   @ApiConsumes(MIME_TYPE)
+  @ApiQuery({
+    name: 'type',
+    required: true,
+    type: String,
+    enumName: 'FilesTypes',
+    enum: FilesTypes,
+  })
   @ApiBody({
     schema: FileSwaggerSchema,
   })
-  public async uploadPhoto(
+  public async upload(
     @UploadedFile(
-      new DtoValidationPipe<Express.Multer.File>(UploadPhotoValidator)
+      new DtoValidationPipe<Express.Multer.File>(UploadFileValidator)
     )
     file: Express.Multer.File,
+    @Query('type') type: FilesTypes,
     @Headers() headers: IHeaders
   ) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const newFile = await this.filesStorageService.upload(file, sub);
+    const newFile = await this.filesStorageService.upload(file, sub, type);
     return fillDto(FileRdo, newFile.toPlainData());
   }
 

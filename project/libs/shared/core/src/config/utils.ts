@@ -25,11 +25,18 @@ export const getMongooseOptions = (): MongooseModuleAsyncOptions => {
 
 export const getStaticStorageOptions = (): ServeStaticModuleAsyncOptions => {
   return {
-    useFactory: async (config: ConfigService) => [
-      {
-        rootPath: resolve(config.get('storage.rootPath')),
-      },
-    ],
+    useFactory: async (config: ConfigService) => {
+      return [
+        {
+          rootPath: resolve(config.get('storage.rootPath')),
+          serveRoot: config.get('storage.serveRoot'),
+          serveStaticOptions: {
+            fallthrough: true,
+            etag: true,
+          },
+        },
+      ];
+    },
     inject: [ConfigService],
   };
 };
