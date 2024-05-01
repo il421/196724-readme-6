@@ -63,6 +63,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
       state,
       types = [],
       title,
+      fromPublishDate,
       page,
       limit = DEFAULT_NUMBER_OF_POSTS,
       sortDirection = SortDirection.Desc,
@@ -78,6 +79,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     if (tags?.length) where.tags = { hasSome: tags };
     if (types?.length) where.type = { in: types };
     if (title) where.title = { contains: title };
+    if (fromPublishDate) where.publishedAt = { gte: fromPublishDate };
 
     const [documents, totalItems] = await Promise.all([
       this.client.post.findMany({
@@ -87,8 +89,8 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
         include: this.include,
         orderBy: {
           publishedAt: sortDirection,
-          likes: { _count: SortDirection.Asc },
-          comments: { _count: SortDirection.Asc },
+          // likes: { _count: SortDirection.Asc }, // @TODO I am getting an error for some reason in here
+          // comments: { _count: SortDirection.Asc }, // @TODO I am getting an error for some reason in here
         },
       }),
       this.getPostCount(where),

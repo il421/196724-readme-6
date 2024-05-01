@@ -14,14 +14,16 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "esModuleInterop": true,
     "paths": {
       "@project/core": ["libs/shared/core/src/index.ts"],
       "@project/data-access": ["libs/shared/data-access/src/index.ts"],
-      "@project/email-subscription-lib": [
-        "libs/email-subscription-lib/src/index.ts"
+      "@project/email-sender-lib": [
+        "libs/email-sender-lib/src/index.ts"
       ],
       "@project/helpers": ["libs/shared/helpers/src/index.ts"],
-     "@project/prisma-client": ["libs/shared/prisma-client/src/index.ts"],
+      "@project/notification-lib": ["libs/notification-lib/src/index.ts"],
+      "@project/prisma-client": ["libs/shared/prisma-client/src/index.ts"],
       "@project/users-lib": ["libs/users-lib/src/index.ts"]
     }
   },
