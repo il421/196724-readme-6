@@ -43,3 +43,10 @@ export const unique = <T>(items: T[]): T[] => {
 
 export const getToken = (headers: IHeaders): string =>
   headers.authorization.split(' ')[1];
+
+export const getSkipPages = (page?: number, limit?: number) =>
+  page && limit ? (page - 1) * limit : undefined;
+
+export const calculatePage = (totalCount: number, limit: number): number => {
+  return Math.ceil(totalCount / limit);
+};

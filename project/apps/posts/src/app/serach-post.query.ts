@@ -1,13 +1,16 @@
-import { PostState, PostType, SortDirection } from '@project/core';
+import {
+  IPaginationQuery,
+  PostState,
+  PostType,
+  SortDirection,
+} from '@project/core';
 
-export interface SearchPostsQuery {
+export interface SearchPostsQuery extends IPaginationQuery {
   usersIds?: string[];
   tags?: string[];
   types?: PostType[];
   state?: PostState;
   title?: string;
-  limit?: number;
-  page?: number;
   sortDirection?: SortDirection;
   fromPublishDate?: Date;
 }
