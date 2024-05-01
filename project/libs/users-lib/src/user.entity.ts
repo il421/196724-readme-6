@@ -11,6 +11,7 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
   public followers?: number;
   public createdAt?: Date;
   public avatarUrl?: string;
+  public latestPostsEmailDate?: Date;
   constructor(user: User) {
     super();
     this.id = user.id;
@@ -22,6 +23,7 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
     this.posts = user.posts;
     this.followers = user.followers;
     this.createdAt = user.createdAt;
+    this.latestPostsEmailDate = user.latestPostsEmailDate;
   }
 
   toPlainData(): User {
@@ -34,6 +36,7 @@ export class UserEntity extends Entity implements IStorableEntity<User> {
       avatarUrl: this.avatarUrl,
       posts: this.posts,
       followers: this.followers,
+      latestPostsEmailDate: this.latestPostsEmailDate,
     };
   }
 

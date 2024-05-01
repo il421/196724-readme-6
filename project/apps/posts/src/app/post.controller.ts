@@ -18,6 +18,7 @@ import {
   IHeaders,
   ITokenPayload,
   SortDirection,
+  RabbitRouting,
 } from '@project/core';
 import { CreatePostDto, UpdatePostDto } from './dtos';
 import { fillDto, getToken } from '@project/helpers';
@@ -31,6 +32,12 @@ import { CreatePostValidator, UpdatePostValidator } from './validator';
 import { SearchPostsQuery } from './serach-post.query';
 import { PostSearchQueryTransformPipe } from './pipes';
 import { POST_PATHS } from './post.constants';
+import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import {
+  CreatePostsNotificationDto,
+  NotificationService,
+  RABBIT_EXCHANGE,
+} from '@project/notification-lib';
 
 @ApiTags(SWAGGER_TAGS.POSTS)
 @ApiBearerAuth()
@@ -38,7 +45,8 @@ import { POST_PATHS } from './post.constants';
 export class PostController {
   constructor(
     private readonly postService: PostService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly notificationService: NotificationService
   ) {}
 
   @Get(POST_PATHS.SEARCH)
@@ -247,5 +255,26 @@ export class PostController {
   public delete(@Param('id') id: string, @Headers() headers: IHeaders) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
     return this.postService.delete(id, sub);
+  }
+
+  @RabbitSubscribe({
+    exchange: RABBIT_EXCHANGE,
+    routingKey: RabbitRouting.ReceiveLatestPosts,
+  })
+  public async receiveLatestPosts(subscriber: CreatePostsNotificationDto) {
+    const postsQueryResult = await this.postService.search({
+      fromPublishDate: subscriber.latestPostsEmailDate,
+    });
+
+    const posts = postsQueryResult.entities.map((post) =>
+      fillDto(PostRdo, post?.toPlainData())
+    );
+
+    if (posts.length) {
+      await this.notificationService.sendLatestPostsEmail({
+        ...subscriber,
+        posts,
+      });
+    }
   }
 }

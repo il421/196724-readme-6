@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { getJwtOptions } from '@project/core';
 import { PostsConfigModule } from './config';
+import { NotificationModule } from '@project/notification-lib';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PostsConfigModule } from './config';
       inject: [ConfigService],
       useFactory: getJwtOptions,
     }),
+    NotificationModule,
   ],
   controllers: [PostController],
   providers: [PostService, PostRepository, PostFactory, JwtAccessStrategy],

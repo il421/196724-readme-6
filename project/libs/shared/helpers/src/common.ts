@@ -28,6 +28,15 @@ export const getMongoConnectionString = ({
   return `mongodb://${username}:${password}@${host}:${port}/${databaseName}?authSource=${authDatabase}`;
 };
 
+export const getRabbitMQConnectionString = ({
+  user,
+  password,
+  host,
+  port,
+}): string => {
+  return `amqp://${user}:${password}@${host}:${port}`;
+};
+
 export const unique = <T>(items: T[]): T[] => {
   return Array.from(new Set(items));
 };

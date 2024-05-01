@@ -7,6 +7,7 @@ import {
   Body,
   UseGuards,
   Headers,
+  Post,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
@@ -17,11 +18,15 @@ import {
 } from '@project/core';
 import { fillDto, getToken } from '@project/helpers';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UpdateUserAvatarDto, UserRdo } from '@project/users-lib';
+import { UpdateUserDto, UserRdo } from '@project/users-lib';
 import { UsersService } from './users.service';
 import { USERS_PATHS } from './users.constants';
 import { JwtAuthGuard } from '@project/data-access';
 import { JwtService } from '@nestjs/jwt';
+import {
+  CreatePostsNotificationDto,
+  NotificationService,
+} from '@project/notification-lib';
 
 @ApiTags(SWAGGER_TAGS.USERS)
 @ApiBearerAuth()
@@ -29,7 +34,8 @@ import { JwtService } from '@nestjs/jwt';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly notificationService: NotificationService
   ) {}
 
   @Get(USERS_PATHS.USER)
@@ -65,10 +71,43 @@ export class UsersController {
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
   public updateAvatar(
-    @Body() dto: UpdateUserAvatarDto,
+    @Body() dto: Pick<UpdateUserDto, 'avatarUrl'>,
     @Headers() headers: IHeaders
   ) {
     const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    return this.usersService.updateUserAvatar(sub, dto.avatarUrl);
+    return this.usersService.updateUser(sub, { avatarUrl: dto.avatarUrl });
+  }
+
+  @Post(USERS_PATHS.RECEIVE_LATEST_POSTS)
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: SUCCESS_MESSAGES.USER_RECEIVED_EMAIL_POSTS,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.USER_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
+  public async receiveLatestPosts(@Headers() headers: IHeaders) {
+    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
+
+    const user = await this.usersService.getUser(sub);
+    const name: string = `${user.firstName} ${user.lastName}`;
+    const payload: CreatePostsNotificationDto = {
+      id: user.id,
+      name,
+      email: user.email,
+      latestPostsEmailDate: user.latestPostsEmailDate,
+    };
+
+    const isSent = await this.notificationService.receiveLatestPosts(payload);
+    if (isSent)
+      await this.usersService.updateUser(sub, {
+        latestPostsEmailDate: new Date(),
+      });
   }
 }

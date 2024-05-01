@@ -6,16 +6,19 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import { AppModule } from './app/app.module';
+import { NotifyModule } from './app/notify.module';
+import { GLOBAL_PREFIX } from '@project/core';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3000;
+  const app = await NestFactory.create(NotifyModule);
+  const configService = app.get(ConfigService);
+  const port = configService.get('application.port');
+  const host = configService.get('application.host');
+
   await app.listen(port);
   Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Application is running on: http://${host}:${port}/${GLOBAL_PREFIX}`
   );
 }
 

@@ -5,3 +5,5 @@ export * from './registers.enum';
 export * from './app/environments.enum';
 export * from './storage';
 export * from './jwt';
+export * from './rabbit';
+export * from './mail';

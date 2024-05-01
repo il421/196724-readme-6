@@ -3,4 +3,6 @@ export enum Registers {
   Mongo = 'mongo',
   Storage = 'storage',
   Jwt = 'jwt',
+  Rabbit = 'rabbit',
+  Mail = 'mail',
 }

@@ -9,4 +9,5 @@ export interface SearchPostsQuery {
   limit?: number;
   page?: number;
   sortDirection?: SortDirection;
+  fromPublishDate?: Date;
 }

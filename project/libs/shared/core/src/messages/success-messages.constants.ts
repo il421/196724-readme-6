@@ -3,6 +3,7 @@ export const SUCCESS_MESSAGES = {
   USER_PASSWORD_UPDATE: 'User password is updated',
   USER_FOUND: 'User details',
   USER_AVATAR: 'User avatar uploaded',
+  USER_RECEIVED_EMAIL_POSTS: 'Latest posts successfully sent',
   COMMENTS: 'Post comments',
   POSTS: 'Post(s) details',
   POST_CREATED: 'Post successfully created',

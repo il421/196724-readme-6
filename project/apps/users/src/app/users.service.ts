@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserEntity, UserRepository } from '@project/users-lib';
+import { UpdateUserDto, UserEntity, UserRepository } from '@project/users-lib';
 import { ERROR_MESSAGES } from '@project/core';
 
 @Injectable()
@@ -12,13 +12,13 @@ export class UsersService {
     return userEntity;
   }
 
-  public async updateUserAvatar(id: string, avatarUrl: string) {
+  public async updateUser(id: string, update: UpdateUserDto) {
     const userEntity = await this.userRepository.findById(id);
     if (!userEntity) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
 
     const newUserEntity = new UserEntity({
       ...userEntity.toPlainData(),
-      avatarUrl,
+      ...update,
     });
     return await this.userRepository.update(newUserEntity);
   }

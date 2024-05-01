@@ -1,0 +1,14 @@
+<h2>Hi, {{user}} ({{email}})</h2>
+<p>Please read the latest README posts {{#if latestPostsEmailDate}}from {{latestPostsEmailDate}}{{/if}}:</p>
+
+<ol>
+  {{#each posts}}
+    <li>
+     <span>{{details}}</span>
+    {{#if title}}<strong>{{title}}</strong>{{/if}}
+    {{#if text}}<q>{{text}}</q>{{/if}}
+    {{#if quoteAuthor}}<span>{{quoteAuthor}}</span>{{/if}}
+    {{#if url}}<a href="{{url}}" target="_blank">{{url}}</a>{{/if}}
+    </li>
+  {{/each}}
+</ol>
