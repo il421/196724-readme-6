@@ -20,6 +20,7 @@
       "@project/data-access": ["libs/shared/data-access/src/index.ts"],
       "@project/email-sender-lib": ["libs/email-sender-lib/src/index.ts"],
       "@project/helpers": ["libs/shared/helpers/src/index.ts"],
+      "@project/interceptors-lib": ["libs/interceptors-lib/src/index.ts"],
       "@project/notification-lib": ["libs/notification-lib/src/index.ts"],
       "@project/prisma-client": ["libs/shared/prisma-client/src/index.ts"],
       "@project/refresh-token-lib": ["libs/refresh-token-lib/src/index.ts"],

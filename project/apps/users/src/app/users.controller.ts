@@ -14,8 +14,7 @@ import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RequestWithUser, UpdateUserDto, UserRdo } from '@project/users-lib';
 import { UsersService } from './users.service';
-import { USERS_PATHS } from './users.constants';
-import { JwtAuthGuard } from '@project/data-access';
+import { JwtAuthGuard, USERS_PATHS } from '@project/data-access';
 import {
   CreatePostsNotificationDto,
   NotificationService,

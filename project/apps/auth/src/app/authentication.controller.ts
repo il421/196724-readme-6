@@ -24,8 +24,8 @@ import {
   RequestWithUser,
 } from '@project/users-lib';
 import { AuthenticationService } from './authentication.service';
-import { AUTHENTICATION_PATHS } from './authentication.constants';
 import {
+  AUTHENTICATION_PATHS,
   DtoValidationPipe,
   JwtAuthGuard,
   JwtRefreshGuard,

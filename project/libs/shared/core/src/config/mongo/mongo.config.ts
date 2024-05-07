@@ -4,6 +4,7 @@ import { validateConfig } from '../utils';
 import { Registers } from '../registers.enum';
 import { MongoConfig } from './mongo.interface';
 import { MONGO_VALIDATION_ERROR } from './mongo.constants';
+import { PARSE_INT_RADIX } from '@project/helpers';
 
 const dbValidationSchema = Joi.object({
   host: Joi.string().hostname().required(),
@@ -18,7 +19,7 @@ const getDbConfig = (): MongoConfig => {
   const config: MongoConfig = {
     host: process.env['MONGO_HOST'] ?? '',
     name: process.env['MONGO_DB'] ?? '',
-    port: parseInt(process.env['MONGO_PORT'], 10),
+    port: parseInt(process.env['MONGO_PORT'], PARSE_INT_RADIX),
     user: process.env['MONGO_USER'] ?? '',
     password: process.env['MONGO_PASSWORD'] ?? '',
     authBase: process.env['MONGO_AUTH_BASE'] ?? '',

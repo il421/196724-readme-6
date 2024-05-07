@@ -17,9 +17,11 @@ export abstract class MongoRepository<
       return null;
     }
 
-    const plainObject = document.toObject({ versionKey: false }) as ReturnType<
-      T['toPlainData']
-    >;
+    const plainObject = document.toObject({
+      getters: true,
+      versionKey: false,
+      flattenObjectIds: true,
+    }) as ReturnType<T['toPlainData']>;
 
     const entity = this.entityFactory.create(plainObject);
     entity.id = document._id;

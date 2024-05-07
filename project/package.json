@@ -9,12 +9,14 @@
     "start-feedback-app": "npx nx run feedback:serve",
     "start-subscriptions-app": "npx nx run subscriptions:serve",
     "start-files-storage-app": "npx nx run files-storage:serve",
-    "start-notify-app": "npx nx run notify:serve"
+    "start-notify-app": "npx nx run notify:serve",
+    "start-gateway-api": "npx nx run api:serve"
   },
   "private": true,
   "dependencies": {
     "@golevelup/nestjs-rabbitmq": "^5.3.0",
     "@nestjs-modules/mailer": "^1.11.2",
+    "@nestjs/axios": "^3.0.2",
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "^3.2.1",
     "@nestjs/core": "^10.0.2",

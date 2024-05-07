@@ -7,3 +7,4 @@ export * from './storage';
 export * from './jwt';
 export * from './rabbit';
 export * from './mail';
+export * from './http-client';

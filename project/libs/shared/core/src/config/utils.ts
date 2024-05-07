@@ -10,7 +10,8 @@ import { resolve } from 'node:path';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { AsyncModuleConfig } from '@golevelup/nestjs-modules';
 import { MailerAsyncOptions } from '@nestjs-modules/mailer/dist/interfaces/mailer-async-options.interface'; // @TODO
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'; // @TODO
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { HttpModuleOptions } from '@nestjs/axios';
 
 export const getMongooseOptions = (): MongooseModuleAsyncOptions => {
   return {
@@ -59,6 +60,15 @@ export async function getJwtOptions(
     },
   };
 }
+
+export const getHttpClientOptions = async (
+  configService: ConfigService
+): Promise<HttpModuleOptions> => {
+  return {
+    timeout: configService.get<number>('http-client.timeout'),
+    maxRedirects: configService.get<number>('http-client.maxRedirects'),
+  };
+};
 
 export const getRabbitMQOptions = (): AsyncModuleConfig<any> => {
   return {
