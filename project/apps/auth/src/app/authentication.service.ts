@@ -8,19 +8,22 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { UserEntity, UserRepository } from '@project/users-lib';
-import { ERROR_MESSAGES, IToken, ITokenPayload, User } from '@project/core';
+import { ERROR_MESSAGES, IToken, User } from '@project/core';
 import {
   CreateUserDto,
   LoginUserDto,
   UpdateUserPasswordDto,
 } from '@project/users-lib';
 import { JwtService } from '@nestjs/jwt';
+import { RefreshTokenService } from '@project/refresh-token-lib';
+import { createJWTPayload } from '@project/helpers';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly refreshTokenService: RefreshTokenService
   ) {}
 
   public async register(dto: CreateUserDto): Promise<UserEntity> {
@@ -63,19 +66,20 @@ export class AuthenticationService {
   }
 
   public async createUserToken(user: User): Promise<IToken> {
-    const payload: ITokenPayload = {
-      sub: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+    const accessTokenPayload = createJWTPayload(user);
+    const refreshTokenPayload = {
+      ...accessTokenPayload,
+      tokenId: crypto.randomUUID(),
     };
+    await this.refreshTokenService.createRefreshSession(refreshTokenPayload);
 
     try {
-      const accessToken = await this.jwtService.signAsync(payload);
-      return { accessToken };
+      const accessToken = await this.jwtService.signAsync(accessTokenPayload);
+      const refreshToken = await this.jwtService.signAsync(refreshTokenPayload);
+      return { accessToken, refreshToken };
     } catch (error) {
       throw new HttpException(
-        ERROR_MESSAGES.TOKEN,
+        ERROR_MESSAGES.TOKEN_CREATE,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }

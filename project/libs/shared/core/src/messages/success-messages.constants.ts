@@ -20,4 +20,5 @@ export const SUCCESS_MESSAGES = {
   FILE: 'File details',
   FILE_UPLOADED: 'File uploaded',
   FILE_DELETED: 'File deleted',
+  REFRESH_TOKEN: 'Get a new access/refresh tokens',
 } as const;

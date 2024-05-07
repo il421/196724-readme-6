@@ -3,7 +3,10 @@ import {
   ClassTransformOptions,
   plainToInstance,
 } from 'class-transformer';
-import { IHeaders } from '@project/core';
+import { IHeaders, ITokenPayload, User } from '@project/core';
+
+export type DateTimeUnit = 's' | 'h' | 'd' | 'm' | 'y';
+export type TimeAndUnit = { value: number; unit: DateTimeUnit };
 
 export function fillDto<T, V>(
   someDto: ClassConstructor<T>,
@@ -49,4 +52,33 @@ export const getSkipPages = (page?: number, limit?: number) =>
 
 export const calculatePage = (totalCount: number, limit: number): number => {
   return Math.ceil(totalCount / limit);
+};
+
+export const parseTime = (time: string): TimeAndUnit => {
+  const regex = /^(\d+)([shdmy])/;
+  const match = regex.exec(time);
+
+  if (!match) {
+    throw new Error(`[parseTime] Bad time string: ${time}`);
+  }
+
+  const [, valueRaw, unitRaw] = match;
+  const value = parseInt(valueRaw, 10);
+
+  if (isNaN(value)) {
+    throw new Error(`[parseTime] Can't parse value count. Result is NaN.`);
+  }
+
+  const unit = unitRaw as DateTimeUnit;
+
+  return { value, unit };
+};
+
+export const createJWTPayload = (user: User): ITokenPayload => {
+  return {
+    sub: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+  };
 };
