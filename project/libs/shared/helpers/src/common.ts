@@ -28,9 +28,25 @@ export const getMongoConnectionString = ({
   return `mongodb://${username}:${password}@${host}:${port}/${databaseName}?authSource=${authDatabase}`;
 };
 
+export const getRabbitMQConnectionString = ({
+  user,
+  password,
+  host,
+  port,
+}): string => {
+  return `amqp://${user}:${password}@${host}:${port}`;
+};
+
 export const unique = <T>(items: T[]): T[] => {
   return Array.from(new Set(items));
 };
 
 export const getToken = (headers: IHeaders): string =>
   headers.authorization.split(' ')[1];
+
+export const getSkipPages = (page?: number, limit?: number) =>
+  page && limit ? (page - 1) * limit : undefined;
+
+export const calculatePage = (totalCount: number, limit: number): number => {
+  return Math.ceil(totalCount / limit);
+};

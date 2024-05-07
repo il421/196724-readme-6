@@ -54,7 +54,7 @@ export class PostRdo {
     description: 'Post create data',
   })
   @Expose()
-  createdAt!: string;
+  createdAt!: Date;
 
   @ApiProperty({
     example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
@@ -68,7 +68,7 @@ export class PostRdo {
     description: 'Post publish data',
   })
   @Expose()
-  publishedAt!: string;
+  publishedAt!: Date;
 
   @ApiProperty({
     example: 'New post',

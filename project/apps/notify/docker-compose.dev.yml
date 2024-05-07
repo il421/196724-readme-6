@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  readme-notify-fakesmtp:
+    image: gessnerfl/fake-smtp-server:2.2.0
+    container_name: "readme-notify-fakesmtp"
+    hostname: "readme-notify-fakesmtp"
+    ports:
+      - ${MAIL_SMTP_PORT}:${MAIL_SMTP_PORT}
+      - "1085:8080"
+
+  readme-notify-rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: readme-notify-rabbitmq
+
+    ports:
+      - '1088:15672'
+      - ${RABBIT_PORT}:${RABBIT_PORT}
+
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5

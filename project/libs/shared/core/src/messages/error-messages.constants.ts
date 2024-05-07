@@ -14,6 +14,7 @@ export const ERROR_MESSAGES = {
   POST_NOT_LIKED: 'Post is not liked',
   POST_ALREADY_LIKED: 'Post is liked already',
   FILE_NOT_FOUND: 'File not found',
+  FILE_NOT_UPLOADED: 'File has not been uploaded',
   SUBSCRIPTION_NOT_FOUND: 'Subscription not found',
   SUBSCRIPTION_EXISTS: 'Subscription exists already',
   COMMENT_NOT_FOUND: 'Comment not found',

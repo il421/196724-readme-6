@@ -17,6 +17,7 @@ import {
   ITokenPayload,
   SUCCESS_MESSAGES,
   SWAGGER_TAGS,
+  IPaginationQuery,
 } from '@project/core';
 import { CreateCommentDto } from './dtos';
 import { fillDto, getToken } from '@project/helpers';
@@ -24,13 +25,10 @@ import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
 import { FEEDBACK_PATHS } from './feedback.constants';
-import {
-  DtoValidationPipe,
-  JwtAuthGuard,
-  ParseStringPipe,
-} from '@project/data-access';
+import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
 import { JwtService } from '@nestjs/jwt';
 import { CreateCommentValidator } from './validator';
+import { CommentsSearchQueryTransformPipe } from './pipes';
 
 @ApiTags(SWAGGER_TAGS.FEEDBACK)
 @ApiBearerAuth()
@@ -48,6 +46,7 @@ export class FeedbackController {
     type: Number,
     description: 'Default is 50',
   })
+  @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiResponse({
     status: HttpStatus.OK,
     isArray: true,
@@ -56,15 +55,20 @@ export class FeedbackController {
   })
   public async getPostComments(
     @Param('postId') postId: string,
-    @Query('limit', ParseStringPipe) limit?: number
+    @Query(CommentsSearchQueryTransformPipe) query?: IPaginationQuery
   ) {
-    const comments = await this.feedbackService.getCommentsByPostId(
+    const commentsQueryResult = await this.feedbackService.getCommentsByPostId(
       postId,
-      limit
+      query?.limit,
+      query?.page
     );
-    return comments.map((comment) =>
-      fillDto(CommentRdo, comment.toPlainData())
-    );
+
+    return {
+      ...commentsQueryResult,
+      entities: commentsQueryResult.entities.map((comment) =>
+        fillDto(CommentRdo, comment?.toPlainData())
+      ),
+    };
   }
   @Post(FEEDBACK_PATHS.COMMENT_CREATE)
   @UseGuards(JwtAuthGuard)

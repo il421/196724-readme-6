@@ -1,10 +1,17 @@
 import { MongooseModuleAsyncOptions } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
-import { getMongoConnectionString } from '@project/helpers';
-import { ServeStaticModuleAsyncOptions } from '@nestjs/serve-static/dist/interfaces/serve-static-options.interface';
+import {
+  getMongoConnectionString,
+  getRabbitMQConnectionString,
+} from '@project/helpers';
+import { ServeStaticModuleAsyncOptions } from '@nestjs/serve-static';
 import { ObjectSchema } from 'joi';
 import { resolve } from 'node:path';
 import { JwtModuleOptions } from '@nestjs/jwt';
+import { AsyncModuleConfig } from '@golevelup/nestjs-modules';
+import { MailerAsyncOptions } from '@nestjs-modules/mailer/dist/interfaces/mailer-async-options.interface'; // @TODO
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'; // @TODO
+
 export const getMongooseOptions = (): MongooseModuleAsyncOptions => {
   return {
     useFactory: async (config: ConfigService) => {
@@ -25,11 +32,18 @@ export const getMongooseOptions = (): MongooseModuleAsyncOptions => {
 
 export const getStaticStorageOptions = (): ServeStaticModuleAsyncOptions => {
   return {
-    useFactory: async (config: ConfigService) => [
-      {
-        rootPath: resolve(config.get('storage.rootPath')),
-      },
-    ],
+    useFactory: async (config: ConfigService) => {
+      return [
+        {
+          rootPath: resolve(config.get('storage.rootPath')),
+          serveRoot: config.get('storage.serveRoot'),
+          serveStaticOptions: {
+            fallthrough: true,
+            etag: true,
+          },
+        },
+      ];
+    },
     inject: [ConfigService],
   };
 };
@@ -46,6 +60,28 @@ export async function getJwtOptions(
   };
 }
 
+export const getRabbitMQOptions = (): AsyncModuleConfig<any> => {
+  return {
+    useFactory: async (config: ConfigService) => ({
+      exchanges: [
+        {
+          name: config.get<string>('rabbit.exchange'),
+          type: 'direct',
+        },
+      ],
+      uri: getRabbitMQConnectionString({
+        host: config.get<string>('rabbit.host'),
+        password: config.get<string>('rabbit.password'),
+        user: config.get<string>('rabbit.user'),
+        port: config.get<string>('rabbit.port'),
+      }),
+      connectionInitOptions: { wait: true },
+      enableControllerDiscovery: true,
+    }),
+    inject: [ConfigService],
+  };
+};
+
 export const validateConfig = (
   schema: ObjectSchema,
   config: object,
@@ -56,3 +92,32 @@ export const validateConfig = (
     throw new Error(`[${message}]: ${error.message}`);
   }
 };
+
+export function getMailerAsyncOptions(): MailerAsyncOptions {
+  return {
+    useFactory: async (configService: ConfigService) => {
+      return {
+        transport: {
+          host: configService.get<string>('mail.host'),
+          port: configService.get<number>('mail.port'),
+          secure: false,
+          auth: {
+            user: configService.get<string>('mail.user'),
+            pass: configService.get<string>('mail.password'),
+          },
+        },
+        defaults: {
+          from: configService.get<string>('mail.from'),
+        },
+        template: {
+          dir: resolve(__dirname, 'assets'),
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      };
+    },
+    inject: [ConfigService],
+  };
+}

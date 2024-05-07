@@ -32,6 +32,9 @@ export class UserModel extends Document implements User {
 
   @Prop({ default: 0 })
   public followers?: number;
+
+  @Prop()
+  public latestPostsEmailDate?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel);

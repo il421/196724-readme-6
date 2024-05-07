@@ -13,6 +13,7 @@ import { getJwtOptions, getMongooseOptions } from '@project/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtAccessStrategy } from '@project/data-access';
+import { NotificationModule } from '@project/notification-lib';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { JwtAccessStrategy } from '@project/data-access';
       inject: [ConfigService],
       useFactory: getJwtOptions,
     }),
+    NotificationModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, UserRepository, UserFactory, JwtAccessStrategy],

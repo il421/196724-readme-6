@@ -1,13 +1,6 @@
 import { Module } from '@nestjs/common';
 import { FilesStorageController } from './files-storage.controller';
-import {
-  FilesStorageFactory,
-  FilesStorageRepository,
-  FilesStorageService,
-  FilesStorageConfigModule,
-  FileModel,
-  FileSchema,
-} from '@project/files-storage-lib';
+
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   getJwtOptions,
@@ -18,6 +11,11 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { JwtAccessStrategy } from '@project/data-access';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { FilesStorageConfigModule } from './config';
+import { FileModel, FileSchema } from './file.model';
+import { FilesStorageService } from './files-storage.service';
+import { FilesStorageRepository } from './files-storage.repository';
+import { FilesStorageFactory } from './files-storage.factory';
 
 @Module({
   imports: [

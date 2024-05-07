@@ -9,9 +9,10 @@ import {
   SortDirection,
 } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
-import { DEFAULT_NUMBER_OF_POSTS } from './post.constants';
+import { DEFAULT_NUMBER_OF_POSTS, DEFAULT_PAGE } from './post.constants';
 import { SearchPostsQuery } from './serach-post.query';
 import { Prisma } from '.prisma/client';
+import { calculatePage, getSkipPages } from '@project/helpers';
 
 @Injectable()
 export class PostRepository extends PostgresRepository<PostEntity, Post> {
@@ -25,10 +26,6 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
   private readonly include = {
     _count: { select: { comments: true, likes: true } },
   };
-
-  private calculatePostsPage(totalCount: number, limit: number): number {
-    return Math.ceil(totalCount / limit);
-  }
 
   private async getPostCount(where: Prisma.PostWhereInput): Promise<number> {
     return this.client.post.count({ where });
@@ -63,11 +60,12 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
       state,
       types = [],
       title,
-      page,
+      fromPublishDate,
+      page = DEFAULT_PAGE,
       limit = DEFAULT_NUMBER_OF_POSTS,
       sortDirection = SortDirection.Desc,
     } = args;
-    const skip = page && limit ? (page - 1) * limit : undefined;
+    const skip = getSkipPages(page, limit);
     const take = limit;
 
     const where: Prisma.PostWhereInput = {
@@ -78,6 +76,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     if (tags?.length) where.tags = { hasSome: tags };
     if (types?.length) where.type = { in: types };
     if (title) where.title = { contains: title };
+    if (fromPublishDate) where.publishedAt = { gte: fromPublishDate };
 
     const [documents, totalItems] = await Promise.all([
       this.client.post.findMany({
@@ -87,8 +86,8 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
         include: this.include,
         orderBy: {
           publishedAt: sortDirection,
-          likes: { _count: SortDirection.Asc },
-          comments: { _count: SortDirection.Asc },
+          // likes: { _count: SortDirection.Asc }, // @TODO I am getting an error for some reason in here
+          // comments: { _count: SortDirection.Asc }, // @TODO I am getting an error for some reason in here
         },
       }),
       this.getPostCount(where),
@@ -97,7 +96,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     return {
       entities: documents.map(this.createEntityFromDocument),
       currentPage: page,
-      totalPages: this.calculatePostsPage(totalItems, take),
+      totalPages: calculatePage(totalItems, take),
       itemsPerPage: take,
       totalItems,
     };

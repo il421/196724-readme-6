@@ -7,11 +7,13 @@ import { STORAGE_VALIDATION_ERROR } from './storage.constants';
 
 const validationSchema = Joi.object({
   rootPath: Joi.string().required(),
+  serveRoot: Joi.string().required(),
 });
 
 const getConfig = (): StorageConfig => {
   const config: StorageConfig = {
     rootPath: process.env['STORAGE_DIRECTORY'],
+    serveRoot: process.env['SERVE_ROOT'],
   };
 
   validateConfig(validationSchema, config, STORAGE_VALIDATION_ERROR);

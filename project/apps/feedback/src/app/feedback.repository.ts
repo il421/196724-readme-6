@@ -1,11 +1,15 @@
 import { PostgresRepository } from '@project/data-access';
-import { CommentEntity } from './entities/comment.entity';
+import { CommentEntity, LikeEntity } from './entities';
 import { Injectable } from '@nestjs/common';
 import { FeedbackFactory } from './feedback.factory';
-import { Comment } from '@project/core';
+import { Comment, PaginationResult } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
-import { LikeEntity } from './entities/like.entity';
-import { DEFAULT_NUMBER_OF_COMMENTS } from './feedback.restrictions';
+import {
+  DEFAULT_NUMBER_OF_COMMENTS,
+  DEFAULT_PAGE,
+} from './feedback.restrictions';
+import { calculatePage, getSkipPages } from '@project/helpers';
+import { Prisma } from '.prisma/client';
 
 @Injectable()
 export class FeedbackRepository extends PostgresRepository<
@@ -17,6 +21,12 @@ export class FeedbackRepository extends PostgresRepository<
     readonly client: PrismaClientService
   ) {
     super(entityFactory, client);
+  }
+
+  private async getCommentsCount(
+    where: Prisma.CommentWhereInput
+  ): Promise<number> {
+    return this.client.comment.count({ where });
   }
 
   public async saveComment(entity: CommentEntity): Promise<void> {
@@ -32,12 +42,32 @@ export class FeedbackRepository extends PostgresRepository<
     return this.createEntityFromDocument(document);
   }
 
-  public async findCommentsByPostId(postId: string, limit?: number) {
-    const documents = await this.client.comment.findMany({
-      where: { postId },
-      take: limit ?? DEFAULT_NUMBER_OF_COMMENTS,
-    });
-    return documents.map((document) => this.createEntityFromDocument(document));
+  public async findCommentsByPostId(
+    postId: string,
+    limit?: number,
+    page?: number
+  ): Promise<PaginationResult<CommentEntity>> {
+    const take = limit ?? DEFAULT_NUMBER_OF_COMMENTS;
+
+    const skip = getSkipPages(page, take);
+    const where = { postId };
+
+    const [documents, totalItems] = await Promise.all([
+      this.client.comment.findMany({
+        where,
+        take,
+        skip,
+      }),
+      this.getCommentsCount(where),
+    ]);
+
+    return {
+      entities: documents.map(this.createEntityFromDocument),
+      currentPage: page ?? DEFAULT_PAGE,
+      totalPages: calculatePage(totalItems, take),
+      itemsPerPage: take,
+      totalItems,
+    };
   }
 
   public async deleteCommentById(id: string) {
