@@ -6,38 +6,33 @@ import {
   Param,
   Post,
   HttpStatus,
-  Headers,
   UseGuards,
   UsePipes,
   Query,
+  Req,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
-  IHeaders,
-  ITokenPayload,
   SUCCESS_MESSAGES,
   SWAGGER_TAGS,
   IPaginationQuery,
 } from '@project/core';
 import { CreateCommentDto } from './dtos';
-import { fillDto, getToken } from '@project/helpers';
+import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
 import { FEEDBACK_PATHS } from './feedback.constants';
 import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
-import { JwtService } from '@nestjs/jwt';
 import { CreateCommentValidator } from './validator';
 import { CommentsSearchQueryTransformPipe } from './pipes';
+import { RequestWithUser } from '@project/users-lib';
 
 @ApiTags(SWAGGER_TAGS.FEEDBACK)
 @ApiBearerAuth()
 @Controller(FEEDBACK_PATHS.BASE)
 export class FeedbackController {
-  constructor(
-    private readonly feedbackService: FeedbackService,
-    private readonly jwtService: JwtService
-  ) {}
+  constructor(private readonly feedbackService: FeedbackService) {}
 
   @Get(FEEDBACK_PATHS.COMMENTS)
   @ApiQuery({
@@ -87,10 +82,9 @@ export class FeedbackController {
   })
   public async create(
     @Body() dto: CreateCommentDto,
-    @Headers() headers: IHeaders
+    @Req() { user }: RequestWithUser
   ) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const newComment = await this.feedbackService.createComment(sub, dto);
+    const newComment = await this.feedbackService.createComment(user.id, dto);
     return fillDto(CommentRdo, newComment.toPlainData());
   }
 
@@ -112,9 +106,8 @@ export class FeedbackController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public delete(@Param('id') id: string, @Headers() headers: IHeaders) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    return this.feedbackService.deleteComment(sub, id);
+  public delete(@Param('id') id: string, @Req() { user }: RequestWithUser) {
+    return this.feedbackService.deleteComment(user.id, id);
   }
 
   @Post(FEEDBACK_PATHS.LIKE_CREATE)
@@ -140,9 +133,11 @@ export class FeedbackController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public like(@Param('postId') postId: string, @Headers() headers: IHeaders) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    return this.feedbackService.like(sub, postId);
+  public like(
+    @Param('postId') postId: string,
+    @Req() { user }: RequestWithUser
+  ) {
+    return this.feedbackService.like(user.id, postId);
   }
 
   @Delete(FEEDBACK_PATHS.LIKE_DELETE)
@@ -163,8 +158,10 @@ export class FeedbackController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public unlike(@Param('postId') postId: string, @Headers() headers: IHeaders) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    return this.feedbackService.unlike(sub, postId);
+  public unlike(
+    @Param('postId') postId: string,
+    @Req() { user }: RequestWithUser
+  ) {
+    return this.feedbackService.unlike(user.id, postId);
   }
 }

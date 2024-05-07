@@ -1,5 +1,6 @@
 export const ERROR_MESSAGES = {
-  TOKEN: 'Create token error',
+  TOKEN_CREATE: 'Create token error',
+  TOKEN_INVALID: 'Invalid token',
   INVALID_QUERY_PARAM: 'Invalid query param',
   PIPE: 'This pipe must used only with params or query',
   BAD_MONGO_ID_ERROR: 'Bad MongoDB ID',
