@@ -23,12 +23,15 @@ import { fillDto } from '@project/helpers';
 import { FullPostRdo, PostRdo } from './rdos';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
-import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
+import {
+  DtoValidationPipe,
+  JwtAuthGuard,
+  POST_PATHS,
+} from '@project/data-access';
 import { TagsTransformPipe } from './pipes';
 import { CreatePostValidator, UpdatePostValidator } from './validator';
 import { SearchPostsQuery } from './serach-post.query';
 import { PostSearchQueryTransformPipe } from './pipes';
-import { POST_PATHS } from './post.constants';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import {
   CreatePostsNotificationDto,

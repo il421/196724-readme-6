@@ -22,8 +22,11 @@ import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
 import { CommentRdo } from './rdos';
-import { FEEDBACK_PATHS } from './feedback.constants';
-import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
+import {
+  DtoValidationPipe,
+  FEEDBACK_PATHS,
+  JwtAuthGuard,
+} from '@project/data-access';
 import { CreateCommentValidator } from './validator';
 import { CommentsSearchQueryTransformPipe } from './pipes';
 import { RequestWithUser } from '@project/users-lib';

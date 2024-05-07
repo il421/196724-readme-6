@@ -15,8 +15,7 @@ import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionRdo } from './rdos';
-import { SUBSCRIPTIONS_PATHS } from './subscriptions.constants';
-import { JwtAuthGuard } from '@project/data-access';
+import { JwtAuthGuard, SUBSCRIPTIONS_PATHS } from '@project/data-access';
 import { RequestWithUser } from '@project/users-lib';
 
 @ApiTags(SWAGGER_TAGS.SUBSCRIPTIONS)

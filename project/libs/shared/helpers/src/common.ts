@@ -7,6 +7,7 @@ import { IHeaders, ITokenPayload, User } from '@project/core';
 
 export type DateTimeUnit = 's' | 'h' | 'd' | 'm' | 'y';
 export type TimeAndUnit = { value: number; unit: DateTimeUnit };
+export const PARSE_INT_RADIX = 10;
 
 export function fillDto<T, V>(
   someDto: ClassConstructor<T>,
@@ -44,9 +45,6 @@ export const unique = <T>(items: T[]): T[] => {
   return Array.from(new Set(items));
 };
 
-export const getToken = (headers: IHeaders): string =>
-  headers.authorization.split(' ')[1];
-
 export const getSkipPages = (page?: number, limit?: number) =>
   page && limit ? (page - 1) * limit : undefined;
 
@@ -63,7 +61,7 @@ export const parseTime = (time: string): TimeAndUnit => {
   }
 
   const [, valueRaw, unitRaw] = match;
-  const value = parseInt(valueRaw, 10);
+  const value = parseInt(valueRaw, PARSE_INT_RADIX);
 
   if (isNaN(value)) {
     throw new Error(`[parseTime] Can't parse value count. Result is NaN.`);

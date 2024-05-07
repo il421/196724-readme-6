@@ -3,9 +3,9 @@ import * as Joi from 'joi';
 import { validateConfig } from '../utils';
 import { Environments } from './environments.enum';
 import { Registers } from '../registers.enum';
+import { PARSE_INT_RADIX } from '@project/helpers';
 
 const VALIDATION_ERROR = 'Application Config Validation Error';
-
 export interface ApplicationConfig {
   environment: string;
   port: number;
@@ -23,7 +23,7 @@ const validationSchema = Joi.object({
 const getConfig = (): ApplicationConfig => {
   const config: ApplicationConfig = {
     environment: process.env['NODE_ENV'] as Environments,
-    port: parseInt(process.env['PORT'], 10),
+    port: parseInt(process.env['PORT'], PARSE_INT_RADIX),
     host: process.env['HOST'],
   };
 

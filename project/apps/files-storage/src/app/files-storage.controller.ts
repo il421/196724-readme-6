@@ -31,12 +31,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 import {
   FIELD_NAME,
-  FILES_STORAGE_PATHS,
   FileSwaggerSchema,
   MIME_TYPE,
 } from './files-storage.constants';
 import {
   DtoValidationPipe,
+  FILES_STORAGE_PATHS,
   JwtAuthGuard,
   MongoIdValidationPipe,
 } from '@project/data-access';

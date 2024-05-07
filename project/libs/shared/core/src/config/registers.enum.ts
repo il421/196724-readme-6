@@ -5,4 +5,5 @@ export enum Registers {
   Jwt = 'jwt',
   Rabbit = 'rabbit',
   Mail = 'mail',
+  HttpClient = 'http-client',
 }
