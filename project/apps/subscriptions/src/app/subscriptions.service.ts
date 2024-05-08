@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateSubscriptionDto } from './dtos';
+import { CreateSubscriptionDto } from '@project/subscriptions-lib';
 import { SubscriptionsRepository } from './subscriptions.repository';
 import { SubscriptionsEntity } from './subscriptions.entity';
 import { ERROR_MESSAGES } from '@project/core';

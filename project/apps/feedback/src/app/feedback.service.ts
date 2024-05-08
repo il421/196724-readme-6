@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCommentDto } from './dtos';
+import { CreateCommentDto } from '@project/feedback-lib';
 import { FeedbackRepository } from './feedback.repository';
 import { ERROR_MESSAGES, PostState } from '@project/core';
 import { CommentEntity, LikeEntity } from './entities';

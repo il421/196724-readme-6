@@ -1,6 +1,6 @@
 import { Injectable, PipeTransform } from '@nestjs/common';
-import { CreatePostDto, UpdatePostDto } from '../dtos';
-import { getUniqueTags } from '../utils';
+import { CreatePostDto, UpdatePostDto } from '@project/posts-lib';
+import { getUniqueTags } from '../../../../../apps/posts/src/app/utils';
 
 @Injectable()
 export class TagsTransformPipe implements PipeTransform {

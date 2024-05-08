@@ -12,5 +12,4 @@ export interface SearchPostsQuery extends IPaginationQuery {
   state?: PostState;
   title?: string;
   sortDirection?: SortDirection;
-  fromPublishDate?: Date;
 }

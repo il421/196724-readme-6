@@ -1,4 +1,4 @@
-type ServicesUrls = {
+export type ServicesUrls = {
   users: string;
   auth: string;
   posts: string;

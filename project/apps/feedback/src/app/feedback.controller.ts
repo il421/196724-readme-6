@@ -17,11 +17,10 @@ import {
   SWAGGER_TAGS,
   IPaginationQuery,
 } from '@project/core';
-import { CreateCommentDto } from './dtos';
+import { CreateCommentDto, CommentRdo } from '@project/feedback-lib';
 import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
-import { CommentRdo } from './rdos';
 import {
   DtoValidationPipe,
   FEEDBACK_PATHS,

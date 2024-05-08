@@ -14,6 +14,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get('application.port');
   const host = configService.get('application.host');
+  app.setGlobalPrefix(GLOBAL_PREFIX);
   buildSwagger(app, SWAGGER_TAGS.FILES);
   await app.listen(port);
   Logger.log(

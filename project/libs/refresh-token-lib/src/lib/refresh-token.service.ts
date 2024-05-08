@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RefreshTokenRepository } from './refresh-token.repository';
-import { IRefreshTokenPayload, jwtConfig } from '@project/core';
-import { ConfigType } from '@nestjs/config';
+import { IRefreshTokenPayload } from '@project/core';
+import { ConfigService } from '@nestjs/config';
 import { parseTime } from '@project/helpers';
 import { RefreshTokenEntity } from './refresh-token.entity';
 import dayjs from 'dayjs';
@@ -10,19 +10,19 @@ import dayjs from 'dayjs';
 export class RefreshTokenService {
   constructor(
     private readonly refreshTokenRepository: RefreshTokenRepository,
-    @Inject(jwtConfig.KEY)
-    private readonly jwtOptions: ConfigType<typeof jwtConfig>
+    private readonly configService: ConfigService
   ) {}
 
   public async createRefreshSession(payload: IRefreshTokenPayload) {
-    const timeValue = parseTime(this.jwtOptions.refreshTokenExpiresIn);
+    const timeValue = parseTime(
+      this.configService.get<string>('jwt.refreshTokenExpiresIn')!
+    );
     const refreshToken = new RefreshTokenEntity({
       tokenId: payload.tokenId,
       createdAt: new Date(),
       userId: payload.sub,
       expiresIn: dayjs().add(timeValue.value, timeValue.unit).toDate(),
     });
-
     return this.refreshTokenRepository.save(refreshToken);
   }
 

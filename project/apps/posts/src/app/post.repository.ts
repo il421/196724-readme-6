@@ -9,8 +9,11 @@ import {
   SortDirection,
 } from '@project/core';
 import { PrismaClientService } from '@project/prisma-client';
-import { DEFAULT_NUMBER_OF_POSTS, DEFAULT_PAGE } from './post.constants';
-import { SearchPostsQuery } from './serach-post.query';
+import {
+  DEFAULT_NUMBER_OF_POSTS,
+  DEFAULT_PAGE,
+  SearchPostsQuery,
+} from '@project/posts-lib';
 import { Prisma } from '.prisma/client';
 import { calculatePage, getSkipPages } from '@project/helpers';
 
@@ -27,7 +30,7 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     _count: { select: { comments: true, likes: true } },
   };
 
-  private async getPostCount(where: Prisma.PostWhereInput): Promise<number> {
+  public async getPostCount(where: Prisma.PostWhereInput): Promise<number> {
     return this.client.post.count({ where });
   }
 
@@ -60,7 +63,6 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
       state,
       types = [],
       title,
-      fromPublishDate,
       page = DEFAULT_PAGE,
       limit = DEFAULT_NUMBER_OF_POSTS,
       sortDirection = SortDirection.Desc,
@@ -76,7 +78,6 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     if (tags?.length) where.tags = { hasSome: tags };
     if (types?.length) where.type = { in: types };
     if (title) where.title = { contains: title };
-    if (fromPublishDate) where.publishedAt = { gte: fromPublishDate };
 
     const [documents, totalItems] = await Promise.all([
       this.client.post.findMany({
@@ -108,6 +109,27 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
       include: this.include,
     });
     return this.createEntityFromDocument(document);
+  }
+
+  public async findUsersPosts(usersIds: string[]) {
+    const documents = await this.client.post.findMany({
+      where: { createdBy: { in: usersIds }, state: PostState.Published },
+      orderBy: {
+        publishedAt: SortDirection.Desc,
+      },
+    });
+    return documents.map(this.createEntityFromDocument);
+  }
+
+  public async findPostsFromDate(date: Date) {
+    const documents = await this.client.post.findMany({
+      where: { publishedAt: { gte: date }, state: PostState.Published },
+      include: this.include,
+      orderBy: {
+        publishedAt: SortDirection.Desc,
+      },
+    });
+    return documents.map(this.createEntityFromDocument);
   }
 
   public delete(id: string) {

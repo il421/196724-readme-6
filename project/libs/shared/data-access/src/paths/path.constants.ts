@@ -32,18 +32,23 @@ export const POST_PATHS = {
   PUBLISH: 'publish/:id',
   REPOST: 'repost/:id',
   DELETE: 'delete/:id',
+  COUNT: 'count/:userId',
+  USERS: 'users',
 } as const;
 
 export const SUBSCRIPTIONS_PATHS = {
   BASE: 'subscriptions',
   SUBSCRIPTIONS: '/',
   CREATE: 'create',
+  CREATE_API: 'subscriptions/create',
   DELETE: 'delete/:authorId',
+  DELETE_API: 'subscriptions/delete/:authorId',
 } as const;
 
 export const USERS_PATHS = {
   BASE: 'users',
   USER: ':id',
+  DETAILS: 'details/:id',
   UPDATE_AVATAR: 'update-avatar',
   RECEIVE_LATEST_POSTS: 'receive-latest-posts',
 } as const;

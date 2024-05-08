@@ -12,6 +12,7 @@ export const SUCCESS_MESSAGES = {
   POST_REPOSTED: 'Post successfully re-posted',
   POST_LIKED: 'Post liked/un-liked',
   POST_DELETED: 'Post successfully deleted',
+  POST_USER_TOTAL: 'Total published users posts',
   COMMENT_CREATED: 'A new post comment is created',
   COMMENT_DELETED: 'Comment is deleted',
   SUBSCRIPTIONS: 'User subscriptions',

@@ -2,7 +2,6 @@ import {
   ConflictException,
   Injectable,
   BadRequestException,
-  UnauthorizedException,
   NotFoundException,
   HttpException,
   HttpStatus,
@@ -17,6 +16,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenService } from '@project/refresh-token-lib';
 import { createJWTPayload } from '@project/helpers';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class AuthenticationService {
@@ -48,7 +48,7 @@ export class AuthenticationService {
 
     if (!existUser) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
     if (!password || !(await existUser.comparePassword(password)))
-      throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
+      throw new BadRequestException(ERROR_MESSAGES.USER_BAD_PASSWORD);
 
     return existUser;
   }
@@ -58,7 +58,7 @@ export class AuthenticationService {
     if (!user) throw new NotFoundException(ERROR_MESSAGES.USER_NOT_FOUND);
 
     if (!payload.password || !(await user.comparePassword(payload.password))) {
-      throw new UnauthorizedException(ERROR_MESSAGES.USER_BAD_PASSWORD);
+      throw new BadRequestException(ERROR_MESSAGES.USER_BAD_PASSWORD);
     }
     const userEntity = new UserEntity(user.toPlainData());
     await userEntity.setPassword(payload.newPassword);
@@ -69,7 +69,7 @@ export class AuthenticationService {
     const accessTokenPayload = createJWTPayload(user);
     const refreshTokenPayload = {
       ...accessTokenPayload,
-      tokenId: crypto.randomUUID(),
+      tokenId: randomUUID(),
     };
     await this.refreshTokenService.createRefreshSession(refreshTokenPayload);
 
