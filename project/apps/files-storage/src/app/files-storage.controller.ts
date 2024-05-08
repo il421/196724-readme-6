@@ -30,11 +30,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import {
-  FIELD_NAME,
-  FileSwaggerSchema,
-  MIME_TYPE,
-} from './files-storage.constants';
-import {
   DtoValidationPipe,
   FILES_STORAGE_PATHS,
   JwtAuthGuard,
@@ -42,7 +37,12 @@ import {
 } from '@project/data-access';
 import { FilesStorageService } from './files-storage.service';
 
-import { FileRdo } from './rdos';
+import {
+  FIELD_NAME,
+  FileRdo,
+  FileSwaggerSchema,
+  MIME_TYPE,
+} from '@project/files-storage-lib';
 import { UploadFileValidator } from './validator';
 import { RequestWithUser } from '@project/users-lib';
 

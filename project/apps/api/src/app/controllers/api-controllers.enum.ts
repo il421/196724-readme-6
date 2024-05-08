@@ -1,3 +1,5 @@
 export enum ApiControllers {
-  Users = 'users',
+  Account = 'account',
+  Files = 'files',
+  Posts = 'posts',
 }

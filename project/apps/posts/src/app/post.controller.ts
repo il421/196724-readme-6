@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseArrayPipe,
   Post,
   Put,
   Query,
@@ -18,9 +19,13 @@ import {
   SortDirection,
   RabbitRouting,
 } from '@project/core';
-import { CreatePostDto, UpdatePostDto } from './dtos';
+import {
+  CreatePostDto,
+  UpdatePostDto,
+  FullPostRdo,
+  PostRdo,
+} from '@project/posts-lib';
 import { fillDto } from '@project/helpers';
-import { FullPostRdo, PostRdo } from './rdos';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
 import {
@@ -28,10 +33,13 @@ import {
   JwtAuthGuard,
   POST_PATHS,
 } from '@project/data-access';
-import { TagsTransformPipe } from './pipes';
+import {
+  TagsTransformPipe,
+  SearchPostsQuery,
+  PostSearchQueryTransformPipe,
+} from '@project/posts-lib';
 import { CreatePostValidator, UpdatePostValidator } from './validator';
-import { SearchPostsQuery } from './serach-post.query';
-import { PostSearchQueryTransformPipe } from './pipes';
+
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import {
   CreatePostsNotificationDto,
@@ -90,6 +98,22 @@ export class PostController {
         fillDto(PostRdo, post?.toPlainData())
       ),
     };
+  }
+
+  @Get(POST_PATHS.USERS)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    type: PostRdo,
+    description: SUCCESS_MESSAGES.POSTS,
+  })
+  @ApiQuery({ name: 'usersIds', required: false, type: Array<String> })
+  public async getUsersPosts(
+    @Query('usersIds', ParseArrayPipe)
+    usersIds?: string[]
+  ) {
+    const posts = await this.postService.findUsersPosts(usersIds);
+    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
   }
 
   @Get(POST_PATHS.DRAFTS)
@@ -257,16 +281,26 @@ export class PostController {
     return this.postService.delete(id, user.id);
   }
 
+  @Get(POST_PATHS.COUNT)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: Number,
+    description: SUCCESS_MESSAGES.POST_USER_TOTAL,
+  })
+  public count(@Param('userId') userId: string) {
+    return this.postService.count(userId);
+  }
+
   @RabbitSubscribe({
     exchange: RABBIT_EXCHANGE,
     routingKey: RabbitRouting.ReceiveLatestPosts,
   })
   public async receiveLatestPosts(subscriber: CreatePostsNotificationDto) {
-    const postsQueryResult = await this.postService.search({
-      fromPublishDate: subscriber.latestPostsEmailDate,
-    });
+    const postsEntities = await this.postService.findPostsFromDate(
+      subscriber.latestPostsEmailDate
+    );
 
-    const posts = postsQueryResult.entities.map((post) =>
+    const posts = postsEntities.map((post) =>
       fillDto(PostRdo, post?.toPlainData())
     );
 

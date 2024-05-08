@@ -3,7 +3,11 @@ import { ApiConfigModule } from './config';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { getHttpClientOptions } from '@project/core';
-import { UsersController } from './controllers';
+import {
+  AccountController,
+  FilesStorageController,
+  PostsController,
+} from './controllers';
 
 @Module({
   imports: [
@@ -13,7 +17,7 @@ import { UsersController } from './controllers';
       useFactory: getHttpClientOptions,
     }),
   ],
-  controllers: [UsersController],
+  controllers: [AccountController, PostsController, FilesStorageController],
   providers: [],
 })
 export class ApiModule {}

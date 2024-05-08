@@ -12,9 +12,18 @@ import {
 import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
 import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RequestWithUser, UpdateUserDto, UserRdo } from '@project/users-lib';
+import {
+  RequestWithUser,
+  UpdateUserAvatarDto,
+  UpdateUserDto,
+  UserRdo,
+} from '@project/users-lib';
 import { UsersService } from './users.service';
-import { JwtAuthGuard, USERS_PATHS } from '@project/data-access';
+import {
+  JwtAuthGuard,
+  MongoIdValidationPipe,
+  USERS_PATHS,
+} from '@project/data-access';
 import {
   CreatePostsNotificationDto,
   NotificationService,
@@ -40,7 +49,7 @@ export class UsersController {
     description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   public async getUser(
-    @Param('id')
+    @Param('id', MongoIdValidationPipe)
     id: string
   ) {
     const user = await this.usersService.getUser(id);
@@ -62,10 +71,10 @@ export class UsersController {
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
   public updateAvatar(
-    @Body() dto: Pick<UpdateUserDto, 'avatarUrl'>,
+    @Body() dto: UpdateUserAvatarDto,
     @Req() { user }: RequestWithUser
   ) {
-    return this.usersService.updateUser(user.id, { avatarUrl: dto.avatarUrl });
+    return this.usersService.updateUser(user.id, { avatarId: dto.avatarId });
   }
 
   @Post(USERS_PATHS.RECEIVE_LATEST_POSTS)

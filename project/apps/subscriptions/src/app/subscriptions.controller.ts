@@ -10,11 +10,13 @@ import {
   Req,
 } from '@nestjs/common';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
-import { CreateSubscriptionDto } from './dtos';
+import {
+  CreateSubscriptionDto,
+  SubscriptionRdo,
+} from '@project/subscriptions-lib';
 import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
-import { SubscriptionRdo } from './rdos';
 import { JwtAuthGuard, SUBSCRIPTIONS_PATHS } from '@project/data-access';
 import { RequestWithUser } from '@project/users-lib';
 
