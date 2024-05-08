@@ -7,7 +7,6 @@ import {
   Post,
   HttpStatus,
   UseGuards,
-  UsePipes,
   Query,
   Req,
 } from '@nestjs/common';
@@ -21,12 +20,7 @@ import { CreateCommentDto, CommentRdo } from '@project/feedback-lib';
 import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FeedbackService } from './feedback.service';
-import {
-  DtoValidationPipe,
-  FEEDBACK_PATHS,
-  JwtAuthGuard,
-} from '@project/data-access';
-import { CreateCommentValidator } from './validator';
+import { FEEDBACK_PATHS, JwtAuthGuard } from '@project/data-access';
 import { CommentsSearchQueryTransformPipe } from './pipes';
 import { RequestWithUser } from '@project/users-lib';
 
