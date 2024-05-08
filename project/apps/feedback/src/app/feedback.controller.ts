@@ -114,7 +114,6 @@ export class FeedbackController {
 
   @Post(FEEDBACK_PATHS.LIKE_CREATE)
   @UseGuards(JwtAuthGuard)
-  @UsePipes(new DtoValidationPipe<CreateCommentDto>(CreateCommentValidator))
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: SUCCESS_MESSAGES.COMMENT_CREATED,
