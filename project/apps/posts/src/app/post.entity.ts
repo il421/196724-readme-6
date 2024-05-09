@@ -19,6 +19,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
   public text: string;
   public quoteAuthor: string;
   public url: string;
+  public photoId: string;
   public description: string;
   public announcement: string;
   public commentsCount?: number;
@@ -39,6 +40,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       publishedAt,
       text,
       url,
+      photoId,
       description,
       quoteAuthor,
       announcement,
@@ -57,6 +59,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
 
     this.text = text;
     this.url = url;
+    this.photoId = photoId;
     this.description = description;
     this.quoteAuthor = quoteAuthor;
     this.announcement = announcement;
@@ -79,6 +82,7 @@ export class PostEntity extends Entity implements IStorableEntity<Post> {
       publishedAt: this.publishedAt,
       text: this.text,
       url: this.url,
+      photoId: this.photoId,
       description: this.description,
       quoteAuthor: this.quoteAuthor,
       announcement: this.announcement,

@@ -107,6 +107,16 @@ export class PostRdo {
   url!: string;
 
   @ApiProperty({
+    example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
+    description: 'System photo file reference identification',
+  })
+  @Expose()
+  @Transform(({ value, obj }) =>
+    obj.type === PostType.Photo ? value : undefined
+  )
+  photoId?: string;
+
+  @ApiProperty({
     example: 'Interesting post',
     description: 'Ref post description',
   })

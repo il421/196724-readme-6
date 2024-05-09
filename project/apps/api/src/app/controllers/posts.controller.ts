@@ -19,6 +19,7 @@ import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   IPaginationQuery,
   PaginationResult,
+  PostType,
   ServicesUrls,
   SortDirection,
   SUCCESS_MESSAGES,
@@ -34,6 +35,7 @@ import {
 } from '@project/posts-lib';
 import { stringify } from 'query-string';
 import { CommentRdo, CreateCommentDto } from '@project/feedback-lib';
+import { FileRdo } from '@project/files-storage-lib';
 
 @Controller(ApiControllers.Posts)
 @UseFilters(AxiosExceptionFilter)
@@ -90,29 +92,42 @@ export class PostsController {
   ): Promise<PaginationResult<PostRdo>> {
     const queryRequest = stringify(query);
 
-    return (
+    const posts = (
       await this.httpService.axiosRef.get<PaginationResult<PostRdo>>(
         `${this.serviceUrls.posts}/${POST_PATHS.SEARCH}?${queryRequest}`
       )
     ).data;
+
+    const { entities, ...restPost } = posts;
+    const newEntities = await Promise.all(
+      posts.entities.map(this.withPhotoUrl)
+    );
+    return { ...restPost, entities: newEntities };
   }
   @Get(POST_PATHS.DRAFTS)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
   public async drafts(): Promise<PaginationResult<PostRdo>> {
-    return (
+    const posts = (
       await this.httpService.axiosRef.get<PaginationResult<PostRdo>>(
         `${this.serviceUrls.posts}/${POST_PATHS.DRAFTS}`
       )
     ).data;
+
+    const { entities, ...restPost } = posts;
+    const newEntities = await Promise.all(
+      posts.entities.map(this.withPhotoUrl)
+    );
+    return { ...restPost, entities: newEntities };
   }
 
   @Get(POST_PATHS.POST)
   public async getPost(@Param('id') id: string): Promise<PostRdo> {
-    return (
+    const post = (
       await this.httpService.axiosRef.get<PostRdo>(
         `${this.serviceUrls.posts}/${id}`
       )
     ).data;
+    return this.withPhotoUrl(post);
   }
 
   @Post(POST_PATHS.CREATE)
@@ -121,12 +136,13 @@ export class PostsController {
     @Body()
     dto: CreatePostDto
   ): Promise<PostRdo> {
-    return (
+    const post = (
       await this.httpService.axiosRef.post<PostRdo>(
         `${this.serviceUrls.posts}/${POST_PATHS.CREATE}`,
         dto
       )
     ).data;
+    return this.withPhotoUrl(post);
   }
 
   @Put(POST_PATHS.UPDATE)
@@ -136,39 +152,42 @@ export class PostsController {
     @Body()
     dto: UpdatePostDto
   ): Promise<PostRdo> {
-    return (
+    const post = (
       await this.httpService.axiosRef.put<PostRdo>(
         `${this.serviceUrls.posts}/update/${id}`,
         dto
       )
     ).data;
+    return this.withPhotoUrl(post);
   }
 
   @Put(POST_PATHS.PUBLISH)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
   public async publish(@Param('id') id: string): Promise<PostRdo> {
-    return (
+    const post = (
       await this.httpService.axiosRef.put<PostRdo>(
         `${this.serviceUrls.posts}/publish/${id}`
       )
     ).data;
+    return this.withPhotoUrl(post);
   }
 
   @Post(POST_PATHS.REPOST)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
   public async repost(@Param('id') id: string): Promise<PostRdo> {
-    return (
+    const post = (
       await this.httpService.axiosRef.post<PostRdo>(
         `${this.serviceUrls.posts}/repost/${id}`
       )
     ).data;
+    return this.withPhotoUrl(post);
   }
 
   @Delete(POST_PATHS.DELETE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
-  public async delete(@Param('id') id: string): Promise<PostRdo> {
+  public async delete(@Param('id') id: string): Promise<void> {
     return (
-      await this.httpService.axiosRef.delete<PostRdo>(
+      await this.httpService.axiosRef.delete<void>(
         `${this.serviceUrls.posts}/delete/${id}`
       )
     ).data;
@@ -237,4 +256,14 @@ export class PostsController {
       )
     ).data;
   }
+
+  private withPhotoUrl = async (post: PostRdo): Promise<PostRdo> => {
+    if (post.type !== PostType.Photo || !post.photoId) return post;
+    const { photoId, ...restPost } = post;
+    const file = await this.httpService.axiosRef.get<FileRdo>(
+      `${this.serviceUrls.filesStorage}/${post.photoId}`
+    );
+
+    return { ...restPost, url: file.data.path };
+  };
 }
