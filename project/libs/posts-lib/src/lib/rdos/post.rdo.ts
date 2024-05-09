@@ -64,6 +64,27 @@ export class PostRdo {
   publishedBy!: string;
 
   @ApiProperty({
+    example: 'Author email',
+    description: 'test@test.com',
+  })
+  @Expose()
+  authorEmail!: string;
+
+  @ApiProperty({
+    example: 'Author first name',
+    description: 'Ilya',
+  })
+  @Expose()
+  authorFirstName!: string;
+
+  @ApiProperty({
+    example: 'Author last name',
+    description: 'Suglobov',
+  })
+  @Expose()
+  authorLastName!: string;
+
+  @ApiProperty({
     example: '2012-12-22',
     description: 'Post publish data',
   })

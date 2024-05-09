@@ -22,4 +22,8 @@ export type Post = ChangeLog & {
 
   likesCount?: number;
   commentsCount?: number;
+
+  authorEmail?: string;
+  authorFirstName?: string;
+  authorLastName?: string;
 };
