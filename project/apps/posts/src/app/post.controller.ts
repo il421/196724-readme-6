@@ -277,8 +277,12 @@ export class PostController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public delete(@Param('id') id: string, @Req() { user }: RequestWithUser) {
-    return this.postService.delete(id, user.id);
+  public async delete(
+    @Param('id') id: string,
+    @Req() { user }: RequestWithUser
+  ) {
+    const postEntity = await this.postService.delete(id, user.id);
+    return fillDto(PostRdo, postEntity.toPlainData());
   }
 
   @Get(POST_PATHS.COUNT)

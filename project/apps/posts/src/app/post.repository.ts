@@ -132,9 +132,10 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
     return documents.map(this.createEntityFromDocument);
   }
 
-  public delete(id: string) {
-    return this.client.post.delete({
+  public async delete(id: string) {
+    const deletePost = await this.client.post.delete({
       where: { id },
     });
+    return this.createEntityFromDocument(deletePost);
   }
 }

@@ -92,7 +92,7 @@ export class PostService {
     });
   }
 
-  public async delete(id: string, userId: string): Promise<void> {
+  public async delete(id: string, userId: string): Promise<PostEntity> {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
 
@@ -100,7 +100,7 @@ export class PostService {
     const isRepost: boolean = post.isRepost && post.publishedBy === userId;
 
     if (isOwnPost || isRepost) {
-      return void (await this.postRepository.delete(id));
+      return this.postRepository.delete(id);
     }
     throw new BadRequestException(ERROR_MESSAGES.POST_DELETE);
   }

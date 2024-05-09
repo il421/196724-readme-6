@@ -36,6 +36,7 @@ import {
 import { stringify } from 'query-string';
 import { CommentRdo, CreateCommentDto } from '@project/feedback-lib';
 import { FileRdo } from '@project/files-storage-lib';
+import { UserRdo } from '@project/users-lib';
 
 @Controller(ApiControllers.Posts)
 @UseFilters(AxiosExceptionFilter)
@@ -100,7 +101,7 @@ export class PostsController {
 
     const { entities, ...restPost } = posts;
     const newEntities = await Promise.all(
-      posts.entities.map(this.withPhotoUrl)
+      posts.entities.map(this.withExtraData)
     );
     return { ...restPost, entities: newEntities };
   }
@@ -115,7 +116,7 @@ export class PostsController {
 
     const { entities, ...restPost } = posts;
     const newEntities = await Promise.all(
-      posts.entities.map(this.withPhotoUrl)
+      posts.entities.map(this.withExtraData)
     );
     return { ...restPost, entities: newEntities };
   }
@@ -127,7 +128,7 @@ export class PostsController {
         `${this.serviceUrls.posts}/${id}`
       )
     ).data;
-    return this.withPhotoUrl(post);
+    return this.withExtraData(post);
   }
 
   @Post(POST_PATHS.CREATE)
@@ -142,7 +143,7 @@ export class PostsController {
         dto
       )
     ).data;
-    return this.withPhotoUrl(post);
+    return this.withExtraData(post);
   }
 
   @Put(POST_PATHS.UPDATE)
@@ -158,7 +159,7 @@ export class PostsController {
         dto
       )
     ).data;
-    return this.withPhotoUrl(post);
+    return this.withExtraData(post);
   }
 
   @Put(POST_PATHS.PUBLISH)
@@ -169,7 +170,7 @@ export class PostsController {
         `${this.serviceUrls.posts}/publish/${id}`
       )
     ).data;
-    return this.withPhotoUrl(post);
+    return this.withExtraData(post);
   }
 
   @Post(POST_PATHS.REPOST)
@@ -180,17 +181,23 @@ export class PostsController {
         `${this.serviceUrls.posts}/repost/${id}`
       )
     ).data;
-    return this.withPhotoUrl(post);
+    return this.withExtraData(post);
   }
 
   @Delete(POST_PATHS.DELETE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
   public async delete(@Param('id') id: string): Promise<void> {
-    return (
-      await this.httpService.axiosRef.delete<void>(
+    const deletedPost = (
+      await this.httpService.axiosRef.delete<PostRdo>(
         `${this.serviceUrls.posts}/delete/${id}`
       )
     ).data;
+
+    if (deletedPost.type === PostType.Photo && deletedPost.photoId) {
+      await this.httpService.axiosRef.delete<PostRdo>(
+        `${this.serviceUrls.filesStorage}/${deletedPost.photoId}/delete`
+      );
+    }
   }
 
   @Get(FEEDBACK_PATHS.COMMENTS)
@@ -257,13 +264,28 @@ export class PostsController {
     ).data;
   }
 
-  private withPhotoUrl = async (post: PostRdo): Promise<PostRdo> => {
-    if (post.type !== PostType.Photo || !post.photoId) return post;
+  private withExtraData = async (post: PostRdo): Promise<PostRdo> => {
+    const user = await this.httpService.axiosRef.get<UserRdo>(
+      `${this.serviceUrls.users}/${post.createdBy}`
+    );
+
     const { photoId, ...restPost } = post;
+
+    const dto = {
+      ...restPost,
+      authorEmail: user.data.email,
+      authorFirstName: user.data.firstName,
+      authorLastName: user.data.lastName,
+    };
+
+    if (post.type !== PostType.Photo || !photoId) return dto;
     const file = await this.httpService.axiosRef.get<FileRdo>(
       `${this.serviceUrls.filesStorage}/${post.photoId}`
     );
 
-    return { ...restPost, url: file.data.path };
+    return {
+      ...dto,
+      url: file.data.path,
+    };
   };
 }
