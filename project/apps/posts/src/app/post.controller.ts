@@ -3,41 +3,50 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpStatus,
   Param,
+  ParseArrayPipe,
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
   SWAGGER_TAGS,
   SUCCESS_MESSAGES,
-  IHeaders,
-  ITokenPayload,
   SortDirection,
   RabbitRouting,
 } from '@project/core';
-import { CreatePostDto, UpdatePostDto } from './dtos';
-import { fillDto, getToken } from '@project/helpers';
-import { FullPostRdo, PostRdo } from './rdos';
+import {
+  CreatePostDto,
+  UpdatePostDto,
+  FullPostRdo,
+  PostRdo,
+} from '@project/posts-lib';
+import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostService } from './post.service';
-import { JwtService } from '@nestjs/jwt';
-import { DtoValidationPipe, JwtAuthGuard } from '@project/data-access';
-import { TagsTransformPipe } from './pipes';
+import {
+  DtoValidationPipe,
+  JwtAuthGuard,
+  POST_PATHS,
+} from '@project/data-access';
+import {
+  TagsTransformPipe,
+  SearchPostsQuery,
+  PostSearchQueryTransformPipe,
+} from '@project/posts-lib';
 import { CreatePostValidator, UpdatePostValidator } from './validator';
-import { SearchPostsQuery } from './serach-post.query';
-import { PostSearchQueryTransformPipe } from './pipes';
-import { POST_PATHS } from './post.constants';
+
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import {
   CreatePostsNotificationDto,
   NotificationService,
   RABBIT_EXCHANGE,
 } from '@project/notification-lib';
+import { RequestWithUser } from '@project/users-lib';
 
 @ApiTags(SWAGGER_TAGS.POSTS)
 @ApiBearerAuth()
@@ -45,7 +54,6 @@ import {
 export class PostController {
   constructor(
     private readonly postService: PostService,
-    private readonly jwtService: JwtService,
     private readonly notificationService: NotificationService
   ) {}
 
@@ -92,6 +100,22 @@ export class PostController {
     };
   }
 
+  @Get(POST_PATHS.USERS)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    type: PostRdo,
+    description: SUCCESS_MESSAGES.POSTS,
+  })
+  @ApiQuery({ name: 'usersIds', required: false, type: Array<String> })
+  public async getUsersPosts(
+    @Query('usersIds', ParseArrayPipe)
+    usersIds?: string[]
+  ) {
+    const posts = await this.postService.findUsersPosts(usersIds);
+    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
+  }
+
   @Get(POST_PATHS.DRAFTS)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
@@ -104,9 +128,8 @@ export class PostController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async getDraftPosts(@Headers() headers: IHeaders) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const postsQueryResult = await this.postService.getDrafts(sub);
+  public async getDraftPosts(@Req() { user }: RequestWithUser) {
+    const postsQueryResult = await this.postService.getDrafts(user.id);
     return {
       ...postsQueryResult,
       entities: postsQueryResult.entities.map((post) =>
@@ -147,11 +170,10 @@ export class PostController {
       new DtoValidationPipe<CreatePostDto>(CreatePostValidator)
     )
     dto: CreatePostDto,
-    @Headers() headers: IHeaders
+    @Req() { user }: RequestWithUser
   ) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
     const payload = fillDto(CreatePostDto, dto);
-    const newPost = await this.postService.create(sub, payload);
+    const newPost = await this.postService.create(user.id, payload);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
@@ -177,10 +199,9 @@ export class PostController {
       new DtoValidationPipe<UpdatePostDto>(UpdatePostValidator)
     )
     dto: UpdatePostDto,
-    @Headers() headers: IHeaders
+    @Req() { user }: RequestWithUser
   ) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const newPost = await this.postService.update(sub, id, dto);
+    const newPost = await this.postService.update(user.id, id, dto);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
@@ -207,9 +228,11 @@ export class PostController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async publish(@Param('id') id: string, @Headers() headers: IHeaders) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const newPost = await this.postService.publish(id, sub);
+  public async publish(
+    @Param('id') id: string,
+    @Req() { user }: RequestWithUser
+  ) {
+    const newPost = await this.postService.publish(id, user.id);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
@@ -228,16 +251,19 @@ export class PostController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async repost(@Param('id') id: string, @Headers() headers: IHeaders) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const newPost = await this.postService.repost(id, sub);
+  public async repost(
+    @Param('id') id: string,
+    @Req() { user }: RequestWithUser
+  ) {
+    const newPost = await this.postService.repost(id, user.id);
     return fillDto(PostRdo, newPost.toPlainData());
   }
 
   @Delete(POST_PATHS.DELETE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
-    status: HttpStatus.NO_CONTENT,
+    status: HttpStatus.OK,
+    type: PostRdo,
     description: SUCCESS_MESSAGES.POST_DELETED,
   })
   @ApiResponse({
@@ -252,9 +278,22 @@ export class PostController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public delete(@Param('id') id: string, @Headers() headers: IHeaders) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    return this.postService.delete(id, sub);
+  public async delete(
+    @Param('id') id: string,
+    @Req() { user }: RequestWithUser
+  ) {
+    const postEntity = await this.postService.delete(id, user.id);
+    return fillDto(PostRdo, postEntity.toPlainData());
+  }
+
+  @Get(POST_PATHS.COUNT)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: Number,
+    description: SUCCESS_MESSAGES.POST_USER_TOTAL,
+  })
+  public count(@Param('userId') userId: string) {
+    return this.postService.count(userId);
   }
 
   @RabbitSubscribe({
@@ -262,11 +301,11 @@ export class PostController {
     routingKey: RabbitRouting.ReceiveLatestPosts,
   })
   public async receiveLatestPosts(subscriber: CreatePostsNotificationDto) {
-    const postsQueryResult = await this.postService.search({
-      fromPublishDate: subscriber.latestPostsEmailDate,
-    });
+    const postsEntities = await this.postService.findPostsFromDate(
+      subscriber.latestPostsEmailDate
+    );
 
-    const posts = postsQueryResult.entities.map((post) =>
+    const posts = postsEntities.map((post) =>
       fillDto(PostRdo, post?.toPlainData())
     );
 

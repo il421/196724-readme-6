@@ -1,0 +1,9 @@
+{
+  "name": "refresh-token-lib",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/refresh-token-lib/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project refresh-token-lib --web",
+  "targets": {}
+}

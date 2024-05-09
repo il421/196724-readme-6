@@ -14,6 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create(PostModule);
   const configService = app.get(ConfigService);
   const port = configService.get('application.port');
+  app.setGlobalPrefix(GLOBAL_PREFIX);
   buildSwagger(app, SWAGGER_TAGS.POSTS);
   await app.listen(port);
   Logger.log(

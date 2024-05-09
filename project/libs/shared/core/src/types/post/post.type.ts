@@ -14,6 +14,7 @@ export type Post = ChangeLog & {
   text?: string;
   announcement?: string;
   url?: string;
+  photoId?: string;
   quoteAuthor?: string;
   description?: string;
 
@@ -21,4 +22,8 @@ export type Post = ChangeLog & {
 
   likesCount?: number;
   commentsCount?: number;
+
+  authorEmail?: string;
+  authorFirstName?: string;
+  authorLastName?: string;
 };

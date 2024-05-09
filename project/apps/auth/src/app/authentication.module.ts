@@ -12,7 +12,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { getJwtOptions, getMongooseOptions } from '@project/core';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { JwtAccessStrategy } from '@project/data-access';
+import { JwtAccessStrategy, JwtRefreshStrategy } from '@project/data-access';
+import { LocalStrategy } from './strategies/local.strategy';
+import { RefreshTokenModule } from '@project/refresh-token-lib';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import { JwtAccessStrategy } from '@project/data-access';
     }),
     MongooseModule.forRootAsync(getMongooseOptions()),
     MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
+    RefreshTokenModule,
   ],
   controllers: [AuthenticationController],
   providers: [
@@ -30,6 +33,8 @@ import { JwtAccessStrategy } from '@project/data-access';
     UserRepository,
     UserFactory,
     JwtAccessStrategy,
+    LocalStrategy,
+    JwtRefreshStrategy,
   ],
 })
 export class AuthenticationModule {}

@@ -4,12 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreatePostDto, UpdatePostDto } from './dtos';
+import { CreatePostDto, UpdatePostDto } from '@project/posts-lib';
 import { ERROR_MESSAGES, PaginationResult, PostState } from '@project/core';
 import { PostRepository } from './post.repository';
 import { PostEntity } from './post.entity';
 import { fillDto } from '@project/helpers';
-import { SearchPostsQuery } from './serach-post.query';
+import { SearchPostsQuery } from '@project/posts-lib';
 
 @Injectable()
 export class PostService {
@@ -69,6 +69,14 @@ export class PostService {
     return this.postRepository.findPosts(args);
   }
 
+  public findUsersPosts(usersIds: string[]): Promise<PostEntity[]> {
+    return this.postRepository.findUsersPosts(usersIds);
+  }
+
+  public findPostsFromDate(date: Date): Promise<PostEntity[]> {
+    return this.postRepository.findPostsFromDate(date);
+  }
+
   public async getPost(id: string): Promise<PostEntity> {
     const post = this.postRepository.findById(id);
     if (!post) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
@@ -84,7 +92,7 @@ export class PostService {
     });
   }
 
-  public async delete(id: string, userId: string): Promise<void> {
+  public async delete(id: string, userId: string): Promise<PostEntity> {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
 
@@ -92,8 +100,12 @@ export class PostService {
     const isRepost: boolean = post.isRepost && post.publishedBy === userId;
 
     if (isOwnPost || isRepost) {
-      return void (await this.postRepository.delete(id));
+      return this.postRepository.delete(id);
     }
     throw new BadRequestException(ERROR_MESSAGES.POST_DELETE);
+  }
+
+  public count(userId: string): Promise<number> {
+    return this.postRepository.getPostCount({ createdBy: userId });
   }
 }

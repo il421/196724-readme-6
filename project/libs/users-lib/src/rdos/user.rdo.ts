@@ -31,6 +31,13 @@ export class UserRdo {
   readonly lastName!: string;
 
   @ApiProperty({
+    description: 'User avatar Id',
+    example: "c3c05894-c1a9-422d-8752-4dc83b27b7b3'",
+  })
+  @Expose()
+  avatarId?: string;
+
+  @ApiProperty({
     description: 'User avatar url',
     example: 'https://avatars.githubusercontent.com/u/a.png',
   })

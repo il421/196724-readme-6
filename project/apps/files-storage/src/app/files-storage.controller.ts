@@ -2,11 +2,11 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpStatus,
   Param,
   Post,
   Query,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -14,12 +14,10 @@ import {
 import {
   ERROR_MESSAGES,
   FilesTypes,
-  IHeaders,
-  ITokenPayload,
   SUCCESS_MESSAGES,
   SWAGGER_TAGS,
 } from '@project/core';
-import { fillDto, getToken } from '@project/helpers';
+import { fillDto } from '@project/helpers';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -32,30 +30,27 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import {
-  FIELD_NAME,
-  FILES_STORAGE_PATHS,
-  FileSwaggerSchema,
-  MIME_TYPE,
-} from './files-storage.constants';
-import { JwtService } from '@nestjs/jwt';
-import {
   DtoValidationPipe,
+  FILES_STORAGE_PATHS,
   JwtAuthGuard,
   MongoIdValidationPipe,
 } from '@project/data-access';
 import { FilesStorageService } from './files-storage.service';
 
-import { FileRdo } from './rdos';
-import { UploadFileValidator, UploadPhotoValidator } from './validator';
+import {
+  FIELD_NAME,
+  FileRdo,
+  FileSwaggerSchema,
+  MIME_TYPE,
+} from '@project/files-storage-lib';
+import { UploadFileValidator } from './validator';
+import { RequestWithUser } from '@project/users-lib';
 
 @ApiTags(SWAGGER_TAGS.FILES)
 @ApiBearerAuth()
 @Controller(FILES_STORAGE_PATHS.BASE)
 export class FilesStorageController {
-  constructor(
-    private readonly filesStorageService: FilesStorageService,
-    private readonly jwtService: JwtService
-  ) {}
+  constructor(private readonly filesStorageService: FilesStorageService) {}
 
   @Post(FILES_STORAGE_PATHS.UPLOAD)
   @UseGuards(JwtAuthGuard)
@@ -86,10 +81,9 @@ export class FilesStorageController {
     )
     file: Express.Multer.File,
     @Query('type') type: FilesTypes,
-    @Headers() headers: IHeaders
+    @Req() { user }: RequestWithUser
   ) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    const newFile = await this.filesStorageService.upload(file, sub, type);
+    const newFile = await this.filesStorageService.upload(file, user.id, type);
     return fillDto(FileRdo, newFile.toPlainData());
   }
 

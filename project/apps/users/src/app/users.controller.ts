@@ -6,23 +6,24 @@ import {
   Patch,
   Body,
   UseGuards,
-  Headers,
   Post,
+  Req,
 } from '@nestjs/common';
-import {
-  ERROR_MESSAGES,
-  IHeaders,
-  ITokenPayload,
-  SUCCESS_MESSAGES,
-  SWAGGER_TAGS,
-} from '@project/core';
-import { fillDto, getToken } from '@project/helpers';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SWAGGER_TAGS } from '@project/core';
+import { fillDto } from '@project/helpers';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UpdateUserDto, UserRdo } from '@project/users-lib';
+import {
+  RequestWithUser,
+  UpdateUserAvatarDto,
+  UpdateUserDto,
+  UserRdo,
+} from '@project/users-lib';
 import { UsersService } from './users.service';
-import { USERS_PATHS } from './users.constants';
-import { JwtAuthGuard } from '@project/data-access';
-import { JwtService } from '@nestjs/jwt';
+import {
+  JwtAuthGuard,
+  MongoIdValidationPipe,
+  USERS_PATHS,
+} from '@project/data-access';
 import {
   CreatePostsNotificationDto,
   NotificationService,
@@ -34,7 +35,6 @@ import {
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService,
     private readonly notificationService: NotificationService
   ) {}
 
@@ -49,7 +49,7 @@ export class UsersController {
     description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
   public async getUser(
-    @Param('id')
+    @Param('id', MongoIdValidationPipe)
     id: string
   ) {
     const user = await this.usersService.getUser(id);
@@ -71,11 +71,10 @@ export class UsersController {
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
   public updateAvatar(
-    @Body() dto: Pick<UpdateUserDto, 'avatarUrl'>,
-    @Headers() headers: IHeaders
+    @Body() dto: UpdateUserAvatarDto,
+    @Req() { user }: RequestWithUser
   ) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-    return this.usersService.updateUser(sub, { avatarUrl: dto.avatarUrl });
+    return this.usersService.updateUser(user.id, { avatarId: dto.avatarId });
   }
 
   @Post(USERS_PATHS.RECEIVE_LATEST_POSTS)
@@ -92,21 +91,19 @@ export class UsersController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async receiveLatestPosts(@Headers() headers: IHeaders) {
-    const { sub } = this.jwtService.decode<ITokenPayload>(getToken(headers));
-
-    const user = await this.usersService.getUser(sub);
-    const name: string = `${user.firstName} ${user.lastName}`;
+  public async receiveLatestPosts(@Req() { user }: RequestWithUser) {
+    const userEntity = await this.usersService.getUser(user.id);
+    const name: string = `${userEntity.firstName} ${userEntity.lastName}`;
     const payload: CreatePostsNotificationDto = {
-      id: user.id,
+      id: userEntity.id,
       name,
-      email: user.email,
-      latestPostsEmailDate: user.latestPostsEmailDate,
+      email: userEntity.email,
+      latestPostsEmailDate: userEntity.latestPostsEmailDate,
     };
 
     const isSent = await this.notificationService.receiveLatestPosts(payload);
     if (isSent)
-      await this.usersService.updateUser(sub, {
+      await this.usersService.updateUser(user.id, {
         latestPostsEmailDate: new Date(),
       });
   }

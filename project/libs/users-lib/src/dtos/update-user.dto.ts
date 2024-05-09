@@ -20,10 +20,10 @@ export class UpdateUserDto {
   public lastName?: string;
 
   @ApiProperty({
-    description: 'Avatar path',
-    example: 'https://docs.nestjs.com/openapi/introduction',
+    description: 'Avatar ID (reference)',
+    example: 'c3c05894-c1a9-422d-8752-4dc83b27b7b3',
   })
-  public avatarUrl?: string;
+  public avatarId?: string;
 
   @ApiProperty({
     description: 'Last newsletter data',

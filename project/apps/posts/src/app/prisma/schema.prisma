@@ -31,6 +31,7 @@ model Post {
   announcement String?
   text         String?
   url          String?
+  photoId      String?
   quoteAuthor  String?
   description  String?
 

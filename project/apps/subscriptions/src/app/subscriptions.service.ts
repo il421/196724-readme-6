@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateSubscriptionDto } from './dtos';
+import { CreateSubscriptionDto } from '@project/subscriptions-lib';
 import { SubscriptionsRepository } from './subscriptions.repository';
 import { SubscriptionsEntity } from './subscriptions.entity';
 import { ERROR_MESSAGES } from '@project/core';
@@ -23,7 +23,6 @@ export class SubscriptionsService {
     const existingSubscription =
       await this.subscriptionsRepository.findByAuthorId(userId, dto.authorId);
     if (!existingSubscription) {
-      // @TODO check for author
       const subEntity = new SubscriptionsEntity({ ...dto, createdBy: userId });
       await this.subscriptionsRepository.save(subEntity);
       return subEntity;
