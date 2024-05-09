@@ -23,7 +23,6 @@ export class SubscriptionsService {
     const existingSubscription =
       await this.subscriptionsRepository.findByAuthorId(userId, dto.authorId);
     if (!existingSubscription) {
-      // @TODO check for author
       const subEntity = new SubscriptionsEntity({ ...dto, createdBy: userId });
       await this.subscriptionsRepository.save(subEntity);
       return subEntity;

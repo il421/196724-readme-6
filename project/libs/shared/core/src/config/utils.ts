@@ -9,7 +9,7 @@ import { ObjectSchema } from 'joi';
 import { resolve } from 'node:path';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { AsyncModuleConfig } from '@golevelup/nestjs-modules';
-import { MailerAsyncOptions } from '@nestjs-modules/mailer/dist/interfaces/mailer-async-options.interface'; // @TODO
+import { MailerAsyncOptions } from '@nestjs-modules/mailer/dist/interfaces/mailer-async-options.interface';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { HttpModuleOptions } from '@nestjs/axios';
 
