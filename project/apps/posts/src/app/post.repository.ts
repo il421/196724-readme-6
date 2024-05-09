@@ -85,11 +85,17 @@ export class PostRepository extends PostgresRepository<PostEntity, Post> {
         take,
         skip,
         include: this.include,
-        orderBy: {
-          publishedAt: sortDirection,
-          // likes: { _count: SortDirection.Asc }, // @TODO I am getting an error for some reason in here
-          // comments: { _count: SortDirection.Asc }, // @TODO I am getting an error for some reason in here
-        },
+        orderBy: [
+          {
+            publishedAt: sortDirection,
+          },
+          {
+            likes: { _count: SortDirection.Desc },
+          },
+          {
+            comments: { _count: SortDirection.Desc },
+          },
+        ],
       }),
       this.getPostCount(where),
     ]);
