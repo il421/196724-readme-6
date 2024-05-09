@@ -68,15 +68,18 @@ export const CreatePostValidator = Joi.object({
   }),
   url: Joi.when('type', [
     {
-      is: PostType.Photo,
-      then: Joi.string().required(),
-    },
-    {
       is: PostType.Video,
       then: Joi.string().required(),
     },
     {
       is: PostType.Ref,
+      then: Joi.string().required(),
+    },
+  ]),
+
+  photoId: Joi.when('type', [
+    {
+      is: PostType.Photo,
       then: Joi.string().required(),
     },
   ]),

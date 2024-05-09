@@ -14,6 +14,7 @@ export type Post = ChangeLog & {
   text?: string;
   announcement?: string;
   url?: string;
+  photoId?: string;
   quoteAuthor?: string;
   description?: string;
 

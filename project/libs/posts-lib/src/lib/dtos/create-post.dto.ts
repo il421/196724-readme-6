@@ -47,6 +47,10 @@ export class CreatePostDto {
   )
   public url!: string;
 
+  @Expose()
+  @Transform(({ value, obj }) => (obj.type === PostType.Photo ? value : null))
+  public photoId!: string;
+
   @ApiProperty({
     example: 'My perfect reference post description',
     description: 'Post description (for Ref type only)',
