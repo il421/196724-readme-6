@@ -17,6 +17,7 @@ import { ApiControllers } from './api-controllers.enum';
 import { FEEDBACK_PATHS, POST_PATHS } from '@project/data-access';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
+  ERROR_MESSAGES,
   IPaginationQuery,
   PaginationResult,
   PostType,
@@ -107,6 +108,16 @@ export class PostsController {
   }
   @Get(POST_PATHS.DRAFTS)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: PostRdo,
+    isArray: true,
+    description: SUCCESS_MESSAGES.POSTS,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async drafts(): Promise<PaginationResult<PostRdo>> {
     const posts = (
       await this.httpService.axiosRef.get<PaginationResult<PostRdo>>(
@@ -122,6 +133,15 @@ export class PostsController {
   }
 
   @Get(POST_PATHS.POST)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: PostRdo,
+    description: SUCCESS_MESSAGES.POSTS,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
+  })
   public async getPost(@Param('id') id: string): Promise<PostRdo> {
     const post = (
       await this.httpService.axiosRef.get<PostRdo>(
@@ -133,6 +153,15 @@ export class PostsController {
 
   @Post(POST_PATHS.CREATE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: PostRdo,
+    description: SUCCESS_MESSAGES.POST_CREATED,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async create(
     @Body()
     dto: CreatePostDto
@@ -148,6 +177,19 @@ export class PostsController {
 
   @Put(POST_PATHS.UPDATE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: PostRdo,
+    description: SUCCESS_MESSAGES.POST_UPDATED,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async update(
     @Param('id') id: string,
     @Body()
@@ -164,6 +206,27 @@ export class PostsController {
 
   @Put(POST_PATHS.PUBLISH)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: PostRdo,
+    description: SUCCESS_MESSAGES.POST_PUBLISHED,
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: ERROR_MESSAGES.POST_UPDATE_OTHER_USERS,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.POST_PUBLISHED,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async publish(@Param('id') id: string): Promise<PostRdo> {
     const post = (
       await this.httpService.axiosRef.put<PostRdo>(
@@ -175,6 +238,19 @@ export class PostsController {
 
   @Post(POST_PATHS.REPOST)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: PostRdo,
+    description: SUCCESS_MESSAGES.POST_REPOSTED,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async repost(@Param('id') id: string): Promise<PostRdo> {
     const post = (
       await this.httpService.axiosRef.post<PostRdo>(
@@ -186,6 +262,23 @@ export class PostsController {
 
   @Delete(POST_PATHS.DELETE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: PostRdo,
+    description: SUCCESS_MESSAGES.POST_DELETED,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.POST_DELETE,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async delete(@Param('id') id: string): Promise<void> {
     const deletedPost = (
       await this.httpService.axiosRef.delete<PostRdo>(
@@ -208,6 +301,12 @@ export class PostsController {
     description: 'Default is 50',
   })
   @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    isArray: true,
+    type: CommentRdo,
+    description: SUCCESS_MESSAGES.COMMENTS,
+  })
   public async getComments(
     @Param('postId') postId: string,
     @Query() query?: IPaginationQuery
@@ -223,6 +322,19 @@ export class PostsController {
 
   @Post(FEEDBACK_PATHS.COMMENT_CREATE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: CommentRdo,
+    description: SUCCESS_MESSAGES.COMMENT_CREATED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async createComment(
     @Body() dto: CreateCommentDto
   ): Promise<CommentRdo> {
@@ -236,6 +348,22 @@ export class PostsController {
 
   @Delete(FEEDBACK_PATHS.COMMENT_DELETE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: SUCCESS_MESSAGES.COMMENT_DELETED,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.COMMENT_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.COMMENT_OTHER_USERS_DELETE,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async deleteComment(@Param('id') id: string): Promise<void> {
     return (
       await this.httpService.axiosRef.delete<void>(
@@ -246,6 +374,26 @@ export class PostsController {
 
   @Post(FEEDBACK_PATHS.LIKE_CREATE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: SUCCESS_MESSAGES.COMMENT_CREATED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.POST_NOT_PUBLISHED,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.POST_ALREADY_LIKED,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async likeComment(@Param('postId') postId: string): Promise<void> {
     return (
       await this.httpService.axiosRef.post<void>(
@@ -256,6 +404,22 @@ export class PostsController {
 
   @Delete(FEEDBACK_PATHS.LIKE_DELETE)
   @UseInterceptors(InjectAuthorizationHeaderInterceptor)
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: SUCCESS_MESSAGES.COMMENT_DELETED,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: ERROR_MESSAGES.POST_NOT_FOUND,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: ERROR_MESSAGES.POST_NOT_PUBLISHED,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: ERROR_MESSAGES.UNAUTHORIZED,
+  })
   public async unlikeComment(@Param('postId') postId: string): Promise<void> {
     return (
       await this.httpService.axiosRef.delete<void>(
