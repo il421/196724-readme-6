@@ -262,7 +262,8 @@ export class PostController {
   @Delete(POST_PATHS.DELETE)
   @UseGuards(JwtAuthGuard)
   @ApiResponse({
-    status: HttpStatus.NO_CONTENT,
+    status: HttpStatus.OK,
+    type: PostRdo,
     description: SUCCESS_MESSAGES.POST_DELETED,
   })
   @ApiResponse({
