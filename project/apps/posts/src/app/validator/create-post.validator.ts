@@ -1,5 +1,7 @@
 import * as Joi from 'joi';
 import {
+  ONE_WORD_ALLOWED_VALIDATION_MESSAGE,
+  ONE_WORD_REG_EX,
   PostAnnouncementConstraints,
   PostQuoteAuthorConstraints,
   PostQuoteTextConstraints,
@@ -18,7 +20,10 @@ export const CreatePostValidator = Joi.object({
     .max(PostTagConstraints.length)
     .unique()
     .items(
-      Joi.string().min(PostTagConstraints.Min).max(PostTagConstraints.Max)
+      Joi.string()
+        .min(PostTagConstraints.Min)
+        .max(PostTagConstraints.Max)
+        .regex(ONE_WORD_REG_EX, { name: ONE_WORD_ALLOWED_VALIDATION_MESSAGE })
     ),
   title: Joi.when('type', [
     {
