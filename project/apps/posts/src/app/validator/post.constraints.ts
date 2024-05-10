@@ -32,3 +32,6 @@ export enum PostTagConstraints {
 export enum PostRefDescriptionConstraints {
   Max = 300,
 }
+
+export const ONE_WORD_REG_EX = /^\S*$/;
+export const ONE_WORD_ALLOWED_VALIDATION_MESSAGE = 'One word allowed only';
