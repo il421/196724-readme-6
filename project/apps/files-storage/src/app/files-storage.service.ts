@@ -108,15 +108,13 @@ export class FilesStorageService {
       throw new NotFoundException(ERROR_MESSAGES.FILE_NOT_FOUND);
     }
 
-    if (fileEntity) {
-      try {
-        await unlink(fileEntity.uploadDirectoryPath);
-      } catch (e) {
-        throw new BadRequestException(e);
-      }
-
-      return void (await this.filesStorageRepository.deleteById(id));
+    try {
+      await unlink(fileEntity.uploadDirectoryPath);
+    } catch (e) {
+      throw new BadRequestException(e);
     }
+
+    return void (await this.filesStorageRepository.deleteById(id));
   }
 
   public async findById(id: string): Promise<FileEntity> {

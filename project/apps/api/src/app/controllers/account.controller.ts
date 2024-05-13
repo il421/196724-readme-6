@@ -73,13 +73,13 @@ export class AccountController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.USER_BAD_PASSWORD,
   })
-  public async create(@Body() createUserDto: CreateUserDto): Promise<UserRdo> {
-    return (
-      await this.httpService.axiosRef.post(
+  public create(@Body() createUserDto: CreateUserDto): Promise<UserRdo> {
+    return this.httpService.axiosRef
+      .post(
         `${this.serviceUrls.auth}/${AUTHENTICATION_PATHS.CREATE}`,
         createUserDto
       )
-    ).data;
+      .then(({ data }) => data);
   }
 
   @Post(AUTHENTICATION_PATHS.LOGIN)
@@ -96,13 +96,13 @@ export class AccountController {
     status: HttpStatus.NOT_FOUND,
     description: ERROR_MESSAGES.USER_NOT_FOUND,
   })
-  public async login(@Body() loginUserDto: LoginUserDto) {
-    return (
-      await this.httpService.axiosRef.post(
+  public login(@Body() loginUserDto: LoginUserDto) {
+    return this.httpService.axiosRef
+      .post(
         `${this.serviceUrls.auth}/${AUTHENTICATION_PATHS.LOGIN}`,
         loginUserDto
       )
-    ).data;
+      .then(({ data }) => data);
   }
 
   @Patch(AUTHENTICATION_PATHS.PASSWORD_UPDATE)
@@ -120,15 +120,13 @@ export class AccountController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async updatePassword(
-    @Body() updateUserPasswordDto: UpdateUserPasswordDto
-  ) {
-    return (
-      await this.httpService.axiosRef.patch(
+  public updatePassword(@Body() updateUserPasswordDto: UpdateUserPasswordDto) {
+    return this.httpService.axiosRef
+      .patch(
         `${this.serviceUrls.auth}/${AUTHENTICATION_PATHS.PASSWORD_UPDATE}`,
         updateUserPasswordDto
       )
-    ).data;
+      .then(({ data }) => data);
   }
 
   @Patch(USERS_PATHS.UPDATE_AVATAR)
@@ -145,13 +143,12 @@ export class AccountController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async updateAvatar(@Body() dto: UpdateUserAvatarDto) {
-    return (
-      await this.httpService.axiosRef.patch(
-        `${this.serviceUrls.users}/${USERS_PATHS.UPDATE_AVATAR}`,
-        { avatarId: dto.avatarId }
-      )
-    ).data;
+  public updateAvatar(@Body() dto: UpdateUserAvatarDto) {
+    return this.httpService.axiosRef
+      .patch(`${this.serviceUrls.users}/${USERS_PATHS.UPDATE_AVATAR}`, {
+        avatarId: dto.avatarId,
+      })
+      .then(({ data }) => data);
   }
 
   @Patch(AUTHENTICATION_PATHS.REFRESH)
@@ -162,13 +159,13 @@ export class AccountController {
     status: HttpStatus.OK,
     description: SUCCESS_MESSAGES.REFRESH_TOKEN,
   })
-  public async refresh(@Body() loginUserDto: LoginUserDto) {
-    return (
-      await this.httpService.axiosRef.post(
+  public refresh(@Body() loginUserDto: LoginUserDto) {
+    return this.httpService.axiosRef
+      .post(
         `${this.serviceUrls.auth}/${AUTHENTICATION_PATHS.REFRESH}`,
         loginUserDto
       )
-    ).data;
+      .then(({ data }) => data);
   }
 
   @Post(USERS_PATHS.RECEIVE_LATEST_POSTS)
@@ -185,12 +182,10 @@ export class AccountController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async receiveLatestPosts() {
-    return (
-      await this.httpService.axiosRef.post(
-        `${this.serviceUrls.users}/${USERS_PATHS.RECEIVE_LATEST_POSTS}`
-      )
-    ).data;
+  public receiveLatestPosts() {
+    return this.httpService.axiosRef
+      .post(`${this.serviceUrls.users}/${USERS_PATHS.RECEIVE_LATEST_POSTS}`)
+      .then(({ data }) => data);
   }
 
   @Get(SUBSCRIPTIONS_PATHS.BASE)
@@ -215,18 +210,19 @@ export class AccountController {
         this.serviceUrls.subscriptions
       )
     ).data;
+
     if (!subscriptions.length) {
       return [];
     }
+
     const authorsIds = subscriptions.map(
       (subscription) => subscription.authorId
     );
+
     const query = queryString.stringify({ usersIds: authorsIds });
-    return (
-      await this.httpService.axiosRef.get<PostRdo[]>(
-        `${this.serviceUrls.posts}/${POST_PATHS.USERS}?${query}`
-      )
-    ).data;
+    return this.httpService.axiosRef
+      .get<PostRdo[]>(`${this.serviceUrls.posts}/${POST_PATHS.USERS}?${query}`)
+      .then(({ data }) => data);
   }
 
   @Post(SUBSCRIPTIONS_PATHS.CREATE_API)
@@ -248,15 +244,15 @@ export class AccountController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async createSubscription(
+  public createSubscription(
     @Body() subscriptionDto: CreateSubscriptionDto
   ): Promise<SubscriptionRdo> {
-    return (
-      await this.httpService.axiosRef.post(
+    return this.httpService.axiosRef
+      .post(
         `${this.serviceUrls.subscriptions}/${SUBSCRIPTIONS_PATHS.CREATE}`,
         subscriptionDto
       )
-    ).data;
+      .then(({ data }) => data);
   }
 
   @Delete(SUBSCRIPTIONS_PATHS.DELETE_API)
@@ -277,12 +273,12 @@ export class AccountController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async deleteSubscription(@Param('authorId') authorId: string) {
-    return (
-      await this.httpService.axiosRef.delete(
+  public deleteSubscription(@Param('authorId') authorId: string) {
+    return this.httpService.axiosRef
+      .delete(
         `${this.serviceUrls.subscriptions}/${SUBSCRIPTIONS_PATHS.DELETE}/${authorId}`
       )
-    ).data;
+      .then(({ data }) => data);
   }
   @Get(USERS_PATHS.DETAILS)
   @ApiResponse({
@@ -307,6 +303,7 @@ export class AccountController {
       const avatarUrl = await this.httpService.axiosRef.get<FileRdo>(
         `${this.serviceUrls.filesStorage}/${avatarId}`
       );
+
       return {
         ...restUserDto,
         posts: totalPosts.data,
