@@ -20,6 +20,6 @@ export class UsersService {
       ...userEntity.toPlainData(),
       ...update,
     });
-    return this.userRepository.update(newUserEntity);
+    return await this.userRepository.update(newUserEntity);
   }
 }

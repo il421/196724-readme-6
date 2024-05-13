@@ -40,7 +40,7 @@ import { FilesStorageService } from './files-storage.service';
 import {
   FIELD_NAME,
   FileRdo,
-  FILE_SWAGGER_SCHEMA,
+  FileSwaggerSchema,
   MIME_TYPE,
 } from '@project/files-storage-lib';
 import { UploadFileValidator } from './validator';
@@ -73,7 +73,7 @@ export class FilesStorageController {
     enum: FilesTypes,
   })
   @ApiBody({
-    schema: FILE_SWAGGER_SCHEMA,
+    schema: FileSwaggerSchema,
   })
   public async upload(
     @UploadedFile(

@@ -19,11 +19,13 @@ export class FeedbackService {
     const post = await this.feedbackRepository.client.post.findUnique({
       where: { id: dto.postId },
     });
-    if (!post) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
-
-    const commentEntity = new CommentEntity({ ...dto, createdBy: userId });
-    await this.feedbackRepository.saveComment(commentEntity);
-    return commentEntity;
+    if (!post) {
+      throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
+    } else {
+      const commentEntity = new CommentEntity({ ...dto, createdBy: userId });
+      await this.feedbackRepository.saveComment(commentEntity);
+      return commentEntity;
+    }
   }
 
   public async getCommentsByPostId(
@@ -38,8 +40,11 @@ export class FeedbackService {
     const comment = await this.feedbackRepository.findCommentById(id);
     if (!comment) {
       throw new NotFoundException(ERROR_MESSAGES.COMMENT_NOT_FOUND);
-    } else if (comment.createdBy !== userId) {
-      throw new BadRequestException(ERROR_MESSAGES.COMMENT_OTHER_USERS_DELETE);
+    } else {
+      if (comment.createdBy !== userId)
+        throw new BadRequestException(
+          ERROR_MESSAGES.COMMENT_OTHER_USERS_DELETE
+        );
     }
     return void (await this.feedbackRepository.deleteCommentById(id));
   }
@@ -59,8 +64,9 @@ export class FeedbackService {
 
     if (like) throw new BadRequestException(ERROR_MESSAGES.POST_ALREADY_LIKED);
 
-    const likeEntity = new LikeEntity({ postId, createdBy: userId });
-    return this.feedbackRepository.saveLike(likeEntity);
+    return await this.feedbackRepository.saveLike(
+      new LikeEntity({ postId, createdBy: userId })
+    );
   }
 
   public async unlike(userId: string, postId: string): Promise<void> {

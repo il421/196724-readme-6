@@ -36,7 +36,7 @@ import { InjectAuthorizationHeaderInterceptor } from '@project/interceptors-lib'
 import {
   FIELD_NAME,
   FileRdo,
-  FILE_SWAGGER_SCHEMA,
+  FileSwaggerSchema,
   MIME_TYPE,
 } from '@project/files-storage-lib';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -78,21 +78,21 @@ export class FilesStorageController {
     enum: FilesTypes,
   })
   @ApiBody({
-    schema: FILE_SWAGGER_SCHEMA,
+    schema: FileSwaggerSchema,
   })
-  public upload(
+  public async upload(
     @UploadedFile() file: Express.Multer.File,
     @Query('type') type: FilesTypes
   ) {
     const formData = new FormData();
     formData.append(FIELD_NAME, Buffer.from(file.buffer), file.originalname);
 
-    return this.httpService.axiosRef
-      .post(
+    return (
+      await this.httpService.axiosRef.post(
         `${this.serviceUrls.filesStorage}/${FILES_STORAGE_PATHS.UPLOAD}?type=${type}`,
         formData
       )
-      .then(({ data }) => data);
+    ).data;
   }
 
   @Delete(FILES_STORAGE_PATHS.DELETE)
@@ -109,9 +109,11 @@ export class FilesStorageController {
     status: HttpStatus.BAD_REQUEST,
     description: ERROR_MESSAGES.BAD_MONGO_ID_ERROR,
   })
-  public delete(@Param('id', MongoIdValidationPipe) id: string) {
-    return this.httpService.axiosRef
-      .delete(`${this.serviceUrls.filesStorage}/${id}/delete`)
-      .then(({ data }) => data);
+  public async delete(@Param('id', MongoIdValidationPipe) id: string) {
+    return (
+      await this.httpService.axiosRef.delete(
+        `${this.serviceUrls.filesStorage}/${id}/delete`
+      )
+    ).data;
   }
 }

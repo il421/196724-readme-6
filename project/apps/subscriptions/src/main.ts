@@ -14,11 +14,10 @@ async function bootstrap() {
   app.setGlobalPrefix(GLOBAL_PREFIX);
   const configService = app.get(ConfigService);
   const port = configService.get('application.port');
-  const host = configService.get('application.host');
   buildSwagger(app, SWAGGER_TAGS.SUBSCRIPTIONS);
   await app.listen(port);
   Logger.log(
-    `🚀 Application is running on: http://${host}:${port}/${GLOBAL_PREFIX}`
+    `🚀 Application is running on: http://localhost:${port}/${GLOBAL_PREFIX}`
   );
 }
 

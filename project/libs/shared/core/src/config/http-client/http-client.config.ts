@@ -38,32 +38,32 @@ const getConfig = (): IHttpClientConfig => {
     timeout: parseInt(process.env['HTTP_CLIENT_TIMEOUT'], PARSE_INT_RADIX),
     serviceUrls: {
       auth: getServiceUrl(
-        process.env['AUTH_HOST'],
+        process.env['HOST'],
         process.env['AUTH_PORT'],
         AUTHENTICATION_PATHS.BASE
       ),
       users: getServiceUrl(
-        process.env['USERS_HOST'],
+        process.env['HOST'],
         process.env['USERS_PORT'],
         USERS_PATHS.BASE
       ),
       posts: getServiceUrl(
-        process.env['POSTS_HOST'],
+        process.env['HOST'],
         process.env['POSTS_PORT'],
         POST_PATHS.BASE
       ),
       subscriptions: getServiceUrl(
-        process.env['SUBSCRIPTIONS_HOST'],
+        process.env['HOST'],
         process.env['SUBSCRIPTIONS_PORT'],
         SUBSCRIPTIONS_PATHS.BASE
       ),
       feedback: getServiceUrl(
-        process.env['FEEDBACK_HOST'],
+        process.env['HOST'],
         process.env['FEEDBACK_PORT'],
         FEEDBACK_PATHS.BASE
       ),
       filesStorage: getServiceUrl(
-        process.env['FILES_STORAGE_HOST'],
+        process.env['HOST'],
         process.env['FILES_STORAGE_PORT'],
         FILES_STORAGE_PATHS.BASE
       ),

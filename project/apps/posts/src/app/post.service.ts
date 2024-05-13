@@ -51,17 +51,18 @@ export class PostService {
     });
   }
 
-  public async repost(postId: string, repostBy: string): Promise<PostEntity> {
-    const post = await this.postRepository.findById(postId);
-    if (!post) throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
-
-    const { id, tags, ...rest } = post.toPlainData();
-    return this.postRepository.create({
-      ...rest,
-      isRepost: true,
-      publishedAt: new Date(),
-      publishedBy: repostBy,
-    });
+  public async repost(id: string, repostBy: string): Promise<PostEntity> {
+    const post = await this.postRepository.findById(id);
+    if (post) {
+      const { id, tags, ...rest } = post.toPlainData();
+      return await this.postRepository.create({
+        ...rest,
+        isRepost: true,
+        publishedAt: new Date(),
+        publishedBy: repostBy,
+      });
+    }
+    throw new NotFoundException(ERROR_MESSAGES.POST_NOT_FOUND);
   }
 
   public search(args: SearchPostsQuery): Promise<PaginationResult<PostEntity>> {
