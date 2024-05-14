@@ -5,7 +5,6 @@ import {
   Get,
   HttpStatus,
   Param,
-  ParseArrayPipe,
   Post,
   Put,
   Query,
@@ -98,22 +97,6 @@ export class PostController {
         fillDto(PostRdo, post?.toPlainData())
       ),
     };
-  }
-
-  @Get(POST_PATHS.USERS)
-  @ApiResponse({
-    status: HttpStatus.OK,
-    isArray: true,
-    type: PostRdo,
-    description: SUCCESS_MESSAGES.POSTS,
-  })
-  @ApiQuery({ name: 'usersIds', required: false, type: Array<String> })
-  public async getUsersPosts(
-    @Query('usersIds', ParseArrayPipe)
-    usersIds?: string[]
-  ) {
-    const posts = await this.postService.findUsersPosts(usersIds);
-    return posts.map((post) => fillDto(PostRdo, post?.toPlainData()));
   }
 
   @Get(POST_PATHS.DRAFTS)

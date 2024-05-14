@@ -4,9 +4,9 @@ import {
   ParseArrayPipe,
   PipeTransform,
 } from '@nestjs/common';
-import { SearchPostsQuery } from '../serach-post.query';
 import { MongoIdValidationPipe, ParseStringPipe } from '@project/data-access';
 import { PARSE_QUERY_ARRAY_PIPE_OPTIONS } from '../post.constants';
+import { SearchPostsQuery } from '../queries';
 
 @Injectable()
 export class PostSearchQueryTransformPipe implements PipeTransform {

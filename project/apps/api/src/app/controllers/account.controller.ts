@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
@@ -28,10 +29,18 @@ import {
   SUBSCRIPTIONS_PATHS,
   USERS_PATHS,
 } from '@project/data-access';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   ERROR_MESSAGES,
+  IPaginationQuery,
   ServicesUrls,
+  SortDirection,
   SUCCESS_MESSAGES,
   SWAGGER_TAGS,
 } from '@project/core';
@@ -43,7 +52,7 @@ import {
   SubscriptionRdo,
 } from '@project/subscriptions-lib';
 import queryString from 'node:querystring';
-import { PostRdo } from '@project/posts-lib';
+import { PostRdo, SearchSubscriptionPostQuery } from '@project/posts-lib';
 
 @Controller(ApiControllers.Account)
 @UseFilters(AxiosExceptionFilter)
@@ -204,7 +213,22 @@ export class AccountController {
     status: HttpStatus.UNAUTHORIZED,
     description: ERROR_MESSAGES.UNAUTHORIZED,
   })
-  public async subscriptions(): Promise<PostRdo[]> {
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Default is 25',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    type: String,
+    enum: SortDirection,
+  })
+  public async subscriptions(
+    @Query() pagingQuery: SearchSubscriptionPostQuery
+  ): Promise<PostRdo[]> {
     const subscriptions = (
       await this.httpService.axiosRef.get<SubscriptionRdo[]>(
         this.serviceUrls.subscriptions
@@ -219,9 +243,12 @@ export class AccountController {
       (subscription) => subscription.authorId
     );
 
-    const query = queryString.stringify({ usersIds: authorsIds });
+    const query = queryString.stringify({
+      ...pagingQuery,
+      usersIds: authorsIds,
+    });
     return this.httpService.axiosRef
-      .get<PostRdo[]>(`${this.serviceUrls.posts}/${POST_PATHS.USERS}?${query}`)
+      .get<PostRdo[]>(`${this.serviceUrls.posts}/${POST_PATHS.SEARCH}?${query}`)
       .then(({ data }) => data);
   }
 

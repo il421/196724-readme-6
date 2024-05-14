@@ -13,7 +13,16 @@ export class SubscriptionsService {
   constructor(private subscriptionsRepository: SubscriptionsRepository) {}
 
   public async find(userId: string): Promise<SubscriptionsEntity[]> {
-    return this.subscriptionsRepository.findByUserId(userId);
+    const userDefaultSubscription = new SubscriptionsEntity({
+      authorId: userId,
+      createdBy: userId,
+    });
+
+    const subscriptions = await this.subscriptionsRepository.findByUserId(
+      userId
+    );
+
+    return [userDefaultSubscription, ...subscriptions];
   }
 
   public async create(
